@@ -1,7 +1,7 @@
 import { prisma, type Prisma } from "@markazai/db";
 import { STUDENT_STATUSES, type DaysPattern } from "@markazai/types";
 import { dateParam, intParam, param, sortParam, type RawSearchParams } from "@/lib/search-params";
-import { isTeacherOnly } from "@/lib/permissions";
+import { canAccess, isTeacherOnly } from "@/lib/permissions";
 import type { SessionUser } from "@/lib/session";
 
 export const PAGE_SIZE = 20;
@@ -14,7 +14,8 @@ export type StudentRow = {
   name: string;
   phone: string;
   photoUrl: string | null;
-  balance: number;
+  /** null — foydalanuvchida moliya ruxsati yo'q (o'qituvchi): qiymat client'ga yuborilmaydi. */
+  balance: number | null;
   status: string;
   freezeReason: string | null;
   note: string | null;
@@ -39,7 +40,8 @@ export async function listStudents(user: SessionUser, sp: RawSearchParams) {
   const from = dateParam(sp, "from");
   const to = dateParam(sp, "to");
   const page = intParam(sp, "page", 1);
-  const sort = sortParam(sp, SORT_KEYS, { key: "createdAt", dir: "desc" });
+  const canFinance = canAccess(user.roles, "finance");
+  const sort = sortParam(sp, canFinance ? SORT_KEYS : (["name", "phone", "createdAt"] as const), { key: "createdAt", dir: "desc" });
 
   const and: Prisma.StudentWhereInput[] = [];
 
@@ -58,11 +60,12 @@ export async function listStudents(user: SessionUser, sp: RawSearchParams) {
     and.push(status === "JOINED_THIS_MONTH" ? { createdAt: { gte: startOfMonthUTC() } } : { status: status as Prisma.StudentWhereInput["status"] });
   }
 
-  if (finance === "debt") and.push({ balance: { lt: 0 } });
-  if (finance === "nodebt") and.push({ balance: { gte: 0 } });
-  if (finance === "positive") and.push({ balance: { gt: 0 } });
-  if (finance === "discount") and.push({ discounts: { some: {} } });
-  if (finance === "paidThisMonth") and.push({ payments: { some: { type: "MANUAL", amount: { gt: 0 }, date: { gte: startOfMonthUTC() } } } });
+  // Moliyaviy filtrlar faqat moliya ruxsati borlar uchun (aks holda filtr orqali balansni bilib olish mumkin).
+  if (canFinance && finance === "debt") and.push({ balance: { lt: 0 } });
+  if (canFinance && finance === "nodebt") and.push({ balance: { gte: 0 } });
+  if (canFinance && finance === "positive") and.push({ balance: { gt: 0 } });
+  if (canFinance && finance === "discount") and.push({ discounts: { some: {} } });
+  if (canFinance && finance === "paidThisMonth") and.push({ payments: { some: { type: "MANUAL", amount: { gt: 0 }, date: { gte: startOfMonthUTC() } } } });
 
   if (courseId) and.push({ enrollments: { some: { leftAt: null, group: { courseId } } } });
   if (tagId) and.push({ tags: { some: { tagId } } });
@@ -98,7 +101,8 @@ export async function listStudents(user: SessionUser, sp: RawSearchParams) {
       include: {
         tags: { include: { tag: true } },
         enrollments: {
-          where: { leftAt: null },
+          // O'qituvchi talabaning faqat o'z guruhlarini ko'radi.
+          where: { leftAt: null, ...(isTeacherOnly(user.roles) && { group: { teacherId: user.teacherId ?? "none" } }) },
           include: { group: { include: { teacher: { select: { name: true } } } } },
           orderBy: { joinedAt: "asc" },
         },
@@ -111,7 +115,7 @@ export async function listStudents(user: SessionUser, sp: RawSearchParams) {
     name: s.name,
     phone: s.phone,
     photoUrl: s.photoUrl,
-    balance: s.balance,
+    balance: canFinance ? s.balance : null,
     status: s.status,
     freezeReason: s.freezeReason,
     note: s.note,
@@ -136,7 +140,8 @@ export async function loadStudentLookups(user: SessionUser) {
     prisma.course.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.tag.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true, color: true } }),
     prisma.group.findMany({
-      where: { organizationId: user.orgId, status: "ACTIVE" },
+      // O'qituvchi roli faqat o'z guruhlarini ko'radi (boshqalarining nomi ham client'ga yuborilmasin).
+      where: { organizationId: user.orgId, status: "ACTIVE", ...(isTeacherOnly(user.roles) && { teacherId: user.teacherId ?? "none" }) },
       orderBy: { name: "asc" },
       select: {
         id: true,

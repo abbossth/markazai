@@ -41,7 +41,8 @@ export default async function GroupsPage({ searchParams }: PageProps<"/groups">)
         page={page}
         pageSize={PAGE_SIZE}
         sort={sort}
-        lookups={lookups}
+        // Tahrirlash imkoni yo'q foydalanuvchiga o'qituvchilar/xonalar ro'yxati client'ga yuborilmaydi.
+        lookups={canWrite ? lookups : { ...lookups, teachers: [], rooms: [] }}
         canWrite={canWrite}
         canDelete={can(user.roles, "groups:delete")}
       />

@@ -61,10 +61,12 @@ export function GroupStudentsPanel({ groupId, students, canWrite }: { groupId: s
             <li key={s.id} className="flex items-center gap-2 px-3 py-2 text-sm">
               <div className="flex min-w-0 flex-1 flex-col">
                 <StudentQuickCard student={s} />
-                <span className="flex items-center gap-1.5 text-xs">
-                  <Money value={s.balance} />
-                  {s.balance < 0 && <Badge variant="destructive">{ts("debtor")}</Badge>}
-                </span>
+                {s.balance !== null && (
+                  <span className="flex items-center gap-1.5 text-xs">
+                    <Money value={s.balance} />
+                    {s.balance < 0 && <Badge variant="destructive">{ts("debtor")}</Badge>}
+                  </span>
+                )}
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" disabled={pending} aria-label={tc("actions")} />}>

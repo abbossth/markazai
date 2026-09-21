@@ -655,7 +655,27 @@
       "debt": "Qarz",
       "lastPayment": "Oxirgi to'lov",
       "never": "Hali to'lamagan",
-      "pay": "To'lov"
+      "pay": "To'lov",
+      "linkedToSalary": "Bu xarajat ish haqi to'lovidan yaratilgan — uni \"Ish haqi\" bo'limidan o'chiring"
+    },
+    "salary": {
+      "teacher": "O'qituvchi",
+      "calculated": "Hisoblangan",
+      "paid": "To'langan",
+      "remaining": "Qoldiq",
+      "pay": "To'lash",
+      "total": "Jami",
+      "empty": "Faol o'qituvchilar yo'q",
+      "payments": "Shu oydagi to'lovlar",
+      "deletePayment": "Ish haqi to'lovi o'chirilsinmi?",
+      "deletePaymentHint": "To'lov va unga mos xarajat yozuvi o'chiriladi.",
+      "payTitle": "{name}: ish haqi to'lash",
+      "payHint": "To'lanmagan qoldiq: {remaining}. To'lov \"Ish haqi\" xarajati sifatida yoziladi.",
+      "amount": "Summa (so'm)",
+      "date": "Sana",
+      "note": "Izoh",
+      "paidToast": "Ish haqi to'landi",
+      "hint": "Hisob-kitob: foiz — guruhlarga shu oyda kelgan to'lovlardan; belgilangan oylik — ustoz davomati bo'yicha. To'lov xarajatlarga yoziladi."
     }
   },
   "teacher": {

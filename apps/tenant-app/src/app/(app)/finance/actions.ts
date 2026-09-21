@@ -6,11 +6,13 @@ import {
   expenseSchema,
   fromISODate,
   paymentSchema,
+  salaryPaymentSchema,
   toCenterParts,
   withdrawalSchema,
   type ActionResult,
   type ExpenseInput,
   type PaymentInput,
+  type SalaryPaymentInput,
   type WithdrawalInput,
 } from "@markazai/types";
 import { logHistory } from "@/lib/history";
@@ -141,6 +143,7 @@ export async function saveExpense(id: string | null, input: ExpenseInput): Promi
 
   const data = { category: d.category, amount: d.amount, date: fromISODate(d.date), description: d.description ?? null };
   if (id) {
+    if (await prisma.salaryPayment.findFirst({ where: { expenseId: id }, select: { id: true } })) return { ok: false, error: "linkedToSalary" };
     const res = await prisma.expense.updateMany({ where: { id, organizationId: user.orgId }, data });
     if (res.count === 0) return { ok: false, error: "notFound" };
   } else {
@@ -153,6 +156,8 @@ export async function saveExpense(id: string | null, input: ExpenseInput): Promi
 export async function deleteExpense(id: string): Promise<Result> {
   const user = await guard("expenses:write");
   if (!user) return { ok: false, error: "forbidden" };
+  // Ish haqi to'lovidan yaratilgan xarajatni faqat "Ish haqi" bo'limidan o'chirish mumkin.
+  if (await prisma.salaryPayment.findFirst({ where: { expenseId: id }, select: { id: true } })) return { ok: false, error: "linkedToSalary" };
   const res = await prisma.expense.deleteMany({ where: { id, organizationId: user.orgId } });
   revalidatePath("/finance");
   return res.count ? { ok: true } : { ok: false, error: "notFound" };
@@ -179,4 +184,48 @@ export async function deleteWithdrawal(id: string): Promise<Result> {
   const res = await prisma.withdrawal.deleteMany({ where: { id, organizationId: user.orgId } });
   revalidatePath("/finance");
   return res.count ? { ok: true } : { ok: false, error: "notFound" };
+}
+
+// ───────────── Ish haqi to'lovi ─────────────
+
+const SALARY_EXPENSE_CATEGORY = "Ish haqi";
+
+/** Ish haqi to'laydi: SalaryPayment va unga mos Expense ("Ish haqi") bitta tranzaksiyada yaratiladi — foyda hisobida ko'rinadi. */
+export async function paySalary(input: SalaryPaymentInput): Promise<Result> {
+  const user = await guard("salary:pay");
+  if (!user) return { ok: false, error: "forbidden" };
+  const parsed = salaryPaymentSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "validation", fieldErrors: issues(parsed.error.issues) };
+  const d = parsed.data;
+  if (isFuture(d.date)) return { ok: false, error: "validation", fieldErrors: { date: "futureDate" } };
+
+  const teacher = await prisma.teacher.findFirst({ where: { id: d.teacherId, organizationId: user.orgId }, select: { name: true } });
+  if (!teacher) return { ok: false, error: "notFound" };
+
+  await prisma.$transaction(async (tx) => {
+    const expense = await tx.expense.create({
+      data: { organizationId: user.orgId, category: SALARY_EXPENSE_CATEGORY, amount: d.amount, date: fromISODate(d.date), description: `${teacher.name} · ${d.period}${d.note ? ` · ${d.note}` : ""}`, createdById: user.id },
+    });
+    await tx.salaryPayment.create({
+      data: { organizationId: user.orgId, teacherId: d.teacherId, period: d.period, amount: d.amount, date: fromISODate(d.date), note: d.note, expenseId: expense.id, createdById: user.id },
+    });
+  });
+  revalidatePath("/finance");
+  revalidatePath(`/teachers/${d.teacherId}`);
+  return { ok: true };
+}
+
+export async function deleteSalaryPayment(id: string): Promise<Result> {
+  const user = await guard("salary:pay");
+  if (!user) return { ok: false, error: "forbidden" };
+  const payment = await prisma.salaryPayment.findFirst({ where: { id, organizationId: user.orgId } });
+  if (!payment) return { ok: false, error: "notFound" };
+
+  await prisma.$transaction([
+    prisma.salaryPayment.delete({ where: { id } }),
+    ...(payment.expenseId ? [prisma.expense.deleteMany({ where: { id: payment.expenseId, organizationId: user.orgId } })] : []),
+  ]);
+  revalidatePath("/finance");
+  revalidatePath(`/teachers/${payment.teacherId}`);
+  return { ok: true };
 }

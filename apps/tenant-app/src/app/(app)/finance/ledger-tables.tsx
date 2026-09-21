@@ -32,6 +32,7 @@ function useErrText() {
 /** O'chirish tugmasi + tasdiqlash dialogi (jadval qatorlari uchun umumiy). */
 function RowDelete({ title, onDelete }: { title: string; onDelete: () => Promise<{ ok: boolean; error?: string }> }) {
   const tc = useTranslations("common");
+  const tl = useTranslations("finance.ledger");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -56,7 +57,7 @@ function RowDelete({ title, onDelete }: { title: string; onDelete: () => Promise
             if (res.ok) {
               toast.success(tc("deleted"));
               router.refresh();
-            } else toast.error(res.error === "forbidden" ? tc("forbidden") : tc("error"));
+            } else toast.error(res.error === "forbidden" ? tc("forbidden") : res.error === "linkedToSalary" ? tl("linkedToSalary") : tc("error"));
           })
         }
       />
@@ -144,7 +145,7 @@ function ExpenseDialog({ open, onOpenChange, expense, categories, today }: { ope
         router.refresh();
       } else if (res.fieldErrors) {
         for (const [name, message] of Object.entries(res.fieldErrors)) setError(name as keyof ExpenseInput, { message });
-      } else toast.error(res.error === "forbidden" ? tc("forbidden") : tc("error"));
+      } else toast.error(res.error === "forbidden" ? tc("forbidden") : res.error === "linkedToSalary" ? t("linkedToSalary") : tc("error"));
     });
 
   return (

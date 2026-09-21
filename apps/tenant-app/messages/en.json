@@ -655,7 +655,27 @@
       "debt": "Debt",
       "lastPayment": "Last payment",
       "never": "Has not paid yet",
-      "pay": "Pay"
+      "pay": "Pay",
+      "linkedToSalary": "This expense was created by a salary payment — delete it from the Salaries section"
+    },
+    "salary": {
+      "teacher": "Teacher",
+      "calculated": "Calculated",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "pay": "Pay",
+      "total": "Total",
+      "empty": "No active teachers",
+      "payments": "Payments this month",
+      "deletePayment": "Delete this salary payment?",
+      "deletePaymentHint": "The payment and its matching expense record will be deleted.",
+      "payTitle": "{name}: pay salary",
+      "payHint": "Unpaid remainder: {remaining}. The payment is recorded as a \"Salary\" expense.",
+      "amount": "Amount (UZS)",
+      "date": "Date",
+      "note": "Note",
+      "paidToast": "Salary paid",
+      "hint": "Calculation: percent — of payments received by the teacher's groups this month; fixed salary — by teacher attendance. Payments are recorded as expenses."
     }
   },
   "teacher": {

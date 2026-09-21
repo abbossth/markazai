@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate, formatPhone, initials } from "@/lib/format";
-import { can } from "@/lib/permissions";
+import { can, canAccess, isTeacherOnly } from "@/lib/permissions";
 import { param } from "@/lib/search-params";
 import { requireModule } from "@/lib/session";
 import { cn } from "@/lib/utils";
@@ -66,7 +66,10 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
 
   const canWrite = can(user.roles, "students:write");
   const today = toISODate(new Date());
-  const activeEnrollments = student.enrollments.filter((e) => !e.leftAt);
+  // Moliya ruxsati yo'q foydalanuvchi (o'qituvchi) balans/to'lovlarni ko'rmaydi va talabaning faqat o'z guruhlarini ko'radi.
+  const canFinance = canAccess(user.roles, "finance");
+  const enrollments = isTeacherOnly(user.roles) ? student.enrollments.filter((e) => e.group.teacherId === user.teacherId) : student.enrollments;
+  const activeEnrollments = enrollments.filter((e) => !e.leftAt);
   const rating = grades._avg.score;
 
   // Oxirgi 3 oy (joriy oy bilan) — oylik balans kartochkalari uchun.
@@ -77,7 +80,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
   const summary = summarizeByGroupMonth(payments.map((p) => ({ amount: p.amount, type: p.type, date: p.date, groupId: p.groupId })));
   const monthLabel = (m: string) => `${tm(String(Number(m.slice(5, 7))) as "1")} ${m.slice(0, 4)}`;
 
-  const attendanceGroups = student.enrollments.map((e) => ({
+  const attendanceGroups = enrollments.map((e) => ({
     id: e.group.id,
     name: e.group.name,
     days: e.group.days,
@@ -111,7 +114,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-semibold">{student.name}</h1>
             <StudentStatusBadge status={student.status} />
-            {student.balance < 0 && <Badge variant="destructive">{t("debtor")}</Badge>}
+            {canFinance && student.balance < 0 && <Badge variant="destructive">{t("debtor")}</Badge>}
           </div>
           <p className="text-muted-foreground text-sm">
             ID: {student.externalId ?? student.id.slice(0, 8)} · {formatPhone(student.phone)}
@@ -133,10 +136,12 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
           )}
         </div>
         <div className="flex gap-6 text-right">
-          <div>
-            <div className="text-muted-foreground text-xs">{t("balance")}</div>
-            <Money value={student.balance} className="text-2xl" />
-          </div>
+          {canFinance && (
+            <div>
+              <div className="text-muted-foreground text-xs">{t("balance")}</div>
+              <Money value={student.balance} className="text-2xl" />
+            </div>
+          )}
           <div>
             <div className="text-muted-foreground text-xs">{t("rating")}</div>
             <div className="text-2xl font-medium tabular-nums">{rating === null ? "—" : rating.toFixed(1)}</div>
@@ -184,11 +189,11 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
         </TabsList>
 
         <TabsContent value="groups" className="flex flex-col gap-6 pt-4">
-          {student.enrollments.length === 0 ? (
+          {enrollments.length === 0 ? (
             <EmptyState title={t("noGroups")} />
           ) : (
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {student.enrollments.map((e) => (
+              {enrollments.map((e) => (
                 <div key={e.id} className={cn("bg-card rounded-lg border p-4", e.leftAt && "opacity-70")}>
                   <div className="flex items-start justify-between gap-2">
                     <Link href={`/groups/${e.group.id}`} className="font-semibold hover:underline">
@@ -202,6 +207,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
                   <p className="text-muted-foreground mb-3 text-xs">
                     {e.group.startTime} · {formatDate(e.joinedAt)}
                   </p>
+                  {canFinance && (
                   <div className="flex flex-wrap gap-1.5">
                     {months.map((m) => {
                       const row = summary.find((r) => r.groupId === e.group.id && r.month === m);
@@ -213,11 +219,13 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
                       );
                     })}
                   </div>
+                  )}
                 </div>
               ))}
             </div>
           )}
 
+          {canFinance && (
           <section className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-medium">{tp("title")}</h2>
@@ -258,6 +266,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
               </div>
             )}
           </section>
+          )}
         </TabsContent>
 
         <TabsContent value="comments" className="pt-4">
@@ -294,7 +303,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
 
         <TabsContent value="history" className="pt-4">
           <HistoryList
-            items={history.map((h) => ({
+            items={history.filter((h) => canFinance || !h.action.startsWith("payment_")).map((h) => ({
               id: h.id,
               action: h.action,
               actorName: h.actorName,

@@ -44,7 +44,8 @@ Bazani noldan qayta yaratish: `npm run reset -w @markazai/db` (**barcha ma'lumot
 - [x] 2. Talabalar va Guruhlar (ro'yxat/filtr/CRUD, talaba profili, guruh profili, davomat va baholash)
 - [x] 3. Lidlar (Kanban, drag-and-drop, lid → talaba, qo'ng'iroq/SMS jurnali, eslatmalar)
 - [x] 4. Moliya (tizim yechimi dars-dars, to'lovlar, xarajatlar, yechib olish, qarzdorlar, chek, Excel/PDF)
-- [ ] 5–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
+- [x] 5. O'qituvchilar va davomat (profil, ish jadvali, ustoz davomati, ikki xil maosh modeli, Moliya'da ish haqi)
+- [ ] 6–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
 
 ## Testlar
 
@@ -58,8 +59,14 @@ cd packages/db && npx vitest run      # hisob-kitob integratsion testlari (haqiq
 - Tizim yechimi **dars-dars**: davomat belgilanganda avtomatik yoziladi. "Keldi" va "sababsiz kelmadi" yechiladi; "sababli" va belgilanmagan darslar yechilmaydi.
 - Dars ulushi = oylik narx (chegirmadan keyin) / oydagi dars soni, kumulyativ yaxlitlash bilan (oy yig'indisi aniq narxga teng).
 - `Student.balance` = to'lovlar yig'indisi (SYSTEM manfiy, MANUAL musbat). Buzilgan bo'lsa: `npm run billing:rebuild -w @markazai/db`.
+- Ish haqi: **foiz** modelida — o'qituvchi guruhlariga shu oyda kelgan qo'lda kiritilgan to'lovlardan foiz (guruh-guruh yaxlitlanadi); **belgilangan** modelida — oylik × (keldi kunlari / oydagi ish kunlari) + qo'shimcha kunlar (kunlik stavka bo'yicha). To'langan ish haqi "Ish haqi" xarajati sifatida yoziladi.
 - Foyda = tushum − xarajat; kassadan yechib olish foydaga ta'sir qilmaydi, faqat kassa qoldig'iga.
 
 ## SMS
 
 `src/lib/sms.ts` — `SmsProvider` interfeysi. Eskiz.uz ulanmaguncha mock provayder ishlaydi: xabar `sms_logs` jadvaliga `MOCK` holatida yoziladi, jo'natilmaydi.
+
+## Rollar va ma'lumot ko'rinishi
+
+- Maosh (`salary:read`) — faqat CEO va filial direktori. Administratorlar o'qituvchilarni boshqaradi, lekin maoshni ko'rmaydi.
+- Moliya moduli ruxsati bo'lmagan rollar (masalan, O'qituvchi) talaba balansi, qarzi va to'lovlarini ko'rmaydi; ma'lumot serverda maskalanadi va brauzerga yuborilmaydi.

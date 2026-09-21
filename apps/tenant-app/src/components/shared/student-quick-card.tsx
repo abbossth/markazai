@@ -14,7 +14,8 @@ export type QuickCardStudent = {
   name: string;
   phone: string;
   status: string;
-  balance: number;
+  /** null — moliyaviy ma'lumot yashirin (ruxsat yo'q). */
+  balance: number | null;
   freezeReason?: string | null;
   createdAt: string;
 };
@@ -39,7 +40,7 @@ export function StudentQuickCard({ student }: { student: QuickCardStudent }) {
           <span className="font-semibold">{student.name}</span>
           <StudentStatusBadge status={student.status} />
         </div>
-        {student.balance < 0 && <Badge variant="destructive">{t("debtor")}</Badge>}
+        {student.balance !== null && student.balance < 0 && <Badge variant="destructive">{t("debtor")}</Badge>}
         {student.status === "FROZEN" && student.freezeReason && (
           <p className="text-muted-foreground text-xs">
             {t("freezeReason")}: {student.freezeReason}
@@ -48,10 +49,14 @@ export function StudentQuickCard({ student }: { student: QuickCardStudent }) {
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
           <dt className="text-muted-foreground">{t("phone")}</dt>
           <dd>{formatPhone(student.phone)}</dd>
-          <dt className="text-muted-foreground">{t("balance")}</dt>
-          <dd>
-            <Money value={student.balance} />
-          </dd>
+          {student.balance !== null && (
+            <>
+              <dt className="text-muted-foreground">{t("balance")}</dt>
+              <dd>
+                <Money value={student.balance} />
+              </dd>
+            </>
+          )}
           <dt className="text-muted-foreground">{t("addedOn")}</dt>
           <dd>{formatDate(student.createdAt)}</dd>
         </dl>

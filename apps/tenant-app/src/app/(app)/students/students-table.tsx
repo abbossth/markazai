@@ -32,9 +32,10 @@ type Props = {
   lookups: StudentLookups;
   canWrite: boolean;
   canDelete: boolean;
+  canFinance: boolean;
 };
 
-export function StudentsTable({ rows, total, page, pageSize, sort, lookups, canWrite, canDelete }: Props) {
+export function StudentsTable({ rows, total, page, pageSize, sort, lookups, canWrite, canDelete, canFinance }: Props) {
   const t = useTranslations("student");
   const tc = useTranslations("common");
   const router = useRouter();
@@ -118,12 +119,16 @@ export function StudentsTable({ rows, total, page, pageSize, sort, lookups, canW
             </div>
           ),
       },
-      {
-        id: "balance",
-        header: t("balance"),
-        meta: { sortKey: "balance", label: t("balance"), className: "text-right" },
-        cell: ({ row }) => <Money value={row.original.balance} />,
-      },
+      ...(canFinance
+        ? ([
+            {
+              id: "balance",
+              header: t("balance"),
+              meta: { sortKey: "balance", label: t("balance"), className: "text-right" },
+              cell: ({ row }) => <Money value={row.original.balance ?? 0} />,
+            },
+          ] as AnyColumnDef<StudentRow>[])
+        : []),
       {
         id: "tags",
         header: t("tags"),
@@ -173,7 +178,7 @@ export function StudentsTable({ rows, total, page, pageSize, sort, lookups, canW
         ),
       },
     ],
-    [t, tc, daysLabel, canWrite, canDelete],
+    [t, tc, daysLabel, canWrite, canDelete, canFinance],
   );
 
   const confirmDelete = () => {

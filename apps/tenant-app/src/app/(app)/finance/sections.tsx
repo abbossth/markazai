@@ -1,4 +1,9 @@
 import { getTranslations } from "next-intl/server";
+import { isPeriod } from "@markazai/types";
+import { prisma } from "@markazai/db";
+import { MonthNav } from "@/components/shared/month-nav";
+import { loadPayrolls } from "@/lib/payroll";
+import { SalaryTable } from "./salary-table";
 import { FilterBar, type FilterField } from "@/components/data-table/filter-bar";
 import { can } from "@/lib/permissions";
 import type { RawSearchParams } from "@/lib/search-params";
@@ -89,6 +94,34 @@ export async function DebtorsSection({ user, sp }: { user: SessionUser; sp: RawS
       <Total label={t("ledger.totalDebt", { count: list.total })} value={list.totalDebt} />
       <FilterBar searchPlaceholder={t("searchPlaceholder")} fields={fields} actions={<ExportButtons tab="debtors" />} />
       <DebtorsTable rows={list.rows} total={list.total} page={list.page} pageSize={PAGE_SIZE} today={range.today} canPay={can(user.roles, "payments:write")} />
+    </>
+  );
+}
+
+export async function SalarySection({ user, sp }: { user: SessionUser; sp: RawSearchParams }) {
+  const t = await getTranslations("finance.salary");
+  const today = resolveRange(sp).today;
+  const monthParam = Array.isArray(sp.month) ? sp.month[0] : sp.month;
+  const period = isPeriod(monthParam) ? monthParam : today.slice(0, 7);
+
+  const [payrolls, payments] = await Promise.all([
+    loadPayrolls(user.orgId, period),
+    prisma.salaryPayment.findMany({ where: { organizationId: user.orgId, period }, orderBy: { date: "desc" }, include: { teacher: { select: { name: true } } } }),
+  ]);
+
+  return (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <MonthNav period={period} params={{ tab: "salary" }} />
+        <p className="text-muted-foreground max-w-xl text-xs">{t("hint")}</p>
+      </div>
+      <SalaryTable
+        period={period}
+        today={today}
+        canPay={can(user.roles, "salary:pay")}
+        rows={payrolls.map((p) => ({ teacherId: p.teacherId, name: p.name, model: p.salaryType, percent: p.percent, calculated: p.payroll.total, paid: p.paid, remaining: p.remaining }))}
+        payments={payments.map((p) => ({ id: p.id, teacherName: p.teacher.name, amount: p.amount, date: p.date.toISOString(), note: p.note }))}
+      />
     </>
   );
 }

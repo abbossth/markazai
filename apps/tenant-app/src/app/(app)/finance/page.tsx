@@ -11,7 +11,7 @@ import { FinanceChart } from "./finance-chart";
 import { NewPaymentButton, PaymentsTable } from "./payments-table";
 import { FINANCE_TABS, PAGE_SIZE, listPayments, loadPaymentLookups, loadSummary, loadTrend, resolveRange, type FinanceTab } from "./queries";
 import { RangePresets } from "./range-presets";
-import { DebtorsSection, ExpensesSection, WithdrawalsSection } from "./sections";
+import { DebtorsSection, ExpensesSection, SalarySection, WithdrawalsSection } from "./sections";
 import { ExportButtons } from "./export-buttons";
 import { SummaryCards } from "./summary-cards";
 import type { RawSearchParams } from "@/lib/search-params";
@@ -26,14 +26,16 @@ export default async function FinancePage({ searchParams }: PageProps<"/finance"
   const sp = await searchParams;
   const t = await getTranslations("finance");
   const requested = param(sp, "tab");
-  const tab: FinanceTab = (FINANCE_TABS as readonly string[]).includes(requested ?? "") ? (requested as FinanceTab) : "payments";
+  // Yechib olish — faqat rahbariyat; ish haqi — faqat salary:read ruxsati borlar.
+  const visibleTabs = FINANCE_TABS.filter((k) => (k !== "withdrawals" || can(user.roles, "withdrawals:write")) && (k !== "salary" || can(user.roles, "salary:read")));
+  const tab: FinanceTab = (visibleTabs as readonly string[]).includes(requested ?? "") ? (requested as FinanceTab) : "payments";
 
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">{t("title")}</h1>
 
       <nav className="bg-muted inline-flex w-fit flex-wrap gap-1 rounded-lg p-1" aria-label={t("title")}>
-        {FINANCE_TABS.map((k) => (
+        {visibleTabs.map((k) => (
           <Link
             key={k}
             href={`/finance?tab=${k}`}
@@ -49,7 +51,7 @@ export default async function FinancePage({ searchParams }: PageProps<"/finance"
       {tab === "expenses" && <ExpensesSection user={user} sp={sp} />}
       {tab === "withdrawals" && <WithdrawalsSection user={user} sp={sp} />}
       {tab === "debtors" && <DebtorsSection user={user} sp={sp} />}
-      {tab === "salary" && <p className="text-muted-foreground py-10 text-center text-sm">{t("salaryComingSoon")}</p>}
+      {tab === "salary" && <SalarySection user={user} sp={sp} />}
     </div>
   );
 }

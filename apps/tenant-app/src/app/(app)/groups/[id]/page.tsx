@@ -12,7 +12,7 @@ import { GroupStatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate, formatMoney } from "@/lib/format";
-import { can } from "@/lib/permissions";
+import { can, canAccess } from "@/lib/permissions";
 import { param } from "@/lib/search-params";
 import { requireModule } from "@/lib/session";
 import { loadGroupLookups } from "../queries";
@@ -59,6 +59,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
   const tab: Tab = (TABS as readonly string[]).includes(requested ?? "") ? (requested as Tab) : "attendance";
 
   const canWrite = can(user.roles, "groups:write");
+  const canFinance = canAccess(user.roles, "finance");
   const today = toISODate(new Date());
   const active = group.enrollments.filter((e) => !e.leftAt);
   const daysLabel =
@@ -160,7 +161,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
               name: e.student.name,
               phone: e.student.phone,
               status: e.student.status,
-              balance: e.student.balance,
+              balance: canFinance ? e.student.balance : null,
               freezeReason: e.student.freezeReason,
               createdAt: e.student.createdAt.toISOString(),
               archived: !!e.leftAt,
