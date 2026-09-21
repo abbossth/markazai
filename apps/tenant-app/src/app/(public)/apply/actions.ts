@@ -13,7 +13,7 @@ export type SubmitResult = { ok: true } | { ok: false; error: "unavailable" | "r
  * server tomonida maydonlar qayta tekshiriladi (kurs shu markazniki bo'lishi shart), takroriy telefon yangi lid yaratmaydi.
  */
 export async function submitLead(input: unknown): Promise<SubmitResult> {
-  const orgId = currentOrganizationId();
+  const orgId = await currentOrganizationId();
   const form = await prisma.leadForm.findUnique({ where: { organizationId: orgId } });
   if (!form?.enabled) return { ok: false, error: "unavailable" };
 

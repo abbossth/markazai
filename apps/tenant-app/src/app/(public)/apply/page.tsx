@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /** Ommaviy ariza formasi: markaz saytiga havola/iframe sifatida joylanadi. Kirish talab qilinmaydi. */
 export default async function ApplyPage() {
-  const orgId = currentOrganizationId();
+  const orgId = await currentOrganizationId();
   const [t, center, form, courses] = await Promise.all([
     getTranslations("apply"),
     loadCenter(),

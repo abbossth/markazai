@@ -9,7 +9,8 @@ const ORG_ID = process.env.DEFAULT_ORGANIZATION_ID ?? "00000000-0000-4000-8000-0
 
 async function main() {
   // Dinamik import: DATABASE_URL yuklangandan keyin klient yaratiladi.
-  const { prisma } = await import("../src/index");
+  const { getAdminPrisma } = await import("../src/index");
+  const prisma = getAdminPrisma();
 
   const branch =
     (await prisma.branch.findFirst({ where: { organizationId: ORG_ID } })) ??

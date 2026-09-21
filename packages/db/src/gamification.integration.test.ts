@@ -10,7 +10,8 @@ type Tx = import("./generated/client").Prisma.TransactionClient;
 
 // Haqiqiy bazada, lekin ROLLBACK qilinadigan tranzaksiya ichida (ma'lumot o'zgarmaydi).
 async function inRollback(fn: (tx: Tx) => Promise<void>) {
-  const { prisma } = await import("./index");
+  const { getAdminPrisma } = await import("./index");
+  const prisma = getAdminPrisma();
   try {
     await prisma.$transaction(async (tx) => {
       await fn(tx);
@@ -21,7 +22,8 @@ async function inRollback(fn: (tx: Tx) => Promise<void>) {
   }
 }
 afterAll(async () => {
-  const { prisma } = await import("./index");
+  const { getAdminPrisma } = await import("./index");
+  const prisma = getAdminPrisma();
   await prisma.$disconnect();
 });
 

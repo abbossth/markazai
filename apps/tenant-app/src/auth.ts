@@ -2,7 +2,8 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@markazai/db";
-import { DEFAULT_ORGANIZATION_ID, loginSchema } from "@markazai/types";
+import { loginSchema } from "@markazai/types";
+import { currentOrganizationId } from "@/lib/tenant";
 import { authConfig } from "./auth.config";
 
 // Foydalanuvchi topilmaganda ham haqiqiy hash solishtiriladi (javob vaqti orqali telefon aniqlanmasligi uchun).
@@ -20,7 +21,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         // 9-bosqichda organizationId subdomen orqali aniqlanadi.
         const user = await prisma.user.findUnique({
-          where: { organizationId_phone: { organizationId: DEFAULT_ORGANIZATION_ID, phone } },
+          where: { organizationId_phone: { organizationId: await currentOrganizationId(), phone } },
         });
         const ok = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
         if (!user || !user.isActive || !ok) return null;

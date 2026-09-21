@@ -5,7 +5,8 @@ import path from "node:path";
 config({ path: path.resolve(process.cwd(), "../../.env") });
 
 async function main() {
-  const { prisma, rebuildAllCharges, recomputeBalances } = await import("../src/index");
+  const { getAdminPrisma, rebuildAllCharges, recomputeBalances } = await import("../src/index");
+  const prisma = getAdminPrisma();
   const orgId = process.env.DEFAULT_ORGANIZATION_ID ?? "00000000-0000-4000-8000-000000000001";
   const lessons = await rebuildAllCharges(prisma, orgId);
   const fixed = await recomputeBalances(prisma, orgId);

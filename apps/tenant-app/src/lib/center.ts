@@ -4,7 +4,7 @@ import { LOCALES, readableForeground } from "@markazai/types";
 import { currentOrganizationId } from "./tenant";
 
 /** Markaz sozlamalari (bir so'rov ichida keshlanadi: layout, i18n va sahifalar bitta so'rov qiladi). */
-export const loadCenter = cache(async () => prisma.centerSettings.findUnique({ where: { organizationId: currentOrganizationId() } }));
+export const loadCenter = cache(async () => prisma.centerSettings.findUnique({ where: { organizationId: await currentOrganizationId() } }));
 
 export type CenterConfig = { name: string; logoUrl: string | null; locales: string[]; defaultTheme: string };
 

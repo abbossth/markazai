@@ -9,7 +9,8 @@ config({ path: path.resolve(process.cwd(), "../../.env") });
 class Rollback extends Error {}
 
 async function inRollback(fn: (tx: import("./generated/client").Prisma.TransactionClient) => Promise<void>) {
-  const { prisma } = await import("./index");
+  const { getAdminPrisma } = await import("./index");
+  const prisma = getAdminPrisma();
   try {
     await prisma.$transaction(
       async (tx) => {
@@ -24,7 +25,8 @@ async function inRollback(fn: (tx: import("./generated/client").Prisma.Transacti
 }
 
 afterAll(async () => {
-  const { prisma } = await import("./index");
+  const { getAdminPrisma } = await import("./index");
+  const prisma = getAdminPrisma();
   await prisma.$disconnect();
 });
 
