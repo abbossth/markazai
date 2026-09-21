@@ -1,11 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@markazai/db";
+import { loadHolidayDates, prisma } from "@markazai/db";
 import {
   fromISODate,
   isPeriod,
   isoWeekday,
+  periodBounds,
   scheduledWorkDays,
   teacherScheduleSchema,
   toCenterParts,
@@ -71,7 +72,9 @@ export async function markFullWorkDays(teacherId: string, period: string): Promi
 
   const today = toCenterParts(new Date()).date;
   const startIso = teacher.workStartDate ? toISODate(teacher.workStartDate) : "0000-00-00";
-  const days = scheduledWorkDays(teacher.workDays, period).filter((d) => d <= today && d >= startIso);
+  const { from: pFrom, to: pTo } = periodBounds(period);
+  const holidays = await loadHolidayDates(prisma, user.orgId, { from: pFrom, to: pTo });
+  const days = scheduledWorkDays(teacher.workDays, period, holidays).filter((d) => d <= today && d >= startIso);
   const res = await prisma.teacherAttendance.createMany({
     data: days.map((d) => ({ organizationId: user.orgId, teacherId, date: fromISODate(d), status: "PRESENT" as const, markedById: user.id })),
     skipDuplicates: true,

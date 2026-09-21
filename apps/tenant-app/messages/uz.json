@@ -1075,6 +1075,117 @@
           "password": "Parol"
         }
       }
+    },
+    "courses": {
+      "add": "Kurs qo'shish",
+      "edit": "Kursni tahrirlash",
+      "name": "Nomi",
+      "price": "Oylik narx (so'm)",
+      "duration": "Davomiyligi (oy)",
+      "color": "Rang",
+      "months": "{count} oy",
+      "groups": "{count} ta guruh",
+      "empty": "Kurslar hali qo'shilmagan",
+      "deleteTitle": "\"{name}\" kursi o'chirilsinmi?",
+      "errors": {
+        "inUse": "Bu kursda guruhlar bor — avval guruhlarni boshqa kursga o'tkazing yoki arxivlab o'chiring"
+      }
+    },
+    "rooms": {
+      "add": "Xona qo'shish",
+      "edit": "Xonani tahrirlash",
+      "name": "Nomi",
+      "capacity": "Sig'im",
+      "groupsCol": "Guruhlar",
+      "empty": "Xonalar hali qo'shilmagan",
+      "deleteTitle": "\"{name}\" xonasi o'chirilsinmi?",
+      "errors": {
+        "inUse": "Bu xonada guruhlar bor — avval guruhlarning xonasini o'zgartiring"
+      }
+    },
+    "tags": {
+      "add": "Teg qo'shish",
+      "edit": "Tegni tahrirlash",
+      "name": "Nomi",
+      "color": "Rang",
+      "usage": "Ishlatilishi",
+      "usageValue": "Talabalar: {students} · Guruhlar: {groups} · Lidlar: {leads}",
+      "empty": "Teglar hali qo'shilmagan",
+      "deleteTitle": "\"{name}\" tegi o'chirilsinmi?",
+      "deleteHint": "Teg barcha talaba, guruh va lidlardan olib tashlanadi."
+    },
+    "holidays": {
+      "add": "Dam olish kuni qo'shish",
+      "name": "Nomi",
+      "namePlaceholder": "Masalan: Navro'z",
+      "date": "Sana",
+      "from": "Dan",
+      "to": "Gacha",
+      "hint": "Dam olish kunlarida dars bo'lmaydi: dars jadvali, davomat, oylik darslar soni (va shu bilan bir dars narxi) hamda o'qituvchining ish kunlari shunga moslanadi.",
+      "empty": "Bu yilda dam olish kunlari yo'q",
+      "deleteTitle": "\"{name}\" o'chirilsinmi?",
+      "deleteHint": "Shu oydagi dars yechimlari qayta hisoblanadi.",
+      "errors": {
+        "hasAttendance": "Bu kunlarda davomat belgilangan — avval belgilarni olib tashlang"
+      }
+    },
+    "archive": {
+      "group": "Guruh",
+      "course": "Kurs",
+      "teacher": "O'qituvchi",
+      "status": "Holat",
+      "endDate": "Tugash sanasi",
+      "students": "Talabalar",
+      "restore": "Qaytarish",
+      "empty": "Arxivda guruhlar yo'q",
+      "errors": {}
+    },
+    "changelog": {
+      "hint": "Tizimdagi so'nggi o'zgarishlar.",
+      "releases": [
+        {
+          "version": "v0.8",
+          "title": "Sozlamalar",
+          "items": [
+            "Umumiy sozlamalar, brend rangi, logotip va login banneri",
+            "Xodimlar: bir nechta rol, Excel import, parolni tiklash",
+            "Kurslar, xonalar, teglar, dam olish kunlari, arxiv",
+            "Chek shabloni, lid forma konstruktori, integratsiyalar"
+          ]
+        },
+        {
+          "version": "v0.7",
+          "title": "Dashboard va hisobotlar",
+          "items": [
+            "Sozlanadigan vidjetlar va dars jadvali",
+            "Reyting, davomat, konversiya, lidlar, churn, jurnallar hisobotlari",
+            "Excel eksport"
+          ]
+        },
+        {
+          "version": "v0.5",
+          "title": "O'qituvchilar va moliya",
+          "items": [
+            "O'qituvchi ish jadvali va davomati",
+            "Foiz va belgilangan oylik modellari, ish haqi to'lovlari"
+          ]
+        },
+        {
+          "version": "v0.4",
+          "title": "Moliya",
+          "items": [
+            "To'lovlar, xarajatlar, yechib olish, qarzdorlar",
+            "Chek chop etish, Excel/PDF eksport"
+          ]
+        },
+        {
+          "version": "v0.3",
+          "title": "Lidlar",
+          "items": [
+            "Kanban doska, lid → talaba, eslatmalar, qo'ng'iroq va SMS jurnali"
+          ]
+        }
+      ]
     }
   }
 }

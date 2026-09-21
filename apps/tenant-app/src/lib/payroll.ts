@@ -1,4 +1,4 @@
-import { prisma } from "@markazai/db";
+import { loadHolidayDates, prisma } from "@markazai/db";
 import { calculatePayroll, lessonDatesInMonth, percentSalary, periodBounds, toCenterParts, type Payroll } from "@markazai/types";
 
 export type GroupPayrollRow = {
@@ -50,6 +50,7 @@ export async function loadPayrolls(orgId: string, period: string, opts: { teache
   const teacherIds = teachers.map((t) => t.id);
   const groupIds = teachers.flatMap((t) => t.groups.map((g) => g.id));
   const range = { gte: from, lte: to };
+  const holidays = await loadHolidayDates(prisma, orgId, { from, to });
 
   const [payments, studentAttendance, teacherAttendance, salaryPaid] = await Promise.all([
     prisma.payment.groupBy({ by: ["groupId"], where: { organizationId: orgId, type: "MANUAL", groupId: { in: groupIds }, date: range }, _sum: { amount: true } }),
@@ -67,7 +68,7 @@ export async function loadPayrolls(orgId: string, period: string, opts: { teache
   return teachers.map((t) => {
     const groups: GroupPayrollRow[] = t.groups
       .map((g) => {
-        const lessons = lessonDatesInMonth({ days: g.days, customDays: g.customDays, startDate: g.startDate, endDate: g.endDate }, y, m).filter((d) => d <= today).length;
+        const lessons = lessonDatesInMonth({ days: g.days, customDays: g.customDays, startDate: g.startDate, endDate: g.endDate, holidays }, y, m).filter((d) => d <= today).length;
         const gp = paymentByGroup.get(g.id) ?? 0;
         return {
           groupId: g.id,
@@ -93,6 +94,7 @@ export async function loadPayrolls(orgId: string, period: string, opts: { teache
       paymentsByGroup: groups.map((g) => g.payments),
       came: tAtt(t.id, "PRESENT"),
       extra: tAtt(t.id, "EXTRA"),
+      holidays,
     });
     if (t.salaryType === "PERCENT") {
       for (const g of groups) g.amount = percentSalary(g.payments, t.percent ?? 0);

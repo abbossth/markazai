@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { setAttendance, setGrade } from "./actions";
 
 type Member = { studentId: string; name: string; joinedAt: string; leftAt: string | null };
-type GroupSchedule = { id: string; days: DaysPattern; customDays: number[]; startDate: string; endDate: string | null };
+type GroupSchedule = { id: string; days: DaysPattern; customDays: number[]; startDate: string; endDate: string | null; holidays: string[] };
 
 type Props =
   | { mode: "attendance"; records: { studentId: string; date: string; value: AttendanceValue }[] }
@@ -50,7 +50,7 @@ export function LessonGrid(props: Props & CommonProps) {
   const dates = useMemo(
     () =>
       lessonDatesInMonth(
-        { days: group.days, customDays: group.customDays, startDate: fromISODate(group.startDate), endDate: group.endDate ? fromISODate(group.endDate) : null },
+        { days: group.days, customDays: group.customDays, startDate: fromISODate(group.startDate), endDate: group.endDate ? fromISODate(group.endDate) : null, holidays: group.holidays },
         cursor.y,
         cursor.m,
       ),

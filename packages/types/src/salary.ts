@@ -14,14 +14,15 @@ export function shiftPeriod(period: string, delta: number): string {
   return new Date(Date.UTC(y, m - 1 + delta, 1)).toISOString().slice(0, 7);
 }
 
-/** Oy ichidagi ish kunlari ("YYYY-MM-DD"): ISO hafta kuni `workDays` ro'yxatida bo'lganlar. */
-export function scheduledWorkDays(workDays: number[], period: string): string[] {
+/** Oy ichidagi ish kunlari ("YYYY-MM-DD"): ISO hafta kuni `workDays` ro'yxatida bo'lgan va dam olish kuni bo'lmaganlar. */
+export function scheduledWorkDays(workDays: number[], period: string, holidays: Iterable<string> = []): string[] {
   const set = new Set(workDays);
+  const off = new Set(holidays);
   const { from, to } = periodBounds(period);
   const out: string[] = [];
   for (let t = from.getTime(); t <= to.getTime(); t += 86_400_000) {
     const d = new Date(t);
-    if (set.has(isoWeekday(d))) out.push(toISODate(d));
+    if (set.has(isoWeekday(d)) && !off.has(toISODate(d))) out.push(toISODate(d));
   }
   return out;
 }
@@ -58,6 +59,8 @@ export type PayrollInput = {
   /** Davomat (FIXED uchun). */
   came: number;
   extra: number;
+  /** Dam olish kunlari — ish kunlari sonidan chiqariladi. */
+  holidays?: string[];
 };
 
 export type Payroll = {
@@ -78,7 +81,7 @@ export function calculatePayroll(i: PayrollInput): Payroll {
     const amount = i.paymentsByGroup.reduce((sum, p) => sum + percentSalary(p, i.percent ?? 0), 0);
     return { method: "PERCENT", fullWorkDays: 0, came: 0, extra: 0, base: amount, extraIncome: 0, total: amount };
   }
-  const fullWorkDays = scheduledWorkDays(i.workDays, i.period).length;
+  const fullWorkDays = scheduledWorkDays(i.workDays, i.period, i.holidays).length;
   const f = fixedSalaryBreakdown({ fixedSalary: i.fixedSalary ?? 0, scheduledCount: fullWorkDays, came: i.came, extra: i.extra });
   return { method: "FIXED", fullWorkDays, came: i.came, extra: i.extra, base: f.base, extraIncome: f.extraIncome, total: f.total };
 }

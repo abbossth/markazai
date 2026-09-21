@@ -80,3 +80,17 @@ describe("schedulesOverlap", () => {
     expect(schedulesOverlap(a, { ...base, startDate: fromISODate("2026-04-01") })).toBe(false);
   });
 });
+
+describe("dam olish kunlari", () => {
+  const g = { days: "ODD" as const, startDate: new Date("2026-09-01T00:00:00.000Z") };
+  it("dars kuni bayramga to'g'ri kelsa, u ro'yxatdan chiqariladi", () => {
+    const all = lessonDatesInMonth(g, 2026, 9);
+    // 2026-09-02 — chorshanba (toq kun)
+    expect(all).toContain("2026-09-02");
+    const withHoliday = lessonDatesInMonth({ ...g, holidays: ["2026-09-02"] }, 2026, 9);
+    expect(withHoliday).toEqual(all.filter((d) => d !== "2026-09-02"));
+  });
+  it("dars kuni bo'lmagan bayram hech narsani o'zgartirmaydi", () => {
+    expect(lessonDatesInMonth({ ...g, holidays: ["2026-09-01"] }, 2026, 9)).toEqual(lessonDatesInMonth(g, 2026, 9));
+  });
+});

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { loadHolidayDates, prisma } from "@markazai/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -80,7 +81,9 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
   const summary = summarizeByGroupMonth(payments.map((p) => ({ amount: p.amount, type: p.type, date: p.date, groupId: p.groupId })));
   const monthLabel = (m: string) => `${tm(String(Number(m.slice(5, 7))) as "1")} ${m.slice(0, 4)}`;
 
+  const holidays = await loadHolidayDates(prisma, user.orgId);
   const attendanceGroups = enrollments.map((e) => ({
+    holidays,
     id: e.group.id,
     name: e.group.name,
     days: e.group.days,

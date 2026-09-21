@@ -35,6 +35,8 @@ type ScheduleInput = {
   customDays?: number[];
   startDate: Date;
   endDate?: Date | null;
+  /** Dam olish (bayram) kunlari "YYYY-MM-DD" — bu kunlarda dars bo'lmaydi. */
+  holidays?: Iterable<string>;
 };
 
 /**
@@ -43,6 +45,7 @@ type ScheduleInput = {
  */
 export function lessonDatesInMonth(group: ScheduleInput, year: number, month: number): string[] {
   const weekdays = new Set(weekdaysOf(group.days, group.customDays));
+  const holidays = new Set(group.holidays ?? []);
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const out: string[] = [];
 
@@ -50,7 +53,7 @@ export function lessonDatesInMonth(group: ScheduleInput, year: number, month: nu
     const d = new Date(Date.UTC(year, month - 1, day));
     if (d < group.startDate) continue;
     if (group.endDate && d > group.endDate) break;
-    if (weekdays.has(isoWeekday(d))) out.push(toISODate(d));
+    if (weekdays.has(isoWeekday(d)) && !holidays.has(toISODate(d))) out.push(toISODate(d));
   }
   return out;
 }

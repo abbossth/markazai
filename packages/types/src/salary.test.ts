@@ -108,3 +108,19 @@ describe("salaryPaymentSchema", () => {
     expect(salaryPaymentSchema.safeParse({ ...ok, amount: 0 }).success).toBe(false);
   });
 });
+
+describe("scheduledWorkDays: dam olish kunlari", () => {
+  it("bayram ish kuniga to'g'ri kelsa sanalmaydi", () => {
+    const all = scheduledWorkDays([1, 2, 3, 4, 5], "2026-09");
+    const off = scheduledWorkDays([1, 2, 3, 4, 5], "2026-09", ["2026-09-01", "2026-09-05"]);
+    expect(off.length).toBe(all.length - 1); // 5-sentabr — shanba, ish kuni emas
+    expect(off).not.toContain("2026-09-01");
+  });
+  it("calculatePayroll: bayram kunlari kunlik stavkani oshiradi (ish kunlari kamayadi)", () => {
+    const base = { salaryType: "FIXED" as const, percent: null, fixedSalary: 2_000_000, workDays: [1, 2, 3, 4, 5], period: "2026-09", paymentsByGroup: [], came: 10, extra: 0 };
+    const a = calculatePayroll(base);
+    const b = calculatePayroll({ ...base, holidays: ["2026-09-01", "2026-09-02"] });
+    expect(b.fullWorkDays).toBe(a.fullWorkDays - 2);
+    expect(b.base).toBeGreaterThan(a.base);
+  });
+});

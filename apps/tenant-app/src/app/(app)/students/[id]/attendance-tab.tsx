@@ -19,7 +19,7 @@ import { SimpleSelect } from "@/components/ui/simple-select";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-type GroupInfo = { id: string; name: string; days: DaysPattern; customDays: number[]; startDate: string; endDate: string | null };
+type GroupInfo = { id: string; name: string; days: DaysPattern; customDays: number[]; startDate: string; endDate: string | null; holidays: string[] };
 type Record = { groupId: string; date: string; status: AttendanceValue };
 
 const STATUS_STYLE: { [K in AttendanceValue]: string } = {
@@ -40,7 +40,7 @@ export function AttendanceTab({ groups, records, today }: { groups: GroupInfo[];
   const { byDate, allDates, stats } = useMemo(() => {
     if (!group) return { byDate: new Map<string, AttendanceValue>(), allDates: [] as string[], stats: null };
     const byDate = new Map<string, AttendanceValue>(records.filter((r) => r.groupId === group.id).map((r) => [r.date, r.status]));
-    const schedule = { days: group.days, customDays: group.customDays, startDate: fromISODate(group.startDate), endDate: group.endDate ? fromISODate(group.endDate) : null };
+    const schedule = { days: group.days, customDays: group.customDays, startDate: fromISODate(group.startDate), endDate: group.endDate ? fromISODate(group.endDate) : null, holidays: group.holidays };
     const end = group.endDate && group.endDate < today ? group.endDate : today;
     const allDates = group.startDate <= end ? lessonDatesBetween(schedule, fromISODate(group.startDate), fromISODate(end)) : [];
     return { byDate, allDates, stats: attendanceStats(allDates, byDate, today) };
@@ -50,7 +50,7 @@ export function AttendanceTab({ groups, records, today }: { groups: GroupInfo[];
 
   const monthDates = new Set(
     group
-      ? lessonDatesInMonth({ days: group.days, customDays: group.customDays, startDate: fromISODate(group.startDate), endDate: group.endDate ? fromISODate(group.endDate) : null }, cursor.y, cursor.m)
+      ? lessonDatesInMonth({ days: group.days, customDays: group.customDays, startDate: fromISODate(group.startDate), endDate: group.endDate ? fromISODate(group.endDate) : null, holidays: group.holidays }, cursor.y, cursor.m)
       : [],
   );
   const daysInMonth = new Date(Date.UTC(cursor.y, cursor.m, 0)).getUTCDate();

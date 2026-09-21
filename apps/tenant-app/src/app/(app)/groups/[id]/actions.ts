@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma, recalculateStudentGroup, syncLessonCharge } from "@markazai/db";
+import { loadMonthHolidays, prisma, recalculateStudentGroup, syncLessonCharge } from "@markazai/db";
 import {
   discountSchema,
   examSchema,
@@ -56,7 +56,8 @@ async function validateLessonCell(user: SessionUser, groupId: string, studentId:
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date > toISODate(new Date())) return { ok: false, error: "validation" };
 
   const [y, m] = [Number(date.slice(0, 4)), Number(date.slice(5, 7))];
-  const lessons = lessonDatesInMonth({ days: group.days, customDays: group.customDays, startDate: group.startDate, endDate: group.endDate }, y, m);
+  const holidays = await loadMonthHolidays(prisma, user.orgId, y, m);
+  const lessons = lessonDatesInMonth({ days: group.days, customDays: group.customDays, startDate: group.startDate, endDate: group.endDate, holidays }, y, m);
   if (!lessons.includes(date)) return { ok: false, error: "validation" };
 
   const enrollment = await prisma.groupStudent.findFirst({ where: { groupId, studentId, organizationId: user.orgId } });

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { loadHolidayDates, prisma } from "@markazai/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -90,6 +91,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
     customDays: group.customDays,
     startDate: toISODate(group.startDate),
     endDate: group.endDate ? toISODate(group.endDate) : null,
+    holidays: await loadHolidayDates(prisma, user.orgId),
   };
   const canMark = can(user.roles, "attendance:write");
 

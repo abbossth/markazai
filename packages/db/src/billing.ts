@@ -1,5 +1,6 @@
 import { expectedLessonCharge, fromISODate, lessonDatesInMonth, toISODate } from "@markazai/types";
 import type { Prisma, PrismaClient } from "./generated/client";
+import { loadMonthHolidays } from "./holidays";
 
 type Db = PrismaClient | Prisma.TransactionClient;
 
@@ -15,8 +16,10 @@ export async function syncLessonCharge(db: Db, { organizationId, groupId, studen
   const group = await db.group.findFirst({ where: { id: groupId, organizationId } });
   if (!group) return 0;
 
+  // Dam olish kunlari oylik darslar sonidan chiqariladi: oylik narx haqiqiy darslarga taqsimlanadi.
+  const holidays = await loadMonthHolidays(db, organizationId, date.getUTCFullYear(), date.getUTCMonth() + 1);
   const monthLessons = lessonDatesInMonth(
-    { days: group.days, customDays: group.customDays, startDate: group.startDate, endDate: group.endDate },
+    { days: group.days, customDays: group.customDays, startDate: group.startDate, endDate: group.endDate, holidays },
     date.getUTCFullYear(),
     date.getUTCMonth() + 1,
   );

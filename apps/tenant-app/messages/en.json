@@ -1075,6 +1075,117 @@
           "password": "Password"
         }
       }
+    },
+    "courses": {
+      "add": "Add course",
+      "edit": "Edit course",
+      "name": "Name",
+      "price": "Monthly price (UZS)",
+      "duration": "Duration (months)",
+      "color": "Color",
+      "months": "{count} mo.",
+      "groups": "{count} groups",
+      "empty": "No courses yet",
+      "deleteTitle": "Delete the course \"{name}\"?",
+      "errors": {
+        "inUse": "This course has groups — move them to another course or archive and delete them first"
+      }
+    },
+    "rooms": {
+      "add": "Add room",
+      "edit": "Edit room",
+      "name": "Name",
+      "capacity": "Capacity",
+      "groupsCol": "Groups",
+      "empty": "No rooms yet",
+      "deleteTitle": "Delete the room \"{name}\"?",
+      "errors": {
+        "inUse": "This room has groups — change the groups' room first"
+      }
+    },
+    "tags": {
+      "add": "Add tag",
+      "edit": "Edit tag",
+      "name": "Name",
+      "color": "Color",
+      "usage": "Usage",
+      "usageValue": "Students: {students} · Groups: {groups} · Leads: {leads}",
+      "empty": "No tags yet",
+      "deleteTitle": "Delete the tag \"{name}\"?",
+      "deleteHint": "The tag will be removed from all students, groups and leads."
+    },
+    "holidays": {
+      "add": "Add holiday",
+      "name": "Name",
+      "namePlaceholder": "For example: Navruz",
+      "date": "Date",
+      "from": "From",
+      "to": "To",
+      "hint": "There are no lessons on holidays: the timetable, attendance, the number of lessons in a month (and with it the price of one lesson) and the teacher's working days all account for this.",
+      "empty": "No holidays this year",
+      "deleteTitle": "Delete \"{name}\"?",
+      "deleteHint": "Lesson charges in that month will be recalculated.",
+      "errors": {
+        "hasAttendance": "Attendance is already marked on these days — remove the marks first"
+      }
+    },
+    "archive": {
+      "group": "Group",
+      "course": "Course",
+      "teacher": "Teacher",
+      "status": "Status",
+      "endDate": "End date",
+      "students": "Students",
+      "restore": "Restore",
+      "empty": "No archived groups",
+      "errors": {}
+    },
+    "changelog": {
+      "hint": "Latest changes in the system.",
+      "releases": [
+        {
+          "version": "v0.8",
+          "title": "Settings",
+          "items": [
+            "General settings, brand color, logo and login banner",
+            "Staff: multiple roles, Excel import, password reset",
+            "Courses, rooms, tags, holidays, archive",
+            "Receipt template, lead form builder, integrations"
+          ]
+        },
+        {
+          "version": "v0.7",
+          "title": "Dashboard and reports",
+          "items": [
+            "Customizable widgets and lesson timetable",
+            "Rating, attendance, conversion, leads, churn and log reports",
+            "Excel export"
+          ]
+        },
+        {
+          "version": "v0.5",
+          "title": "Teachers and finance",
+          "items": [
+            "Teacher work schedule and attendance",
+            "Percent and fixed salary models, salary payments"
+          ]
+        },
+        {
+          "version": "v0.4",
+          "title": "Finance",
+          "items": [
+            "Payments, expenses, withdrawals, debtors",
+            "Receipt printing, Excel/PDF export"
+          ]
+        },
+        {
+          "version": "v0.3",
+          "title": "Leads",
+          "items": [
+            "Kanban board, lead → student, reminders, call and SMS logs"
+          ]
+        }
+      ]
     }
   }
 }
