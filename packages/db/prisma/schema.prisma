@@ -82,22 +82,382 @@ model UserBranch {
 }
 
 model CenterSettings {
-  id                  String   @id @default(uuid()) @db.Uuid
-  organizationId      String   @unique @map("organization_id") @db.Uuid
-  name                String
-  phone               String?
-  workingHours        String?  @map("working_hours")
-  logoUrl             String?  @map("logo_url")
-  loginBannerUrl      String?  @map("login_banner_url")
-  brandColor          String?  @map("brand_color")
-  lessonStartStep     Int      @default(30) @map("lesson_start_step")
-  returningStudentRule String? @map("returning_student_rule")
-  gamificationEnabled Boolean  @default(false) @map("gamification_enabled")
+  id                   String   @id @default(uuid()) @db.Uuid
+  organizationId       String   @unique @map("organization_id") @db.Uuid
+  name                 String
+  phone                String?
+  workingHours         String?  @map("working_hours")
+  logoUrl              String?  @map("logo_url")
+  loginBannerUrl       String?  @map("login_banner_url")
+  brandColor           String?  @map("brand_color")
+  lessonStartStep      Int      @default(30) @map("lesson_start_step")
+  returningStudentRule String?  @map("returning_student_rule")
+  gamificationEnabled  Boolean  @default(false) @map("gamification_enabled")
   // Til ro'yxati konfiguratsiya darajasida — kodga qattiq yozilmaydi.
-  locales             String[] @default(["uz", "ru", "en"])
-  defaultTheme        String   @default("system") @map("default_theme")
-  createdAt           DateTime @default(now()) @map("created_at")
-  updatedAt           DateTime @updatedAt @map("updated_at")
+  locales              String[] @default(["uz", "ru", "en"])
+  defaultTheme         String   @default("system") @map("default_theme")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
 
   @@map("center_settings")
+}
+
+// ─────────────────────────────────────────────────────────────
+// 2-bosqich: Talabalar, Guruhlar, Kurslar, O'qituvchilar
+// Pul summalari butun so'mda (Int) saqlanadi.
+// ─────────────────────────────────────────────────────────────
+
+enum StudentStatus {
+  ACTIVE
+  FROZEN
+  NO_GROUP
+  TRIAL
+  LEFT_AFTER_TRIAL
+  LEFT_ACTIVE_GROUP
+  JOINED_THIS_MONTH
+}
+
+enum GroupStatus {
+  ACTIVE
+  ARCHIVED
+  COMPLETED
+}
+
+// Dars kunlari: toq (Du/Chor/Ju), juft (Se/Pay/Shan), har kuni, dam olish kuni (Shan/Yak), boshqa (customDays).
+enum DaysPattern {
+  ODD
+  EVEN
+  EVERY_DAY
+  WEEKEND
+  OTHER
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+}
+
+// SYSTEM — darsga qatnashganlik asosida avtomatik yechiladi; MANUAL — qo'lda kiritilgan to'lov.
+enum PaymentType {
+  SYSTEM
+  MANUAL
+}
+
+model Course {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  price          Int
+  durationMonths Int      @default(1) @map("duration_months")
+  color          String   @default("#6366f1")
+  icon           String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  groups Group[]
+
+  @@index([organizationId])
+  @@map("courses")
+}
+
+model Room {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  capacity       Int      @default(15)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  groups Group[]
+
+  @@unique([organizationId, name])
+  @@map("rooms")
+}
+
+model Tag {
+  id             String  @id @default(uuid()) @db.Uuid
+  organizationId String  @map("organization_id") @db.Uuid
+  name           String
+  color          String?
+
+  students StudentTag[]
+  groups   GroupTag[]
+
+  @@unique([organizationId, name])
+  @@map("tags")
+}
+
+model Teacher {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  // Tizimga kira oladigan bo'lsa, TEACHER rolli User bilan bog'lanadi.
+  userId         String?   @unique @map("user_id") @db.Uuid
+  name           String
+  phone          String
+  birthDate      DateTime? @map("birth_date") @db.Date
+  gender         Gender?
+  photoUrl       String?   @map("photo_url")
+  isActive       Boolean   @default(true) @map("is_active")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  groups Group[]
+
+  @@unique([organizationId, phone])
+  @@index([organizationId])
+  @@map("teachers")
+}
+
+model Group {
+  id              String      @id @default(uuid()) @db.Uuid
+  organizationId  String      @map("organization_id") @db.Uuid
+  name            String
+  courseId        String      @map("course_id") @db.Uuid
+  teacherId       String      @map("teacher_id") @db.Uuid
+  roomId          String?     @map("room_id") @db.Uuid
+  days            DaysPattern
+  // days = OTHER bo'lganda: 1 = Dushanba ... 7 = Yakshanba
+  customDays      Int[]       @map("custom_days")
+  startTime       String      @map("start_time") // "HH:mm"
+  durationMinutes Int         @default(90) @map("duration_minutes")
+  startDate       DateTime    @map("start_date") @db.Date
+  endDate         DateTime?   @map("end_date") @db.Date
+  price           Int
+  status          GroupStatus @default(ACTIVE)
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  course        Course         @relation(fields: [courseId], references: [id])
+  teacher       Teacher        @relation(fields: [teacherId], references: [id])
+  room          Room?          @relation(fields: [roomId], references: [id])
+  enrollments   GroupStudent[]
+  tags          GroupTag[]
+  attendance    Attendance[]
+  grades        Grade[]
+  discounts     Discount[]
+  exams         Exam[]
+  onlineLessons OnlineLesson[]
+  payments      Payment[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId, status])
+  @@map("groups")
+}
+
+model Student {
+  id             String        @id @default(uuid()) @db.Uuid
+  organizationId String        @map("organization_id") @db.Uuid
+  name           String
+  phone          String
+  extraPhones    String[]      @map("extra_phones")
+  photoUrl       String?       @map("photo_url")
+  birthDate      DateTime?     @map("birth_date") @db.Date
+  gender         Gender?
+  // Manfiy bo'lishi mumkin (qarzdor). Payment yozuvlari yig'indisiga teng bo'lishi kerak.
+  balance        Int           @default(0)
+  status         StudentStatus @default(NO_GROUP)
+  freezeReason   String?       @map("freeze_reason")
+  note           String?
+  externalId     String?       @map("external_id")
+  contactPerson  String?       @map("contact_person")
+  email          String?
+  telegram       String?
+  socialLink     String?       @map("social_link")
+  address        String?
+  documentUrl    String?       @map("document_url")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  enrollments GroupStudent[]
+  tags        StudentTag[]
+  attendance  Attendance[]
+  grades      Grade[]
+  discounts   Discount[]
+  payments    Payment[]
+
+  @@index([organizationId, status])
+  @@index([organizationId, name])
+  @@map("students")
+}
+
+// Talabaning guruhdagi a'zoligi. leftAt != null — guruhdan chiqqan (arxivlangan).
+model GroupStudent {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  groupId        String    @map("group_id") @db.Uuid
+  studentId      String    @map("student_id") @db.Uuid
+  joinedAt       DateTime  @map("joined_at") @db.Date
+  leftAt         DateTime? @map("left_at") @db.Date
+
+  group   Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, studentId])
+  @@index([organizationId])
+  @@index([studentId])
+  @@map("group_students")
+}
+
+model StudentTag {
+  organizationId String  @map("organization_id") @db.Uuid
+  studentId      String  @map("student_id") @db.Uuid
+  tagId          String  @map("tag_id") @db.Uuid
+  student        Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  tag            Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([studentId, tagId])
+  @@index([organizationId])
+  @@map("student_tags")
+}
+
+model GroupTag {
+  organizationId String @map("organization_id") @db.Uuid
+  groupId        String @map("group_id") @db.Uuid
+  tagId          String @map("tag_id") @db.Uuid
+  group          Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  tag            Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, tagId])
+  @@index([organizationId])
+  @@map("group_tags")
+}
+
+// Faqat mavjud yozuvlar saqlanadi; yozuv yo'qligi = "bo'sh".
+model Attendance {
+  id             String           @id @default(uuid()) @db.Uuid
+  organizationId String           @map("organization_id") @db.Uuid
+  groupId        String           @map("group_id") @db.Uuid
+  studentId      String           @map("student_id") @db.Uuid
+  date           DateTime         @db.Date
+  status         AttendanceStatus
+  markedById     String?          @map("marked_by_id") @db.Uuid
+
+  group   Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, studentId, date])
+  @@index([organizationId])
+  @@map("attendance")
+}
+
+// Baholash tabi: har bir dars kuni uchun 0–100 ball.
+model Grade {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  groupId        String   @map("group_id") @db.Uuid
+  studentId      String   @map("student_id") @db.Uuid
+  date           DateTime @db.Date
+  score          Int
+
+  group   Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, studentId, date])
+  @@index([organizationId])
+  @@map("grades")
+}
+
+// Individual (chegirmali) narx: talaba shu guruhda `amount` so'm chegirma oladi.
+model Discount {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  studentId      String    @map("student_id") @db.Uuid
+  groupId        String    @map("group_id") @db.Uuid
+  amount         Int
+  fromDate       DateTime  @map("from_date") @db.Date
+  toDate         DateTime? @map("to_date") @db.Date
+  reason         String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  group   Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("discounts")
+}
+
+model Exam {
+  id              String   @id @default(uuid()) @db.Uuid
+  organizationId  String   @map("organization_id") @db.Uuid
+  groupId         String   @map("group_id") @db.Uuid
+  name            String
+  date            DateTime @db.Date
+  durationMinutes Int      @map("duration_minutes")
+  maxScore        Int      @map("max_score")
+  passScore       Int      @map("pass_score")
+  fileUrl         String?  @map("file_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("exams")
+}
+
+model OnlineLesson {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  groupId        String   @map("group_id") @db.Uuid
+  title          String
+  url            String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("online_lessons")
+}
+
+// amount ishorali: SYSTEM yozuvlar manfiy (yechilgan), MANUAL yozuvlar musbat (to'langan).
+// Student.balance = shu yozuvlar yig'indisi. Moliya logikasi 4-bosqichda Vitest bilan.
+model Payment {
+  id             String      @id @default(uuid()) @db.Uuid
+  organizationId String      @map("organization_id") @db.Uuid
+  studentId      String      @map("student_id") @db.Uuid
+  groupId        String?     @map("group_id") @db.Uuid
+  amount         Int
+  date           DateTime    @db.Date
+  type           PaymentType
+  description    String?
+  receivedById   String?     @map("received_by_id") @db.Uuid
+  receiptPrinted Boolean     @default(false) @map("receipt_printed")
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  group   Group?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, date])
+  @@index([studentId])
+  @@map("payments")
+}
+
+model Comment {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  authorId       String   @map("author_id") @db.Uuid
+  // Bittasi to'ldiriladi: talaba yoki guruh (lid keyingi bosqichda qo'shiladi).
+  studentId      String?  @map("student_id") @db.Uuid
+  groupId        String?  @map("group_id") @db.Uuid
+  body           String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([organizationId, studentId])
+  @@index([organizationId, groupId])
+  @@map("comments")
+}
+
+// Talaba/guruh/o'qituvchi sahifalaridagi "Tarix" tablari uchun umumiy audit-log.
+model HistoryLog {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  entityType     String   @map("entity_type") // "student" | "group" | ...
+  entityId       String   @map("entity_id") @db.Uuid
+  action         String // "created" | "updated" | "joined_group" | ...
+  details        Json?
+  actorId        String?  @map("actor_id") @db.Uuid
+  actorName      String?  @map("actor_name")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([organizationId, entityType, entityId, createdAt])
+  @@map("history_logs")
 }

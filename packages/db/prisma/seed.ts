@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import path from "node:path";
 import bcrypt from "bcryptjs";
+import { seedDemoData } from "./seed-demo";
 
 config({ path: path.resolve(process.cwd(), "../../.env") });
 
@@ -35,6 +36,7 @@ async function main() {
   ] as const;
 
   const passwordHash = await bcrypt.hash("password123", 10);
+  let ceo: { id: string; name: string } | undefined;
   for (const s of staff) {
     const user = await prisma.user.upsert({
       where: { organizationId_phone: { organizationId: ORG_ID, phone: s.phone } },
@@ -48,12 +50,15 @@ async function main() {
         passwordHash,
       },
     });
+    if (s.roles.includes("CEO")) ceo = { id: user.id, name: user.name };
     await prisma.userBranch.upsert({
       where: { userId_branchId: { userId: user.id, branchId: branch.id } },
       update: {},
       create: { organizationId: ORG_ID, userId: user.id, branchId: branch.id },
     });
   }
+
+  await seedDemoData(prisma, ORG_ID, ceo!);
 
   console.log("Seed tayyor. Kirish: +998 90 123 45 67 / password123 (CEO)");
   await prisma.$disconnect();

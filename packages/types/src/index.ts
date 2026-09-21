@@ -30,3 +30,5 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.input<typeof loginSchema>;
 export type LoginOutput = z.output<typeof loginSchema>;
+
+export * from "./schedule";

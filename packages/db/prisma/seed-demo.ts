@@ -1,0 +1,275 @@
+import bcrypt from "bcryptjs";
+import type { PrismaClient } from "../src/generated/client";
+import { fromISODate, lessonDatesInMonth } from "@markazai/types";
+
+// Deterministik tasodifiy sonlar — seed har safar bir xil natija beradi.
+function rng(seed: number) {
+  return () => {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const utcDate = (y: number, m: number, d: number) => new Date(Date.UTC(y, m - 1, d));
+
+const FIRST_NAMES_M = ["Akmal", "Bekzod", "Sardor", "Jasur", "Otabek", "Dilshod", "Rustam", "Timur", "Farrux", "Shahzod", "Aziz", "Umid"];
+const FIRST_NAMES_F = ["Malika", "Nigora", "Zilola", "Madina", "Feruza", "Sevara", "Kamola", "Gulnora", "Shahnoza", "Laylo", "Dildora", "Nilufar"];
+const LAST_NAMES = ["Karimov", "Rahimov", "Toshpulatov", "Yusupov", "Abdullayev", "Ergashev", "Qodirov", "Nazarov", "Saidov", "Ismoilov"];
+
+/**
+ * Demo ma'lumotlar: 4 kurs, 3 xona, 4 o'qituvchi, 6 guruh, 28 talaba, davomat, baholar,
+ * to'lovlar (ikkala tur: tizim va qo'lda), chegirmalar, imtihonlar, izohlar.
+ * Talabalar mavjud bo'lsa, hech narsa qilmaydi (idempotent).
+ */
+export async function seedDemoData(prisma: PrismaClient, orgId: string, actor: { id: string; name: string }) {
+  if ((await prisma.student.count({ where: { organizationId: orgId } })) > 0) {
+    console.log("Demo ma'lumotlar allaqachon mavjud — o'tkazib yuborildi.");
+    return;
+  }
+
+  const rand = rng(2026);
+  const pick = <T>(arr: readonly T[]) => arr[Math.floor(rand() * arr.length)]!;
+  const now = new Date();
+  const today = utcDate(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate());
+  const year = today.getUTCFullYear();
+  const month = today.getUTCMonth() + 1;
+
+  // ── Kurslar, xonalar, teglar ──
+  const courseDefs = [
+    { name: "Ingliz tili", price: 450_000, color: "#2563eb" },
+    { name: "Rus tili", price: 400_000, color: "#dc2626" },
+    { name: "Matematika", price: 350_000, color: "#16a34a" },
+    { name: "Python dasturlash", price: 700_000, color: "#9333ea" },
+  ];
+  const courses = await Promise.all(
+    courseDefs.map((c) => prisma.course.create({ data: { organizationId: orgId, durationMonths: 6, ...c } })),
+  );
+  const rooms = await Promise.all(
+    [
+      { name: "101", capacity: 12 },
+      { name: "102", capacity: 15 },
+      { name: "Lab", capacity: 10 },
+    ].map((r) => prisma.room.create({ data: { organizationId: orgId, ...r } })),
+  );
+  const tags = await Promise.all(
+    [
+      { name: "Yangi", color: "#0ea5e9" },
+      { name: "VIP", color: "#f59e0b" },
+      { name: "Chegirmali", color: "#10b981" },
+    ].map((t) => prisma.tag.create({ data: { organizationId: orgId, ...t } })),
+  );
+
+  // ── O'qituvchilar (biri tizimga kira oladi: TEACHER rolli User bilan bog'langan) ──
+  const teacherUser = await prisma.user.upsert({
+    where: { organizationId_phone: { organizationId: orgId, phone: "998903333333" } },
+    update: {},
+    create: {
+      organizationId: orgId,
+      phone: "998903333333",
+      name: "Nodira Yusupova",
+      roles: ["TEACHER"],
+      position: "Ingliz tili o'qituvchisi",
+      passwordHash: await bcrypt.hash("password123", 10),
+    },
+  });
+  const teacherDefs = [
+    { name: "Nodira Yusupova", phone: "998903333333", gender: "FEMALE" as const, userId: teacherUser.id },
+    { name: "Sherzod Aliyev", phone: "998904444444", gender: "MALE" as const, userId: null },
+    { name: "Gulbahor Rasulova", phone: "998905555555", gender: "FEMALE" as const, userId: null },
+    { name: "Bobur Mirzayev", phone: "998906666666", gender: "MALE" as const, userId: null },
+  ];
+  const teachers = await Promise.all(teacherDefs.map((t) => prisma.teacher.create({ data: { organizationId: orgId, ...t } })));
+
+  // ── Guruhlar ──
+  const groupDefs = [
+    { name: "A-3", course: 0, teacher: 0, room: 0, days: "ODD", time: "09:00", start: [year, month - 3, 1] },
+    { name: "B-1", course: 0, teacher: 0, room: 1, days: "EVEN", time: "14:00", start: [year, month - 2, 1] },
+    { name: "R-2", course: 1, teacher: 1, room: 1, days: "ODD", time: "16:00", start: [year, month - 4, 1] },
+    { name: "M-5", course: 2, teacher: 2, room: 0, days: "EVEN", time: "11:00", start: [year, month - 2, 1] },
+    { name: "PY-1", course: 3, teacher: 3, room: 2, days: "ODD", time: "18:00", start: [year, month - 1, 1] },
+    { name: "PY-2", course: 3, teacher: 3, room: 2, days: "WEEKEND", time: "10:00", start: [year, month - 1, 1] },
+  ] as const;
+
+  const groups = [];
+  for (const g of groupDefs) {
+    const [y, m, d] = g.start;
+    // month - N manfiy bo'lsa Date.UTC o'zi yilni to'g'rilaydi.
+    const startDate = utcDate(y, m, d);
+    groups.push(
+      await prisma.group.create({
+        data: {
+          organizationId: orgId,
+          name: g.name,
+          courseId: courses[g.course]!.id,
+          teacherId: teachers[g.teacher]!.id,
+          roomId: rooms[g.room]!.id,
+          days: g.days,
+          customDays: [],
+          startTime: g.time,
+          startDate,
+          endDate: new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth() + 6, 0)),
+          price: courses[g.course]!.price,
+        },
+      }),
+    );
+  }
+  await prisma.groupTag.createMany({
+    data: [
+      { organizationId: orgId, groupId: groups[0]!.id, tagId: tags[1]!.id },
+      { organizationId: orgId, groupId: groups[4]!.id, tagId: tags[0]!.id },
+    ],
+  });
+
+  // ── Talabalar ──
+  type Plan = { status: "ACTIVE" | "FROZEN" | "NO_GROUP" | "TRIAL" | "LEFT_AFTER_TRIAL" | "LEFT_ACTIVE_GROUP"; groupIdx: number[] };
+  const plans: Plan[] = [];
+  for (let i = 0; i < 20; i++) plans.push({ status: "ACTIVE", groupIdx: i % 5 === 4 ? [i % 6, (i + 2) % 6] : [i % 6] });
+  plans.push({ status: "FROZEN", groupIdx: [0] }, { status: "FROZEN", groupIdx: [3] });
+  plans.push({ status: "NO_GROUP", groupIdx: [] }, { status: "NO_GROUP", groupIdx: [] });
+  plans.push({ status: "TRIAL", groupIdx: [1] }, { status: "TRIAL", groupIdx: [4] });
+  plans.push({ status: "LEFT_AFTER_TRIAL", groupIdx: [] });
+  plans.push({ status: "LEFT_ACTIVE_GROUP", groupIdx: [2] });
+
+  const students = [];
+  for (let i = 0; i < plans.length; i++) {
+    const plan = plans[i]!;
+    const female = i % 2 === 1;
+    const name = `${pick(female ? FIRST_NAMES_F : FIRST_NAMES_M)} ${pick(LAST_NAMES)}${female ? "a" : ""}`;
+    // Ba'zilari shu oyda qo'shilgan ("Bu oy qo'shildi" filtri uchun).
+    const createdAt = i % 7 === 0 ? utcDate(year, month, Math.max(1, today.getUTCDate() - 3)) : utcDate(year, month - 3, 5 + i);
+    students.push(
+      await prisma.student.create({
+        data: {
+          organizationId: orgId,
+          name,
+          phone: `9989${String(10 + (i % 9))}${String(1000000 + i * 37331).slice(0, 7)}`,
+          gender: female ? "FEMALE" : "MALE",
+          birthDate: utcDate(2004 + (i % 10), 1 + (i % 12), 1 + (i % 27)),
+          status: plan.status,
+          freezeReason: plan.status === "FROZEN" ? (i % 2 ? "Oilaviy sabab" : "Safarga ketgan") : null,
+          note: i % 4 === 0 ? "Ota-onasi bilan bog'lanish kerak" : null,
+          externalId: `EXT-${1000 + i}`,
+          createdAt,
+        },
+      }),
+    );
+  }
+
+  await prisma.studentTag.createMany({
+    data: students.flatMap((s, i) =>
+      i % 5 === 0 ? [{ organizationId: orgId, studentId: s.id, tagId: tags[i % 3]!.id }] : [],
+    ),
+  });
+
+  // ── A'zoliklar ──
+  const enrollments: { organizationId: string; groupId: string; studentId: string; joinedAt: Date; leftAt: Date | null }[] = [];
+  plans.forEach((plan, i) => {
+    for (const gi of new Set(plan.groupIdx)) {
+      const group = groups[gi]!;
+      enrollments.push({
+        organizationId: orgId,
+        groupId: group.id,
+        studentId: students[i]!.id,
+        joinedAt: group.startDate,
+        leftAt: plan.status === "LEFT_ACTIVE_GROUP" ? utcDate(year, month - 1, 20) : null,
+      });
+    }
+  });
+  await prisma.groupStudent.createMany({ data: enrollments });
+
+  // ── Davomat, baholar, to'lovlar ──
+  const attendance: { organizationId: string; groupId: string; studentId: string; date: Date; status: "PRESENT" | "ABSENT" | "EXCUSED" }[] = [];
+  const grades: { organizationId: string; groupId: string; studentId: string; date: Date; score: number }[] = [];
+  const payments: { organizationId: string; studentId: string; groupId: string; amount: number; date: Date; type: "SYSTEM" | "MANUAL"; description: string; receivedById?: string }[] = [];
+  const balances = new Map<string, number>();
+  const addBalance = (studentId: string, amount: number) => balances.set(studentId, (balances.get(studentId) ?? 0) + amount);
+
+  const activeEnrollments = enrollments.filter((e) => !e.leftAt);
+  for (const group of groups) {
+    const members = activeEnrollments.filter((e) => e.groupId === group.id);
+    // Oxirgi 3 oy (joriy oy — faqat bugungacha)
+    for (let back = 2; back >= 0; back--) {
+      const d = new Date(Date.UTC(year, month - 1 - back, 1));
+      const y = d.getUTCFullYear();
+      const m = d.getUTCMonth() + 1;
+      const dates = lessonDatesInMonth({ days: group.days, customDays: group.customDays, startDate: group.startDate, endDate: group.endDate }, y, m).filter(
+        (iso) => fromISODate(iso) <= today,
+      );
+      if (dates.length === 0) continue;
+
+      for (const e of members) {
+        for (const iso of dates) {
+          const r = rand();
+          attendance.push({
+            organizationId: orgId,
+            groupId: group.id,
+            studentId: e.studentId,
+            date: fromISODate(iso),
+            status: r < 0.85 ? "PRESENT" : r < 0.95 ? "ABSENT" : "EXCUSED",
+          });
+          if (r < 0.85 && rand() < 0.35) {
+            grades.push({ organizationId: orgId, groupId: group.id, studentId: e.studentId, date: fromISODate(iso), score: 55 + Math.floor(rand() * 46) });
+          }
+        }
+
+        // Oylik yechim (tizim) va to'lov (qo'lda)
+        const chargeDate = fromISODate(dates[0]!);
+        payments.push({ organizationId: orgId, studentId: e.studentId, groupId: group.id, amount: -group.price, date: chargeDate, type: "SYSTEM", description: `${m}-oy uchun yechim` });
+        addBalance(e.studentId, -group.price);
+
+        // O'tgan oylarda ko'pchilik to'laydi; joriy oyda ~50%; ba'zilari umuman to'lamaydi (qarzdor).
+        const studentIdx = students.findIndex((s) => s.id === e.studentId);
+        const chronicDebtor = studentIdx % 6 === 3;
+        const paysThisMonth = back > 0 ? !chronicDebtor : rand() < 0.5 && !chronicDebtor;
+        if (paysThisMonth) {
+          const partial = studentIdx % 8 === 5;
+          const amount = partial ? Math.round(group.price / 2 / 1000) * 1000 : group.price;
+          payments.push({ organizationId: orgId, studentId: e.studentId, groupId: group.id, amount, date: chargeDate, type: "MANUAL", description: "Naqd to'lov", receivedById: actor.id });
+          addBalance(e.studentId, amount);
+        }
+      }
+    }
+  }
+  await prisma.attendance.createMany({ data: attendance });
+  await prisma.grade.createMany({ data: grades });
+  await prisma.payment.createMany({ data: payments });
+  for (const [studentId, balance] of balances) {
+    await prisma.student.update({ where: { id: studentId }, data: { balance } });
+  }
+
+  // ── Chegirmalar, imtihonlar, izohlar, tarix ──
+  const discountTargets = activeEnrollments.slice(2, 4);
+  for (const e of discountTargets) {
+    await prisma.discount.create({
+      data: { organizationId: orgId, studentId: e.studentId, groupId: e.groupId, amount: 50_000, fromDate: utcDate(year, month - 1, 1), reason: "Aka-uka chegirmasi" },
+    });
+  }
+  await prisma.exam.createMany({
+    data: [
+      { organizationId: orgId, groupId: groups[0]!.id, name: "Oraliq nazorat", date: utcDate(year, month, 25), durationMinutes: 90, maxScore: 100, passScore: 60 },
+      { organizationId: orgId, groupId: groups[4]!.id, name: "Python asoslari testi", date: utcDate(year, month - 1, 28), durationMinutes: 60, maxScore: 50, passScore: 30 },
+    ],
+  });
+  await prisma.onlineLesson.create({
+    data: { organizationId: orgId, groupId: groups[4]!.id, title: "1-dars yozuvi", url: "https://example.com/lesson-1" },
+  });
+  await prisma.comment.createMany({
+    data: [
+      { organizationId: orgId, authorId: actor.id, studentId: students[0]!.id, body: "Darslarda faol qatnashyapti." },
+      { organizationId: orgId, authorId: actor.id, groupId: groups[0]!.id, body: "Guruh uchun qo'shimcha dars rejalashtirildi." },
+    ],
+  });
+  await prisma.historyLog.createMany({
+    data: [
+      ...students.map((s) => ({ organizationId: orgId, entityType: "student", entityId: s.id, action: "created", actorId: actor.id, actorName: actor.name })),
+      ...groups.map((g) => ({ organizationId: orgId, entityType: "group", entityId: g.id, action: "created", actorId: actor.id, actorName: actor.name })),
+    ],
+  });
+
+  console.log(
+    `Demo ma'lumotlar: ${courses.length} kurs, ${teachers.length} o'qituvchi, ${groups.length} guruh, ${students.length} talaba, ${attendance.length} davomat, ${payments.length} to'lov.`,
+  );
+}
