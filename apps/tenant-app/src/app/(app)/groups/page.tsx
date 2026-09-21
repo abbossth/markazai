@@ -1,5 +1,50 @@
-import { ComingSoon } from "@/components/layout/coming-soon";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { DAYS_PATTERNS, GROUP_STATUSES } from "@markazai/types";
+import { FilterBar, type FilterField } from "@/components/data-table/filter-bar";
+import { can, isTeacherOnly } from "@/lib/permissions";
+import { requireModule } from "@/lib/session";
+import { PAGE_SIZE, listGroups, loadGroupLookups } from "./queries";
+import { GroupsTable, NewGroupButton } from "./groups-table";
 
-export default function Page() {
-  return <ComingSoon navKey="groups" />;
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return { title: t("groups") };
+}
+
+export default async function GroupsPage({ searchParams }: PageProps<"/groups">) {
+  const user = await requireModule("groups");
+  const sp = await searchParams;
+  const t = await getTranslations("group");
+  const te = await getTranslations("enums");
+
+  const [{ rows, total, page, sort }, lookups] = await Promise.all([listGroups(user, sp), loadGroupLookups(user)]);
+  const canWrite = can(user.roles, "groups:write");
+
+  const fields: FilterField[] = [
+    { name: "status", label: t("status"), type: "select", options: GROUP_STATUSES.map((s) => ({ value: s, label: te(`groupStatus.${s}`) })) },
+    ...(isTeacherOnly(user.roles) ? [] : [{ name: "teacherId", label: t("teacher"), type: "select" as const, options: lookups.teachers.map((x) => ({ value: x.id, label: x.name })) }]),
+    { name: "courseId", label: t("course"), type: "select", options: lookups.courses.map((c) => ({ value: c.id, label: c.name })) },
+    { name: "days", label: t("days"), type: "select", options: DAYS_PATTERNS.map((d) => ({ value: d, label: te(`days.${d}`) })) },
+    { name: "tagId", label: t("tags"), type: "select", options: lookups.tags.map((x) => ({ value: x.id, label: x.name })) },
+    { name: "from", label: `${t("startDate")}: ${t("dateFrom")}`, type: "date" },
+    { name: "to", label: `${t("startDate")}: ${t("dateTo")}`, type: "date" },
+  ];
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h1 className="text-2xl font-semibold">{t("title")}</h1>
+      <FilterBar searchPlaceholder={t("searchPlaceholder")} fields={fields} actions={canWrite ? <NewGroupButton lookups={lookups} /> : null} />
+      <GroupsTable
+        rows={rows}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sort={sort}
+        lookups={lookups}
+        canWrite={canWrite}
+        canDelete={can(user.roles, "groups:delete")}
+      />
+    </div>
+  );
 }

@@ -1,7 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { Construction } from "lucide-react";
+import { requireModule } from "@/lib/session";
 
-export async function ComingSoon({ navKey }: { navKey: "leads" | "teachers" | "groups" | "students" | "finance" | "reports" | "settings" }) {
+type NavKey = "leads" | "teachers" | "finance" | "reports" | "settings";
+
+/** Hali qurilmagan bo'lim uchun to'ldirgich; ammo modul ruxsati baribir tekshiriladi. */
+export async function ComingSoon({ navKey }: { navKey: NavKey }) {
+  await requireModule(navKey);
   const tn = await getTranslations("nav");
   const tc = await getTranslations("common");
 

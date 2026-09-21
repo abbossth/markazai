@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
 import { z } from "zod";
 import { summarizeByGroupMonth, toISODate } from "@markazai/types";
@@ -46,14 +46,14 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
 
-  const [profile, lookups, locale, t, tt, te, tp] = await Promise.all([
+  const [profile, lookups, t, tt, te, tp, tm] = await Promise.all([
     loadStudentProfile(user, id),
     loadStudentLookups(user),
-    getLocale(),
     getTranslations("student"),
     getTranslations("student.tabs"),
     getTranslations("enums"),
     getTranslations("student.payments"),
+    getTranslations("enums.months"),
   ]);
   if (!profile) notFound();
 
@@ -73,8 +73,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
     return d.toISOString().slice(0, 7);
   });
   const summary = summarizeByGroupMonth(payments.map((p) => ({ amount: p.amount, type: p.type, date: p.date, groupId: p.groupId })));
-  const monthLabel = (m: string) =>
-    new Intl.DateTimeFormat(locale, { month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${m}-01T00:00:00.000Z`));
+  const monthLabel = (m: string) => `${tm(String(Number(m.slice(5, 7))) as "1")} ${m.slice(0, 4)}`;
 
   const attendanceGroups = student.enrollments.map((e) => ({
     id: e.group.id,

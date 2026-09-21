@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fromISODate, isoWeekday, lessonDatesBetween, lessonDatesInMonth, weekdaysOf } from "./schedule";
+import { fromISODate, isoWeekday, lessonDatesBetween, lessonDatesInMonth, schedulesOverlap, weekdaysOf } from "./schedule";
 
 describe("weekdaysOf", () => {
   it("toq/juft/har kuni/dam olish kuni", () => {
@@ -57,5 +57,26 @@ describe("lessonDatesBetween", () => {
     const g = { days: "EVERY_DAY" as const, startDate: fromISODate("2025-01-01") };
     const dates = lessonDatesBetween(g, fromISODate("2025-12-30"), fromISODate("2026-01-02"));
     expect(dates).toEqual(["2025-12-30", "2025-12-31", "2026-01-01", "2026-01-02"]);
+  });
+});
+
+describe("schedulesOverlap", () => {
+  const base = { days: "ODD" as const, startTime: "09:00", durationMinutes: 90, startDate: fromISODate("2026-01-01"), endDate: null };
+
+  it("bir xil kun va vaqt — to'qnashadi", () => {
+    expect(schedulesOverlap(base, { ...base, startTime: "10:00" })).toBe(true);
+  });
+  it("vaqt ketma-ket (biri tugagan zahoti ikkinchisi boshlansa) — to'qnashmaydi", () => {
+    expect(schedulesOverlap(base, { ...base, startTime: "10:30" })).toBe(false);
+  });
+  it("kunlar kesishmasa (toq va juft) — to'qnashmaydi", () => {
+    expect(schedulesOverlap(base, { ...base, days: "EVEN" })).toBe(false);
+  });
+  it("OTHER kunlari toq guruh bilan kesishsa — to'qnashadi", () => {
+    expect(schedulesOverlap(base, { ...base, days: "OTHER", customDays: [5, 7] })).toBe(true);
+  });
+  it("sana oralig'lari kesishmasa — to'qnashmaydi", () => {
+    const a = { ...base, endDate: fromISODate("2026-03-31") };
+    expect(schedulesOverlap(a, { ...base, startDate: fromISODate("2026-04-01") })).toBe(false);
   });
 });

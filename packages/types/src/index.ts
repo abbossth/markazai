@@ -31,3 +31,5 @@ export * from "./student";
 export * from "./common";
 export * from "./finance";
 export * from "./attendance";
+export * from "./group";
+export * from "./group-extras";

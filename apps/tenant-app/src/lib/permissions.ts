@@ -17,18 +17,19 @@ const MODULE_ACCESS: Record<Role, AppModule[]> = {
   TEACHER: ["dashboard", "groups", "students"],
 };
 
-export type Permission = "students:write" | "students:delete" | "groups:write" | "groups:delete";
+export type Permission = "students:write" | "students:delete" | "groups:write" | "groups:delete" | "attendance:write";
 
 const PERMISSIONS: Record<Role, Permission[]> = {
-  CEO: ["students:write", "students:delete", "groups:write", "groups:delete"],
-  BRANCH_DIRECTOR: ["students:write", "students:delete", "groups:write", "groups:delete"],
-  ADMINISTRATOR: ["students:write", "students:delete", "groups:write", "groups:delete"],
-  ADMINISTRATOR2: ["students:write", "students:delete", "groups:write", "groups:delete"],
-  LIMITED_ADMINISTRATOR: ["students:write", "groups:write"],
-  INTERN_ADMINISTRATOR: ["students:write"],
+  CEO: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write"],
+  BRANCH_DIRECTOR: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write"],
+  ADMINISTRATOR: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write"],
+  ADMINISTRATOR2: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write"],
+  LIMITED_ADMINISTRATOR: ["students:write", "groups:write", "attendance:write"],
+  INTERN_ADMINISTRATOR: ["students:write", "attendance:write"],
   CASHIER: [],
   MARKETER: [],
-  TEACHER: [],
+  // O'qituvchi faqat o'z guruhlarida davomat/baho qo'ya oladi (server tomonida egalik tekshiriladi).
+  TEACHER: ["attendance:write"],
 };
 
 export function canAccess(roles: string[], module: AppModule) {

@@ -38,6 +38,7 @@ export function FilterBar({ searchPlaceholder, fields, actions }: Props) {
   }, []);
 
   const urlQ = searchParams.get("q") ?? "";
+  const [initialQ] = useState(urlQ);
   const values = Object.fromEntries(fields.map((f) => [f.name, draft[f.name] ?? searchParams.get(f.name) ?? ""]));
   const activeCount = fields.filter((f) => searchParams.get(f.name)).length;
 
@@ -61,7 +62,7 @@ export function FilterBar({ searchPlaceholder, fields, actions }: Props) {
       <div className="flex items-center gap-2">
         <div className="relative w-full max-w-sm">
           <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-          <Input key={inputKey} defaultValue={urlQ} onChange={(e) => onSearchChange(e.target.value)} placeholder={searchPlaceholder} className="pl-8" />
+          <Input key={inputKey} defaultValue={inputKey === 0 ? initialQ : ""} onChange={(e) => onSearchChange(e.target.value)} placeholder={searchPlaceholder} className="pl-8" />
         </div>
         <Button variant={open ? "secondary" : "outline"} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
           <ListFilter className="size-4" />

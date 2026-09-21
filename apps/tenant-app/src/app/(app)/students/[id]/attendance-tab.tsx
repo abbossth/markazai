@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { CalendarDays, ChevronLeft, ChevronRight, List } from "lucide-react";
 import {
   attendanceStats,
@@ -30,7 +30,7 @@ const STATUS_STYLE: { [K in AttendanceValue]: string } = {
 
 export function AttendanceTab({ groups, records, today }: { groups: GroupInfo[]; records: Record[]; today: string }) {
   const t = useTranslations("attendance");
-  const locale = useLocale();
+  const tm = useTranslations("enums.months");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
   const [view, setView] = useState<"calendar" | "list">("calendar");
   const [cursor, setCursor] = useState(() => ({ y: Number(today.slice(0, 4)), m: Number(today.slice(5, 7)) }));
@@ -61,7 +61,7 @@ export function AttendanceTab({ groups, records, today }: { groups: GroupInfo[];
       const d = new Date(Date.UTC(y, m - 1 + delta, 1));
       return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1 };
     });
-  const monthName = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(cursor.y, cursor.m - 1, 1)));
+  const monthName = `${tm(String(cursor.m) as "1")} ${cursor.y}`;
 
   return (
     <div className="flex flex-col gap-4">
@@ -97,7 +97,7 @@ export function AttendanceTab({ groups, records, today }: { groups: GroupInfo[];
             <Button variant="ghost" size="icon-sm" onClick={() => shift(-1)} aria-label={t("prevMonth")}>
               <ChevronLeft className="size-4" />
             </Button>
-            <span className="text-sm font-medium capitalize">{monthName}</span>
+            <span className="text-sm font-medium">{monthName}</span>
             <Button variant="ghost" size="icon-sm" onClick={() => shift(1)} aria-label={t("nextMonth")}>
               <ChevronRight className="size-4" />
             </Button>

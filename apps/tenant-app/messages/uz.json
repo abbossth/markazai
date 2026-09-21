@@ -91,7 +91,16 @@
     "invalidDate": "Sana noto'g'ri",
     "invalidEmail": "Email noto'g'ri",
     "invalid": "Qiymat noto'g'ri",
-    "freezeReasonRequired": "Muzlatish sababini kiriting"
+    "freezeReasonRequired": "Muzlatish sababini kiriting",
+    "nameTaken": "Bu nom band",
+    "invalidTime": "Vaqt noto'g'ri",
+    "daysRequired": "Kamida bitta kunni tanlang",
+    "endBeforeStart": "Tugash sanasi boshlanishdan oldin bo'lmasligi kerak",
+    "roomConflict": "Bu xona shu vaqtda band",
+    "teacherConflict": "O'qituvchi shu vaqtda boshqa guruhda dars beradi",
+    "invalidUrl": "Havola http:// yoki https:// bilan boshlanishi kerak",
+    "passAboveMax": "O'tish balli maksimal balldan oshmasligi kerak",
+    "discountTooLarge": "Chegirma guruh narxidan kam bo'lishi kerak"
   },
   "enums": {
     "studentStatus": {
@@ -134,6 +143,20 @@
     "paymentType": {
       "SYSTEM": "Tizim",
       "MANUAL": "To'lov"
+    },
+    "months": {
+      "1": "Yanvar",
+      "2": "Fevral",
+      "3": "Mart",
+      "4": "Aprel",
+      "5": "May",
+      "6": "Iyun",
+      "7": "Iyul",
+      "8": "Avgust",
+      "9": "Sentabr",
+      "10": "Oktabr",
+      "11": "Noyabr",
+      "12": "Dekabr"
     }
   },
   "student": {
@@ -238,7 +261,10 @@
       "left_group": "Guruhdan chiqdi",
       "student_joined": "Talaba qo'shildi",
       "student_left": "Talaba chiqdi",
-      "group_status_changed": "Guruh holati o'zgardi"
+      "group_status_changed": "Guruh holati o'zgardi",
+      "discount_added": "Chegirma qo'shildi",
+      "discount_removed": "Chegirma o'chirildi",
+      "exam_added": "Imtihon qo'shildi"
     }
   },
   "attendance": {
@@ -256,6 +282,93 @@
     "nextMonth": "Keyingi oy",
     "PRESENT": "Bor edi",
     "ABSENT": "Yo'q",
-    "EXCUSED": "Sababli"
+    "EXCUSED": "Sababli",
+    "student": "Talaba",
+    "average": "O'rtacha",
+    "noStudents": "Bu oyda guruhda talabalar yo'q"
+  },
+  "group": {
+    "title": "Guruhlar",
+    "new": "Yangi guruh",
+    "newTitle": "Yangi guruh",
+    "newDescription": "Guruh ma'lumotlarini kiriting",
+    "editTitle": "Guruhni tahrirlash",
+    "searchPlaceholder": "Guruh nomi bo'yicha qidirish...",
+    "name": "Guruh nomi",
+    "course": "Kurs",
+    "teacher": "O'qituvchi",
+    "days": "Kunlar",
+    "room": "Xona",
+    "dates": "Mashg'ulot sanalari",
+    "elapsed": "O'tilgan muddat",
+    "tags": "Teglar",
+    "students": "Talabalar",
+    "price": "Narx",
+    "status": "Guruh holati",
+    "selectCourse": "Kursni tanlang",
+    "selectTeacher": "O'qituvchini tanlang",
+    "customDays": "Dars kunlari",
+    "startTime": "Darsning boshlanish vaqti",
+    "duration": "Davomiyligi (daqiqa)",
+    "startDate": "Boshlanish sanasi",
+    "endDate": "Tugash sanasi",
+    "dateFrom": "dan",
+    "dateTo": "gacha",
+    "open": "Ochish",
+    "changeStatus": "Holatni o'zgartirish",
+    "deleteTitle": "\"{name}\" o'chirilsinmi?",
+    "hasStudents": "A'zolari yoki to'lovlari bor guruhni o'chirib bo'lmaydi — uni arxivga o'tkazing",
+    "daysCount": "{count} kun",
+    "studentsList": "Talabalar",
+    "showArchived": "Arxivlangan ({count})",
+    "noStudents": "Talabalar yo'q",
+    "restoreStudent": "Guruhga qaytarish",
+    "removeStudent": "Guruhdan chiqarish",
+    "addStudents": "Talaba qo'shish",
+    "addStudentsHint": "Ism yoki telefon bo'yicha qidiring va guruhga qo'shing",
+    "time": "Vaqt",
+    "capacity": "Xona sig'imi",
+    "tabs": {
+      "attendance": "Davomat",
+      "grades": "Baholash",
+      "online": "Onlayn darslar va materiallar",
+      "discounts": "Chegirmali narx",
+      "exams": "Imtihonlar",
+      "history": "Tarix",
+      "comments": "Izohlar"
+    },
+    "online": {
+      "add": "Material qo'shish",
+      "empty": "Materiallar yo'q",
+      "title": "Nomi",
+      "url": "Havola"
+    },
+    "discounts": {
+      "basePrice": "Guruh narxi",
+      "add": "Chegirma qo'shish",
+      "empty": "Individual chegirmalar yo'q",
+      "student": "Talaba",
+      "selectStudent": "Talabani tanlang",
+      "discount": "Chegirma",
+      "finalPrice": "Yakuniy narx",
+      "period": "Muddat",
+      "reason": "Sabab",
+      "from": "Boshlanish",
+      "to": "Tugash"
+    },
+    "exams": {
+      "add": "Imtihon qo'shish",
+      "empty": "Imtihonlar yo'q",
+      "name": "Nomi",
+      "date": "Sana",
+      "duration": "Davomiyligi",
+      "durationMinutes": "Davomiyligi (daqiqa)",
+      "minutes": "{count} daq.",
+      "maxScore": "Maksimal ball",
+      "passScore": "O'tish balli",
+      "file": "Fayl",
+      "fileUrl": "Fayl havolasi (ixtiyoriy)",
+      "open": "Ochish"
+    }
   }
 }

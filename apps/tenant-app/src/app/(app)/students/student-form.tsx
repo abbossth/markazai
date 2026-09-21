@@ -11,6 +11,7 @@ import { studentSchema, toISODate, type StudentInput, type StudentOutput } from 
 import { PhoneInput } from "@/components/layout/phone-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Field } from "@/components/shared/form-field";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -294,15 +295,5 @@ function StudentFormBody({ lookups, student, onDone }: { lookups: Props["lookups
         </Button>
       </SheetFooter>
     </form>
-  );
-}
-
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Label>{label}</Label>
-      {children}
-      {error && <p className="text-destructive text-xs">{error}</p>}
-    </div>
   );
 }

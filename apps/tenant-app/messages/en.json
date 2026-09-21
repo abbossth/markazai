@@ -91,7 +91,16 @@
     "invalidDate": "Invalid date",
     "invalidEmail": "Invalid email",
     "invalid": "Invalid value",
-    "freezeReasonRequired": "Enter the freeze reason"
+    "freezeReasonRequired": "Enter the freeze reason",
+    "nameTaken": "This name is taken",
+    "invalidTime": "Invalid time",
+    "daysRequired": "Select at least one day",
+    "endBeforeStart": "End date cannot be before the start date",
+    "roomConflict": "This room is busy at that time",
+    "teacherConflict": "The teacher teaches another group at that time",
+    "invalidUrl": "The link must start with http:// or https://",
+    "passAboveMax": "Pass score cannot exceed the maximum score",
+    "discountTooLarge": "The discount must be less than the group price"
   },
   "enums": {
     "studentStatus": {
@@ -134,6 +143,20 @@
     "paymentType": {
       "SYSTEM": "System",
       "MANUAL": "Payment"
+    },
+    "months": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
     }
   },
   "student": {
@@ -238,7 +261,10 @@
       "left_group": "Left group",
       "student_joined": "Student joined",
       "student_left": "Student left",
-      "group_status_changed": "Group status changed"
+      "group_status_changed": "Group status changed",
+      "discount_added": "Discount added",
+      "discount_removed": "Discount removed",
+      "exam_added": "Exam added"
     }
   },
   "attendance": {
@@ -256,6 +282,93 @@
     "nextMonth": "Next month",
     "PRESENT": "Present",
     "ABSENT": "Absent",
-    "EXCUSED": "Excused"
+    "EXCUSED": "Excused",
+    "student": "Student",
+    "average": "Average",
+    "noStudents": "No students in the group this month"
+  },
+  "group": {
+    "title": "Groups",
+    "new": "New group",
+    "newTitle": "New group",
+    "newDescription": "Enter the group's details",
+    "editTitle": "Edit group",
+    "searchPlaceholder": "Search by group name...",
+    "name": "Group name",
+    "course": "Course",
+    "teacher": "Teacher",
+    "days": "Days",
+    "room": "Room",
+    "dates": "Lesson dates",
+    "elapsed": "Elapsed",
+    "tags": "Tags",
+    "students": "Students",
+    "price": "Price",
+    "status": "Group status",
+    "selectCourse": "Select a course",
+    "selectTeacher": "Select a teacher",
+    "customDays": "Lesson days",
+    "startTime": "Lesson start time",
+    "duration": "Duration (min)",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "dateFrom": "from",
+    "dateTo": "to",
+    "open": "Open",
+    "changeStatus": "Change status",
+    "deleteTitle": "Delete \"{name}\"?",
+    "hasStudents": "A group with members or payments cannot be deleted — archive it instead",
+    "daysCount": "{count} days",
+    "studentsList": "Students",
+    "showArchived": "Archived ({count})",
+    "noStudents": "No students",
+    "restoreStudent": "Restore to group",
+    "removeStudent": "Remove from group",
+    "addStudents": "Add student",
+    "addStudentsHint": "Search by name or phone and add to the group",
+    "time": "Time",
+    "capacity": "Room capacity",
+    "tabs": {
+      "attendance": "Attendance",
+      "grades": "Grades",
+      "online": "Online lessons & materials",
+      "discounts": "Discounted price",
+      "exams": "Exams",
+      "history": "History",
+      "comments": "Comments"
+    },
+    "online": {
+      "add": "Add material",
+      "empty": "No materials",
+      "title": "Title",
+      "url": "Link"
+    },
+    "discounts": {
+      "basePrice": "Group price",
+      "add": "Add discount",
+      "empty": "No individual discounts",
+      "student": "Student",
+      "selectStudent": "Select a student",
+      "discount": "Discount",
+      "finalPrice": "Final price",
+      "period": "Period",
+      "reason": "Reason",
+      "from": "From",
+      "to": "To"
+    },
+    "exams": {
+      "add": "Add exam",
+      "empty": "No exams",
+      "name": "Name",
+      "date": "Date",
+      "duration": "Duration",
+      "durationMinutes": "Duration (min)",
+      "minutes": "{count} min",
+      "maxScore": "Max score",
+      "passScore": "Pass score",
+      "file": "File",
+      "fileUrl": "File link (optional)",
+      "open": "Open"
+    }
   }
 }

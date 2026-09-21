@@ -73,3 +73,28 @@ export function lessonDatesBetween(group: ScheduleInput, from: Date, to: Date): 
   }
   return out;
 }
+
+export function timeToMinutes(time: string): number {
+  const [h, m] = time.split(":").map(Number);
+  return (h ?? 0) * 60 + (m ?? 0);
+}
+
+type OverlapInput = ScheduleInput & { startTime: string; durationMinutes: number };
+
+/**
+ * Ikki guruh jadvali to'qnashadimi: umumiy hafta kuni + vaqt oralig'i kesishishi + sana oralig'i kesishishi.
+ * (Bir xona yoki bir o'qituvchi bir vaqtda ikki joyda bo'lolmaydi.)
+ */
+export function schedulesOverlap(a: OverlapInput, b: OverlapInput): boolean {
+  const aDays = new Set(weekdaysOf(a.days, a.customDays));
+  if (!weekdaysOf(b.days, b.customDays).some((d) => aDays.has(d))) return false;
+
+  const aStart = timeToMinutes(a.startTime);
+  const bStart = timeToMinutes(b.startTime);
+  if (!(aStart < bStart + b.durationMinutes && bStart < aStart + a.durationMinutes)) return false;
+
+  const far = Number.POSITIVE_INFINITY;
+  const aEnd = a.endDate?.getTime() ?? far;
+  const bEnd = b.endDate?.getTime() ?? far;
+  return a.startDate.getTime() <= bEnd && b.startDate.getTime() <= aEnd;
+}

@@ -25,12 +25,27 @@ npm run db:seed                 # demo CEO va filial
 npm run dev -w tenant-app       # http://localhost:3000
 ```
 
-Demo kirish (seed): `+998 90 123 45 67` / `password123` (CEO).
+Demo kirish (seed, parol hammasida `password123`):
+
+| Rol | Telefon |
+|---|---|
+| CEO | `+998 90 123 45 67` |
+| Administrator + Cashier | `+998 90 111 11 11` |
+| Marketer | `+998 90 222 22 22` |
+| O'qituvchi (faqat o'z guruhlari) | `+998 90 333 33 33` |
+
+Bazani noldan qayta yaratish: `npm run reset -w @markazai/db` (**barcha ma'lumotni o'chiradi** — faqat dev bazada).
 
 `.env` fayli monorepo ildizida turadi — Next.js va Prisma ikkalasi shu yerdan o'qiydi.
 
 ## Bosqichlar holati
 
 - [x] 1. Fundament: auth (telefon+parol), UZ/RU/EN, dark/light, layout, global qidiruv
-- [ ] 2. Talabalar va Guruhlar
+- [x] 2. Talabalar va Guruhlar (ro'yxat/filtr/CRUD, talaba profili, guruh profili, davomat va baholash)
 - [ ] 3–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
+
+## Testlar
+
+```bash
+cd packages/types && npx vitest run   # jadval, davomat va moliyaviy hisob-kitob mantig'i
+```
