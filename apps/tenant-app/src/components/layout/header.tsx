@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Bell, History, Maximize, Minimize } from "lucide-react";
+import { History, Maximize, Minimize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlobalSearch } from "./global-search";
+import type { BellItem } from "@/app/(app)/reminders/queries";
 import { LocaleSwitcher } from "./locale-switcher";
+import { NotificationsBell } from "./notifications-bell";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
-type Props = { user: { name: string; phone: string; image?: string | null; roles: string[] } };
+type Props = {
+  user: { name: string; phone: string; image?: string | null; roles: string[] };
+  reminders: { count: number; items: BellItem[] };
+};
 
 function FullscreenToggle() {
   const t = useTranslations("common");
@@ -34,7 +39,7 @@ function FullscreenToggle() {
   );
 }
 
-export function Header({ user }: Props) {
+export function Header({ user, reminders }: Props) {
   const t = useTranslations("common");
 
   return (
@@ -44,13 +49,11 @@ export function Header({ user }: Props) {
         <LocaleSwitcher />
         <ThemeToggle />
         <FullscreenToggle />
-        {/* Tarix va bildirishnomalar keyingi bosqichlarda ulanadi */}
+        {/* Tarix keyingi bosqichlarda ulanadi */}
         <Button variant="ghost" size="icon" aria-label={t("history")} title={t("history")}>
           <History className="size-4" />
         </Button>
-        <Button variant="ghost" size="icon" aria-label={t("notifications")} title={t("notifications")}>
-          <Bell className="size-4" />
-        </Button>
+        <NotificationsBell count={reminders.count} items={reminders.items} />
         <UserMenu {...user} />
       </div>
     </header>

@@ -8,6 +8,7 @@ import { LEAD_SOURCES } from "@markazai/types";
 import { CallsTab } from "@/components/shared/calls-tab";
 import { CommentsPanel } from "@/components/shared/comments-panel";
 import { HistoryList } from "@/components/shared/history-list";
+import { RemindersPanel } from "@/components/shared/reminders-panel";
 import { SmsTab } from "@/components/shared/sms-tab";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,11 +16,13 @@ import { formatDate, formatDateTime, formatPhone } from "@/lib/format";
 import { can } from "@/lib/permissions";
 import { param } from "@/lib/search-params";
 import { requireModule } from "@/lib/session";
+import { toCenterParts } from "@markazai/types";
+import { loadReminderItems, loadReminderLookups } from "../../reminders/queries";
 import { loadStudentLookups } from "../../students/queries";
 import { LeadHeaderActions } from "./header-actions";
 import { loadLeadLookups, loadLeadProfile } from "./queries";
 
-const TABS = ["comments", "calls", "sms", "history"] as const;
+const TABS = ["comments", "reminders", "calls", "sms", "history"] as const;
 type Tab = (typeof TABS)[number];
 
 export async function generateMetadata({ params }: PageProps<"/leads/[id]">): Promise<Metadata> {
@@ -33,10 +36,12 @@ export default async function LeadProfilePage({ params, searchParams }: PageProp
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
 
-  const [profile, lookups, studentLookups, t, tt, te] = await Promise.all([
+  const [profile, lookups, studentLookups, reminderLookups, reminders, t, tt, te] = await Promise.all([
     loadLeadProfile(user, id),
     loadLeadLookups(user),
     loadStudentLookups(user),
+    loadReminderLookups(user),
+    loadReminderItems(user, { leadId: id }),
     getTranslations("lead"),
     getTranslations("lead.tabs"),
     getTranslations("enums"),
@@ -151,6 +156,17 @@ export default async function LeadProfilePage({ params, searchParams }: PageProp
                 currentUserId={user.id}
                 canDeleteAny={user.roles.includes("CEO")}
                 comments={comments.map((c) => ({ id: c.id, authorId: c.authorId, authorName: name(c.authorId), body: c.body, createdAt: c.createdAt.toISOString() }))}
+              />
+            </TabsContent>
+            <TabsContent value="reminders" className="pt-4">
+              <RemindersPanel
+                link={{ leadId: lead.id }}
+                items={reminders}
+                lookups={reminderLookups}
+                currentUserId={user.id}
+                canWrite={canWrite}
+                canDeleteAny={user.roles.includes("CEO")}
+                today={toCenterParts(new Date()).date}
               />
             </TabsContent>
             <TabsContent value="calls" className="pt-4">

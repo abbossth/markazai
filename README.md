@@ -42,10 +42,15 @@ Bazani noldan qayta yaratish: `npm run reset -w @markazai/db` (**barcha ma'lumot
 
 - [x] 1. Fundament: auth (telefon+parol), UZ/RU/EN, dark/light, layout, global qidiruv
 - [x] 2. Talabalar va Guruhlar (ro'yxat/filtr/CRUD, talaba profili, guruh profili, davomat va baholash)
-- [ ] 3–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
+- [x] 3. Lidlar (Kanban, drag-and-drop, lid → talaba, qo'ng'iroq/SMS jurnali, eslatmalar)
+- [ ] 4–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
 
 ## Testlar
 
 ```bash
 cd packages/types && npx vitest run   # jadval, davomat va moliyaviy hisob-kitob mantig'i
 ```
+
+## SMS
+
+`src/lib/sms.ts` — `SmsProvider` interfeysi. Eskiz.uz ulanmaguncha mock provayder ishlaydi: xabar `sms_logs` jadvaliga `MOCK` holatida yoziladi, jo'natilmaydi.

@@ -300,7 +300,8 @@
       "converted": "Converted to student",
       "created_from_lead": "Created from lead",
       "call_logged": "Call logged",
-      "sms_sent": "SMS sent"
+      "sms_sent": "SMS sent",
+      "reminder_added": "Reminder added"
     }
   },
   "attendance": {
@@ -405,7 +406,8 @@
       "file": "File",
       "fileUrl": "File link (optional)",
       "open": "Open"
-    }
+    },
+    "reminders": "Reminders"
   },
   "lead": {
     "title": "Leads",
@@ -470,7 +472,8 @@
       "comments": "Comments",
       "calls": "Calls",
       "sms": "SMS",
-      "history": "History"
+      "history": "History",
+      "reminders": "Reminders"
     }
   },
   "calls": {
@@ -491,5 +494,20 @@
     "queued": "SMS logged",
     "failed": "SMS was not sent",
     "fromLead": "From lead stage"
+  },
+  "reminders": {
+    "add": "Add reminder",
+    "empty": "No reminders",
+    "title": "Title",
+    "note": "Note",
+    "dueDate": "Date",
+    "dueTime": "Time",
+    "responsible": "Responsible",
+    "tags": "Tags",
+    "markDone": "Mark as done",
+    "overdue": "Overdue",
+    "bellTitle": "Reminders",
+    "bellEmpty": "No reminders for today",
+    "bellMore": "{count} more reminders"
   }
 }

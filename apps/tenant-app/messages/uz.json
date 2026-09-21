@@ -300,7 +300,8 @@
       "converted": "Talabaga aylantirildi",
       "created_from_lead": "Lid orqali yaratildi",
       "call_logged": "Qo'ng'iroq qayd etildi",
-      "sms_sent": "SMS yuborildi"
+      "sms_sent": "SMS yuborildi",
+      "reminder_added": "Eslatma qo'shildi"
     }
   },
   "attendance": {
@@ -405,7 +406,8 @@
       "file": "Fayl",
       "fileUrl": "Fayl havolasi (ixtiyoriy)",
       "open": "Ochish"
-    }
+    },
+    "reminders": "Eslatma"
   },
   "lead": {
     "title": "Lidlar",
@@ -470,7 +472,8 @@
       "comments": "Izohlar",
       "calls": "Qo'ng'iroqlar",
       "sms": "SMS",
-      "history": "Tarix"
+      "history": "Tarix",
+      "reminders": "Eslatmalar"
     }
   },
   "calls": {
@@ -491,5 +494,20 @@
     "queued": "SMS jurnalga yozildi",
     "failed": "SMS yuborilmadi",
     "fromLead": "Lid davridan"
+  },
+  "reminders": {
+    "add": "Eslatma qo'shish",
+    "empty": "Eslatmalar yo'q",
+    "title": "Sarlavha",
+    "note": "Izoh",
+    "dueDate": "Sana",
+    "dueTime": "Vaqt",
+    "responsible": "Mas'ul xodim",
+    "tags": "Teglar",
+    "markDone": "Bajarildi deb belgilash",
+    "overdue": "Muddati o'tgan",
+    "bellTitle": "Eslatmalar",
+    "bellEmpty": "Bugunga eslatmalar yo'q",
+    "bellMore": "Yana {count} ta eslatma"
   }
 }

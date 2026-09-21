@@ -3,9 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
-import { toISODate, weekdaysOf } from "@markazai/types";
+import { toCenterParts, toISODate, weekdaysOf } from "@markazai/types";
+import { loadReminderItems, loadReminderLookups } from "../../reminders/queries";
 import { CommentsPanel } from "@/components/shared/comments-panel";
 import { HistoryList } from "@/components/shared/history-list";
+import { RemindersPanel } from "@/components/shared/reminders-panel";
 import { GroupStatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,9 +41,11 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
 
-  const [profile, lookups, t, tt, te, tw] = await Promise.all([
+  const [profile, lookups, reminderLookups, reminders, t, tt, te, tw] = await Promise.all([
     loadGroupProfile(user, id),
     loadGroupLookups(user),
+    loadReminderLookups(user),
+    loadReminderItems(user, { groupId: id }),
     getTranslations("group"),
     getTranslations("group.tabs"),
     getTranslations("enums"),
@@ -162,6 +166,19 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
               archived: !!e.leftAt,
             }))}
           />
+          <section className="flex flex-col gap-2">
+            <h2 className="text-sm font-semibold">{t("reminders")}</h2>
+            <RemindersPanel
+              link={{ groupId: group.id }}
+              items={reminders}
+              lookups={reminderLookups}
+              currentUserId={user.id}
+              canWrite={canWrite}
+              canDeleteAny={user.roles.includes("CEO")}
+              today={toCenterParts(new Date()).date}
+              compact
+            />
+          </section>
         </aside>
 
         <section className="min-w-0">
