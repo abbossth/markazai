@@ -5,11 +5,13 @@ import { getTranslations } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
 import { z } from "zod";
 import { summarizeByGroupMonth, toISODate } from "@markazai/types";
+import { CallsTab } from "@/components/shared/calls-tab";
 import { CommentsPanel } from "@/components/shared/comments-panel";
 import { EmptyState } from "@/components/shared/empty-state";
 import { HistoryList } from "@/components/shared/history-list";
 import { Money } from "@/components/shared/money";
 import { PrintButton } from "@/components/shared/print-button";
+import { SmsTab } from "@/components/shared/sms-tab";
 import { StudentStatusBadge } from "@/components/shared/status-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -57,7 +59,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
   ]);
   if (!profile) notFound();
 
-  const { student, payments, comments, attendance, history, grades, userNames } = profile;
+  const { student, payments, comments, attendance, history, grades, calls, sms, fromLead, leadHistory, userNames } = profile;
   const sp = await searchParams;
   const requestedTab = param(sp, "tab");
   const tab: Tab = (TABS as readonly string[]).includes(requestedTab ?? "") ? (requestedTab as Tab) : "groups";
@@ -270,10 +272,18 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
         </TabsContent>
 
         <TabsContent value="calls" className="pt-4">
-          <EmptyState title={t("callsEmpty")} hint={t("integrationHint")} />
+          <CallsTab
+            target={{ studentId: student.id }}
+            canWrite={canWrite}
+            items={calls.map((c) => ({ id: c.id, direction: c.direction, outcome: c.outcome, durationSeconds: c.durationSeconds, note: c.note, createdAt: c.createdAt.toISOString(), authorName: userNames.get(c.createdById) ?? "—", fromLead: !!c.leadId }))}
+          />
         </TabsContent>
         <TabsContent value="sms" className="pt-4">
-          <EmptyState title={t("smsEmpty")} hint={t("integrationHint")} />
+          <SmsTab
+            target={{ studentId: student.id }}
+            canWrite={canWrite}
+            items={sms.map((m) => ({ id: m.id, text: m.text, status: m.status, senderName: userNames.get(m.sentById) ?? "—", createdAt: m.createdAt.toISOString(), fromLead: !!m.leadId }))}
+          />
         </TabsContent>
 
         <TabsContent value="history" className="pt-4">
@@ -289,7 +299,27 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
         </TabsContent>
 
         <TabsContent value="leads" className="pt-4">
-          <EmptyState title={t("leadsEmpty")} hint={t("leadsHint")} />
+          {fromLead ? (
+            <div className="flex max-w-2xl flex-col gap-4">
+              <dl className="bg-card grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-lg border p-4 text-sm">
+                <dt className="text-muted-foreground">{t("leadName")}</dt>
+                <dd className="text-right font-medium">
+                  {user.roles.some((r) => r !== "TEACHER") ? <Link href={`/leads/${fromLead.id}`} className="hover:underline">{fromLead.name}</Link> : fromLead.name}
+                </dd>
+                <dt className="text-muted-foreground">{t("leadSource")}</dt>
+                <dd className="text-right font-medium">{fromLead.source ? te(`leadSource.${fromLead.source}`) : "—"}</dd>
+                <dt className="text-muted-foreground">{t("leadCreated")}</dt>
+                <dd className="text-right font-medium">{formatDate(fromLead.createdAt)}</dd>
+                <dt className="text-muted-foreground">{t("leadConverted")}</dt>
+                <dd className="text-right font-medium">{formatDate(fromLead.convertedAt)}</dd>
+              </dl>
+              <HistoryList
+                items={leadHistory.map((h) => ({ id: h.id, action: h.action, actorName: h.actorName, createdAt: h.createdAt.toISOString(), details: (h.details as Record<string, unknown> | null) ?? null }))}
+              />
+            </div>
+          ) : (
+            <EmptyState title={t("leadsEmpty")} hint={t("leadsHint")} />
+          )}
         </TabsContent>
       </Tabs>
     </div>

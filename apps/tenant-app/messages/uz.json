@@ -168,6 +168,21 @@
       "WALK_IN": "O'zi kelgan",
       "PHONE": "Telefon",
       "OTHER": "Boshqa"
+    },
+    "callOutcome": {
+      "ANSWERED": "Javob berdi",
+      "NO_ANSWER": "Javob bermadi",
+      "BUSY": "Band",
+      "WRONG_NUMBER": "Noto'g'ri raqam"
+    },
+    "callDirection": {
+      "OUTGOING": "Chiquvchi",
+      "INCOMING": "Kiruvchi"
+    },
+    "smsStatus": {
+      "SENT": "Yuborildi",
+      "FAILED": "Xatolik",
+      "MOCK": "Test rejimi"
     }
   },
   "student": {
@@ -255,7 +270,11 @@
         "debt": "Qarz",
         "none": "—"
       }
-    }
+    },
+    "leadName": "Lid",
+    "leadSource": "Manba",
+    "leadCreated": "Lid yaratilgan",
+    "leadConverted": "Talabaga aylantirilgan"
   },
   "comments": {
     "placeholder": "Izoh yozing...",
@@ -275,7 +294,13 @@
       "group_status_changed": "Guruh holati o'zgardi",
       "discount_added": "Chegirma qo'shildi",
       "discount_removed": "Chegirma o'chirildi",
-      "exam_added": "Imtihon qo'shildi"
+      "exam_added": "Imtihon qo'shildi",
+      "lead_moved": "Ustunga ko'chirildi",
+      "list_changed": "Ro'yxat o'zgardi",
+      "converted": "Talabaga aylantirildi",
+      "created_from_lead": "Lid orqali yaratildi",
+      "call_logged": "Qo'ng'iroq qayd etildi",
+      "sms_sent": "SMS yuborildi"
     }
   },
   "attendance": {
@@ -435,6 +460,36 @@
     "duplicateTitle": "Bu telefon raqami mavjud",
     "duplicateLead": "Bu raqam bilan lid allaqachon bor: {name}. Baribir saqlansinmi?",
     "duplicateStudent": "Bu raqam bilan talaba allaqachon bor: {name}. Baribir saqlansinmi?",
-    "saveAnyway": "Baribir saqlash"
+    "saveAnyway": "Baribir saqlash",
+    "convert": "Talabaga aylantirish",
+    "convertTitle": "\"{name}\" talabaga aylantirilsinmi?",
+    "convertHint": "Yangi talaba yaratiladi va lid doskadan olib tashlanadi. Xohlasangiz, darhol guruhga qo'shishingiz mumkin.",
+    "converted": "Talaba yaratildi",
+    "convertedBanner": "Lid talabaga aylantirilgan ({date})",
+    "tabs": {
+      "comments": "Izohlar",
+      "calls": "Qo'ng'iroqlar",
+      "sms": "SMS",
+      "history": "Tarix"
+    }
+  },
+  "calls": {
+    "log": "Qo'ng'iroqni qayd etish",
+    "empty": "Qo'ng'iroqlar tarixi yo'q",
+    "direction": "Yo'nalish",
+    "outcome": "Natija",
+    "duration": "Davomiyligi (daqiqa)",
+    "note": "Izoh",
+    "minutes": "{count} daq.",
+    "fromLead": "Lid davridan"
+  },
+  "sms": {
+    "placeholder": "SMS matni...",
+    "send": "Yuborish",
+    "empty": "SMS tarixi yo'q",
+    "mockNotice": "Eskiz.uz ulanmaguncha xabarlar faqat jurnalga yoziladi (test rejimi).",
+    "queued": "SMS jurnalga yozildi",
+    "failed": "SMS yuborilmadi",
+    "fromLead": "Lid davridan"
   }
 }

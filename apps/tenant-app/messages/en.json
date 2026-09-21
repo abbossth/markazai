@@ -168,6 +168,21 @@
       "WALK_IN": "Walk-in",
       "PHONE": "Phone",
       "OTHER": "Other"
+    },
+    "callOutcome": {
+      "ANSWERED": "Answered",
+      "NO_ANSWER": "No answer",
+      "BUSY": "Busy",
+      "WRONG_NUMBER": "Wrong number"
+    },
+    "callDirection": {
+      "OUTGOING": "Outgoing",
+      "INCOMING": "Incoming"
+    },
+    "smsStatus": {
+      "SENT": "Sent",
+      "FAILED": "Failed",
+      "MOCK": "Test mode"
     }
   },
   "student": {
@@ -255,7 +270,11 @@
         "debt": "Debt",
         "none": "—"
       }
-    }
+    },
+    "leadName": "Lead",
+    "leadSource": "Source",
+    "leadCreated": "Lead created",
+    "leadConverted": "Converted to student"
   },
   "comments": {
     "placeholder": "Write a comment...",
@@ -275,7 +294,13 @@
       "group_status_changed": "Group status changed",
       "discount_added": "Discount added",
       "discount_removed": "Discount removed",
-      "exam_added": "Exam added"
+      "exam_added": "Exam added",
+      "lead_moved": "Moved to column",
+      "list_changed": "List changed",
+      "converted": "Converted to student",
+      "created_from_lead": "Created from lead",
+      "call_logged": "Call logged",
+      "sms_sent": "SMS sent"
     }
   },
   "attendance": {
@@ -435,6 +460,36 @@
     "duplicateTitle": "This phone number already exists",
     "duplicateLead": "A lead with this number already exists: {name}. Save anyway?",
     "duplicateStudent": "A student with this number already exists: {name}. Save anyway?",
-    "saveAnyway": "Save anyway"
+    "saveAnyway": "Save anyway",
+    "convert": "Convert to student",
+    "convertTitle": "Convert \"{name}\" to a student?",
+    "convertHint": "A new student will be created and the lead removed from the board. You can also add them to a group right away.",
+    "converted": "Student created",
+    "convertedBanner": "Lead converted to a student ({date})",
+    "tabs": {
+      "comments": "Comments",
+      "calls": "Calls",
+      "sms": "SMS",
+      "history": "History"
+    }
+  },
+  "calls": {
+    "log": "Log a call",
+    "empty": "No call history",
+    "direction": "Direction",
+    "outcome": "Outcome",
+    "duration": "Duration (min)",
+    "note": "Note",
+    "minutes": "{count} min",
+    "fromLead": "From lead stage"
+  },
+  "sms": {
+    "placeholder": "SMS text...",
+    "send": "Send",
+    "empty": "No SMS history",
+    "mockNotice": "Until Eskiz.uz is connected, messages are only written to the log (test mode).",
+    "queued": "SMS logged",
+    "failed": "SMS was not sent",
+    "fromLead": "From lead stage"
   }
 }

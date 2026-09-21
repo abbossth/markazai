@@ -9,7 +9,7 @@ import { requireUser } from "@/lib/session";
 
 const bodySchema = z.string().trim().min(1, "required").max(2000);
 
-type Target = { studentId: string } | { groupId: string };
+type Target = { studentId: string } | { groupId: string } | { leadId: string };
 
 export async function addComment(target: Target, body: string): Promise<ActionResult> {
   const user = await requireUser();
@@ -22,6 +22,12 @@ export async function addComment(target: Target, body: string): Promise<ActionRe
     if (!exists) return { ok: false, error: "notFound" };
     await prisma.comment.create({ data: { organizationId: user.orgId, authorId: user.id, studentId: target.studentId, body: parsed.data } });
     revalidatePath(`/students/${target.studentId}`);
+  } else if ("leadId" in target) {
+    if (!canAccess(user.roles, "leads")) return { ok: false, error: "forbidden" };
+    const exists = await prisma.lead.findFirst({ where: { id: target.leadId, organizationId: user.orgId }, select: { id: true } });
+    if (!exists) return { ok: false, error: "notFound" };
+    await prisma.comment.create({ data: { organizationId: user.orgId, authorId: user.id, leadId: target.leadId, body: parsed.data } });
+    revalidatePath(`/leads/${target.leadId}`);
   } else {
     if (!canAccess(user.roles, "groups")) return { ok: false, error: "forbidden" };
     const exists = await prisma.group.findFirst({ where: { id: target.groupId, organizationId: user.orgId }, select: { id: true } });
@@ -42,5 +48,6 @@ export async function deleteComment(id: string): Promise<ActionResult> {
   await prisma.comment.delete({ where: { id } });
   if (comment.studentId) revalidatePath(`/students/${comment.studentId}`);
   if (comment.groupId) revalidatePath(`/groups/${comment.groupId}`);
+  if (comment.leadId) revalidatePath(`/leads/${comment.leadId}`);
   return { ok: true };
 }

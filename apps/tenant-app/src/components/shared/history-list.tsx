@@ -14,6 +14,8 @@ export type HistoryItem = {
 export function HistoryList({ items }: { items: HistoryItem[] }) {
   const t = useTranslations("history");
   const te = useTranslations("enums.studentStatus");
+  const tco = useTranslations("enums.callOutcome");
+  const tss = useTranslations("enums.smsStatus");
   const has = (key: string) => t.has(`actions.${key}` as "actions.created");
 
   const describe = (item: HistoryItem) => {
@@ -25,6 +27,16 @@ export function HistoryList({ items }: { items: HistoryItem[] }) {
         const to = te.has(String(d.to) as "ACTIVE") ? te(String(d.to) as "ACTIVE") : String(d.to);
         return `${label}: ${from} → ${to}${d.reason ? ` (${String(d.reason)})` : ""}`;
       }
+      case "lead_moved":
+        return `${label}: ${String(d.from ?? "")} → ${String(d.to ?? "")}`;
+      case "converted":
+        return `${label}: ${String(d.studentName ?? "")}`;
+      case "created_from_lead":
+        return `${label}: ${String(d.leadName ?? "")}`;
+      case "call_logged":
+        return `${label}: ${tco.has(String(d.outcome) as "ANSWERED") ? tco(String(d.outcome) as "ANSWERED") : String(d.outcome ?? "")}`;
+      case "sms_sent":
+        return `${label}: ${tss.has(String(d.status) as "SENT") ? tss(String(d.status) as "SENT") : String(d.status ?? "")}`;
       case "joined_group":
       case "left_group":
         return `${label}: ${String(d.groupName ?? "")}`;
