@@ -97,6 +97,18 @@ model CenterSettings {
   // Til ro'yxati konfiguratsiya darajasida — kodga qattiq yozilmaydi.
   locales              String[] @default(["uz", "ru", "en"])
   defaultTheme         String   @default("system") @map("default_theme")
+  // Aloqa va login sahifasi
+  address              String?
+  telegram             String?
+  instagram            String?
+  loginWelcome         String?  @map("login_welcome")
+  offerText            String?  @map("offer_text")
+  // Chek shabloni (Sozlamalar → Chek shabloni)
+  receiptHeader        String?  @map("receipt_header")
+  receiptFooter        String?  @map("receipt_footer")
+  receiptShowLogo      Boolean  @default(true) @map("receipt_show_logo")
+  receiptShowBranch    Boolean  @default(true) @map("receipt_show_branch")
+  receiptShowCashier   Boolean  @default(true) @map("receipt_show_cashier")
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
@@ -802,4 +814,50 @@ model DashboardLayout {
 
   @@index([organizationId])
   @@map("dashboard_layouts")
+}
+
+// ─────────────────────────────────────────────────────────────
+// 7-bosqich: Sozlamalar
+// ─────────────────────────────────────────────────────────────
+
+// Dam olish (bayram) kunlari: shu kunlarda dars bo'lmaydi (jadval, davomat, oylik dars soni, ish haqi).
+model Holiday {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  date           DateTime @db.Date
+  name           String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@unique([organizationId, date])
+  @@map("holidays")
+}
+
+// Ommaviy lid formasi konstruktori (bitta forma / markaz). fields — [{ key, enabled, required, label? }].
+model LeadForm {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @unique @map("organization_id") @db.Uuid
+  enabled        Boolean  @default(false)
+  title          String
+  description    String?
+  submitLabel    String   @map("submit_label")
+  successMessage String   @map("success_message")
+  fields         Json
+  // Yangi lid tushadigan Kanban ustuni (bo'sh — birinchi ustun).
+  columnId       String?  @map("column_id") @db.Uuid
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("lead_forms")
+}
+
+// Integratsiyalar (Payme/Click/Uzum/Facebook/amoCRM/Workly/Telegram). Sirlar `config` ichida shifrlangan saqlanadi.
+model Integration {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  kind           String
+  enabled        Boolean  @default(false)
+  config         Json
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([organizationId, kind])
+  @@map("integrations")
 }

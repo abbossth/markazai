@@ -934,5 +934,70 @@
       "excel": "Excel",
       "pdf": "PDF"
     }
+  },
+  "settings": {
+    "title": "Настройки",
+    "nav": {
+      "general": "Общие",
+      "staff": "Сотрудники",
+      "courses": "Курсы",
+      "rooms": "Кабинеты",
+      "tags": "Теги",
+      "holidays": "Выходные дни",
+      "receipt": "Шаблон чека",
+      "leadForm": "Форма лида",
+      "integrations": "Интеграции",
+      "archive": "Архив",
+      "changelog": "Что нового"
+    },
+    "general": {
+      "sections": {
+        "center": "Данные центра",
+        "lessons": "Занятия",
+        "brand": "Бренд и внешний вид",
+        "login": "Страница входа",
+        "offer": "Оферта",
+        "modules": "Модули"
+      },
+      "name": "Название центра",
+      "phone": "Телефон",
+      "address": "Адрес",
+      "workingHours": "Часы работы",
+      "workingHoursHint": "Например: 09:00–21:00",
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "lessonStartStep": "Шаг начала занятия (минуты)",
+      "lessonStartStepHint": "При создании группы время начала выбирается с этим шагом.",
+      "returningStudentRule": "Правило «вернувшийся студент»",
+      "returningStudentRuleHint": "Как поступать со студентом, который ушёл и вернулся (например, скидка или повторный пробный урок).",
+      "brandColor": "Цвет бренда",
+      "brandColorHint": "Кнопки и акценты. Пусто — стандартный нейтральный цвет.",
+      "brandReset": "Стандартный цвет",
+      "defaultTheme": "Тема по умолчанию",
+      "themes": {
+        "light": "Светлая",
+        "dark": "Тёмная",
+        "system": "Системная"
+      },
+      "locales": "Включённые языки",
+      "localesHint": "Должен быть включён хотя бы один язык.",
+      "logo": "Логотип",
+      "loginBanner": "Баннер страницы входа",
+      "upload": "Загрузить изображение",
+      "remove": "Удалить",
+      "uploading": "Загрузка…",
+      "imageHint": "PNG, JPG, WEBP или GIF, до 2 МБ.",
+      "uploadErrors": {
+        "tooLarge": "Изображение не должно превышать 2 МБ",
+        "invalidType": "Только PNG, JPG, WEBP или GIF",
+        "generic": "Не удалось загрузить"
+      },
+      "loginWelcome": "Приветствие на странице входа",
+      "offerText": "Текст оферты",
+      "offerHint": "Публичная оферта или договор (для показа в чеке/публичной форме).",
+      "gamification": "Геймификация (система койнов)",
+      "gamificationHint": "Если включено, студенты получают койны за посещаемость и оценки.",
+      "previewButton": "Вид"
+    }
   }
 }

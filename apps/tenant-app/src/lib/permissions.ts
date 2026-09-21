@@ -33,7 +33,8 @@ export type Permission =
   | "withdrawals:write"
   | "teachers:write"
   | "salary:read"
-  | "salary:pay";
+  | "salary:pay"
+  | "settings:manage";
 
 const ADMIN_PERMISSIONS: Permission[] = [
   "students:write",
@@ -50,10 +51,13 @@ const ADMIN_PERMISSIONS: Permission[] = [
 const FINANCE_STAFF: Permission[] = ["payments:write", "expenses:write"];
 const FINANCE_MANAGER: Permission[] = [...FINANCE_STAFF, "payments:void", "withdrawals:write", "salary:read", "salary:pay"];
 
+// Sozlamalar (xodimlar, kurslar, integratsiyalar...) — faqat modul ruxsati ham bor rollar.
+const SETTINGS: Permission[] = ["settings:manage"];
+
 const PERMISSIONS: Record<Role, Permission[]> = {
-  CEO: [...ADMIN_PERMISSIONS, ...FINANCE_MANAGER],
-  BRANCH_DIRECTOR: [...ADMIN_PERMISSIONS, ...FINANCE_MANAGER],
-  ADMINISTRATOR: [...ADMIN_PERMISSIONS, ...FINANCE_STAFF],
+  CEO: [...ADMIN_PERMISSIONS, ...FINANCE_MANAGER, ...SETTINGS],
+  BRANCH_DIRECTOR: [...ADMIN_PERMISSIONS, ...FINANCE_MANAGER, ...SETTINGS],
+  ADMINISTRATOR: [...ADMIN_PERMISSIONS, ...FINANCE_STAFF, ...SETTINGS],
   ADMINISTRATOR2: [...ADMIN_PERMISSIONS, ...FINANCE_STAFF],
   LIMITED_ADMINISTRATOR: ["students:write", "groups:write", "attendance:write", "leads:write"],
   INTERN_ADMINISTRATOR: ["students:write", "attendance:write", "leads:write"],

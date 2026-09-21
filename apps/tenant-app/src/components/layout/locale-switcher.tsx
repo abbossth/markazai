@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCenterConfig } from "@/components/providers/providers";
 import { LOCALES } from "@/i18n/config";
 import { setLocale } from "@/i18n/actions";
 
@@ -17,6 +18,8 @@ export function LocaleSwitcher() {
   const t = useTranslations("common");
   const current = useLocale();
   const [pending, startTransition] = useTransition();
+  const { locales: enabled } = useCenterConfig();
+  const options = LOCALES.filter((l) => enabled.includes(l.code));
   const active = LOCALES.find((l) => l.code === current);
 
   return (
@@ -28,7 +31,7 @@ export function LocaleSwitcher() {
         {active?.short}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {LOCALES.map((l) => (
+        {options.map((l) => (
           <DropdownMenuItem key={l.code} onClick={() => startTransition(() => setLocale(l.code))}>
             <span className="flex-1">{l.label}</span>
             {l.code === current && <Check className="size-4" />}

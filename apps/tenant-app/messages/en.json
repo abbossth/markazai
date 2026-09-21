@@ -934,5 +934,70 @@
       "excel": "Excel",
       "pdf": "PDF"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "nav": {
+      "general": "General",
+      "staff": "Staff",
+      "courses": "Courses",
+      "rooms": "Rooms",
+      "tags": "Tags",
+      "holidays": "Holidays",
+      "receipt": "Receipt template",
+      "leadForm": "Lead form",
+      "integrations": "Integrations",
+      "archive": "Archive",
+      "changelog": "What's new"
+    },
+    "general": {
+      "sections": {
+        "center": "Center details",
+        "lessons": "Lessons",
+        "brand": "Brand and appearance",
+        "login": "Login page",
+        "offer": "Offer",
+        "modules": "Modules"
+      },
+      "name": "Center name",
+      "phone": "Phone",
+      "address": "Address",
+      "workingHours": "Working hours",
+      "workingHoursHint": "For example: 09:00–21:00",
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "lessonStartStep": "Lesson start step (minutes)",
+      "lessonStartStepHint": "When creating a group, the start time is picked with this step.",
+      "returningStudentRule": "\"Returning student\" rule",
+      "returningStudentRuleHint": "How to treat a student who left and came back (for example a discount or a repeated trial).",
+      "brandColor": "Brand color",
+      "brandColorHint": "Buttons and accents. Empty — the default neutral color.",
+      "brandReset": "Default color",
+      "defaultTheme": "Default theme",
+      "themes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "locales": "Enabled languages",
+      "localesHint": "At least one language must be enabled.",
+      "logo": "Logo",
+      "loginBanner": "Login banner image",
+      "upload": "Upload image",
+      "remove": "Remove",
+      "uploading": "Uploading…",
+      "imageHint": "PNG, JPG, WEBP or GIF, up to 2 MB.",
+      "uploadErrors": {
+        "tooLarge": "The image must not exceed 2 MB",
+        "invalidType": "Only PNG, JPG, WEBP or GIF",
+        "generic": "Upload failed"
+      },
+      "loginWelcome": "Login page welcome text",
+      "offerText": "Offer text",
+      "offerHint": "Public offer or agreement text (to show on the receipt/public form).",
+      "gamification": "Gamification (coin system)",
+      "gamificationHint": "When on, students earn coins for attendance and grades.",
+      "previewButton": "Preview"
+    }
   }
 }

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { Providers } from "@/components/providers/providers";
+import { brandCss, loadCenter, loadCenterConfig } from "@/lib/center";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,6 +23,8 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();
+  const [config, center] = await Promise.all([loadCenterConfig(), loadCenter()]);
+  const brand = brandCss(center?.brandColor);
 
   return (
     <html
@@ -29,9 +32,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>{brand && <style dangerouslySetInnerHTML={{ __html: brand }} />}</head>
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider>
-          <Providers>{children}</Providers>
+          <Providers config={config}>{children}</Providers>
         </NextIntlClientProvider>
       </body>
     </html>

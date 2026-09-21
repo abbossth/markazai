@@ -934,5 +934,70 @@
       "excel": "Excel",
       "pdf": "PDF"
     }
+  },
+  "settings": {
+    "title": "Sozlamalar",
+    "nav": {
+      "general": "Umumiy",
+      "staff": "Xodimlar",
+      "courses": "Kurslar",
+      "rooms": "Xonalar",
+      "tags": "Teglar",
+      "holidays": "Dam olish kunlari",
+      "receipt": "Chek shabloni",
+      "leadForm": "Lid forma",
+      "integrations": "Integratsiyalar",
+      "archive": "Arxiv",
+      "changelog": "Nima yangilik"
+    },
+    "general": {
+      "sections": {
+        "center": "Markaz ma'lumotlari",
+        "lessons": "Darslar",
+        "brand": "Brend va ko'rinish",
+        "login": "Login sahifasi",
+        "offer": "Oferta",
+        "modules": "Modullar"
+      },
+      "name": "Markaz nomi",
+      "phone": "Telefon",
+      "address": "Manzil",
+      "workingHours": "Ish vaqti",
+      "workingHoursHint": "Masalan: 09:00–21:00",
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "lessonStartStep": "Dars boshlanish qadami (daqiqa)",
+      "lessonStartStepHint": "Guruh yaratishda dars boshlanish vaqti shu qadam bilan tanlanadi.",
+      "returningStudentRule": "\"Qaytgan o'quvchi\" qoidasi",
+      "returningStudentRuleHint": "Ketib qaytgan talabaga qanday munosabatda bo'lish (masalan, chegirma yoki qayta sinov).",
+      "brandColor": "Brend rangi",
+      "brandColorHint": "Tugmalar va urg'u ranglari. Bo'sh — standart neytral rang.",
+      "brandReset": "Standart rang",
+      "defaultTheme": "Standart mavzu",
+      "themes": {
+        "light": "Yorug'",
+        "dark": "Qorong'i",
+        "system": "Tizim"
+      },
+      "locales": "Yoqilgan tillar",
+      "localesHint": "Kamida bitta til yoqilgan bo'lishi kerak.",
+      "logo": "Logotip",
+      "loginBanner": "Login banner-rasmi",
+      "upload": "Rasm yuklash",
+      "remove": "O'chirish",
+      "uploading": "Yuklanmoqda…",
+      "imageHint": "PNG, JPG, WEBP yoki GIF, 2 MB gacha.",
+      "uploadErrors": {
+        "tooLarge": "Rasm 2 MB dan oshmasligi kerak",
+        "invalidType": "Faqat PNG, JPG, WEBP yoki GIF",
+        "generic": "Yuklab bo'lmadi"
+      },
+      "loginWelcome": "Login sahifasidagi salom matni",
+      "offerText": "Oferta matni",
+      "offerHint": "Ommaviy oferta yoki shartnoma matni (chekda/ommaviy formada ko'rsatish uchun).",
+      "gamification": "Gamifikatsiya (coin tizimi)",
+      "gamificationHint": "Yoqilsa, talabalar davomat va baholar uchun coin oladi.",
+      "previewButton": "Ko'rinish"
+    }
   }
 }

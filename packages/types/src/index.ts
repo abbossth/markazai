@@ -5,18 +5,7 @@ import { phoneSchema } from "./phone";
 export const DEFAULT_ORGANIZATION_ID =
   process.env.DEFAULT_ORGANIZATION_ID ?? "00000000-0000-4000-8000-000000000001";
 
-export const ROLES = [
-  "CEO",
-  "ADMINISTRATOR",
-  "LIMITED_ADMINISTRATOR",
-  "ADMINISTRATOR2",
-  "INTERN_ADMINISTRATOR",
-  "CASHIER",
-  "MARKETER",
-  "BRANCH_DIRECTOR",
-  "TEACHER",
-] as const;
-export type Role = (typeof ROLES)[number];
+export * from "./roles";
 
 export const loginSchema = z.object({
   phone: phoneSchema,
@@ -42,3 +31,4 @@ export * from "./salary";
 export * from "./teacher";
 export * from "./dashboard";
 export * from "./reports";
+export * from "./settings";
