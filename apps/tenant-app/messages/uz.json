@@ -37,7 +37,8 @@
     "notFound": "Topilmadi",
     "more": "(ko'proq)",
     "less": "(kamroq)",
-    "print": "Chop etish"
+    "print": "Chop etish",
+    "locked": "Bu ro'yxat qulflangan"
   },
   "nav": {
     "dashboard": "Bosh sahifa",
@@ -157,6 +158,16 @@
       "10": "Oktabr",
       "11": "Noyabr",
       "12": "Dekabr"
+    },
+    "leadSource": {
+      "INSTAGRAM": "Instagram",
+      "TELEGRAM": "Telegram",
+      "FACEBOOK": "Facebook",
+      "WEBSITE": "Veb-sayt",
+      "REFERRAL": "Tavsiya",
+      "WALK_IN": "O'zi kelgan",
+      "PHONE": "Telefon",
+      "OTHER": "Boshqa"
     }
   },
   "student": {
@@ -370,5 +381,60 @@
       "fileUrl": "Fayl havolasi (ixtiyoriy)",
       "open": "Ochish"
     }
+  },
+  "lead": {
+    "title": "Lidlar",
+    "searchPlaceholder": "Ism yoki telefon bo'yicha qidirish...",
+    "newLead": "Yangi lid",
+    "newTitle": "Yangi lid",
+    "newDescription": "Lid ma'lumotlarini kiriting",
+    "editTitle": "Lidni tahrirlash",
+    "name": "Ism",
+    "phone": "Telefon",
+    "column": "Ustun",
+    "list": "Ro'yxat",
+    "source": "Mijoz manbai",
+    "assignee": "Mas'ul xodim",
+    "course": "Kurs",
+    "days": "Kunlar",
+    "note": "Izoh",
+    "tags": "Teglar",
+    "section": "Bo'lim",
+    "task": "Vazifa",
+    "createdAt": "Qo'shilgan sana",
+    "dateFrom": "dan",
+    "dateTo": "gacha",
+    "taskFilter": {
+      "overdue": "Muddati o'tgan",
+      "today": "Bugun",
+      "any": "Vazifasi bor",
+      "none": "Vazifasi yo'q"
+    },
+    "open": "Ochish",
+    "total": "Jami: {count} ta lid",
+    "newColumn": "Yangi ustun",
+    "renameColumn": "Ustun nomini o'zgartirish",
+    "newList": "Yangi ro'yxat",
+    "renameList": "Ro'yxat nomini o'zgartirish",
+    "moveLeft": "Chapga surish",
+    "moveRight": "O'ngga surish",
+    "lockList": "Qulflash",
+    "unlockList": "Qulfni ochish",
+    "listLocked": "Ro'yxat qulflangan (nomini o'zgartirib, o'chirib bo'lmaydi)",
+    "columnNotEmpty": "Ustunda lidlar bor — avval ularni boshqa ustunga ko'chiring",
+    "lastColumn": "Oxirgi ustunni o'chirib bo'lmaydi",
+    "deleteTitle": "\"{name}\" o'chirilsinmi?",
+    "deleteListHint": "Ro'yxatdagi lidlar ustunning umumiy qismiga o'tadi.",
+    "overdue": "Muddati o'tgan vazifa",
+    "pending": "Bajarilmagan vazifa",
+    "menu": {
+      "sms": "SMS",
+      "comment": "Izoh",
+      "call": "Qo'ng'iroq"
+    },
+    "duplicateTitle": "Bu telefon raqami mavjud",
+    "duplicateLead": "Bu raqam bilan lid allaqachon bor: {name}. Baribir saqlansinmi?",
+    "duplicateStudent": "Bu raqam bilan talaba allaqachon bor: {name}. Baribir saqlansinmi?",
+    "saveAnyway": "Baribir saqlash"
   }
 }

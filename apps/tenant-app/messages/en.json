@@ -37,7 +37,8 @@
     "notFound": "Not found",
     "more": "(more)",
     "less": "(less)",
-    "print": "Print"
+    "print": "Print",
+    "locked": "This list is locked"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -157,6 +158,16 @@
       "10": "October",
       "11": "November",
       "12": "December"
+    },
+    "leadSource": {
+      "INSTAGRAM": "Instagram",
+      "TELEGRAM": "Telegram",
+      "FACEBOOK": "Facebook",
+      "WEBSITE": "Website",
+      "REFERRAL": "Referral",
+      "WALK_IN": "Walk-in",
+      "PHONE": "Phone",
+      "OTHER": "Other"
     }
   },
   "student": {
@@ -370,5 +381,60 @@
       "fileUrl": "File link (optional)",
       "open": "Open"
     }
+  },
+  "lead": {
+    "title": "Leads",
+    "searchPlaceholder": "Search by name or phone...",
+    "newLead": "New lead",
+    "newTitle": "New lead",
+    "newDescription": "Enter the lead's details",
+    "editTitle": "Edit lead",
+    "name": "Name",
+    "phone": "Phone",
+    "column": "Column",
+    "list": "List",
+    "source": "Source",
+    "assignee": "Assignee",
+    "course": "Course",
+    "days": "Days",
+    "note": "Note",
+    "tags": "Tags",
+    "section": "Section",
+    "task": "Task",
+    "createdAt": "Date added",
+    "dateFrom": "from",
+    "dateTo": "to",
+    "taskFilter": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "any": "Has a task",
+      "none": "No tasks"
+    },
+    "open": "Open",
+    "total": "Total: {count} leads",
+    "newColumn": "New column",
+    "renameColumn": "Rename column",
+    "newList": "New list",
+    "renameList": "Rename list",
+    "moveLeft": "Move left",
+    "moveRight": "Move right",
+    "lockList": "Lock",
+    "unlockList": "Unlock",
+    "listLocked": "The list is locked (cannot be renamed or deleted)",
+    "columnNotEmpty": "The column has leads — move them to another column first",
+    "lastColumn": "The last column cannot be deleted",
+    "deleteTitle": "Delete \"{name}\"?",
+    "deleteListHint": "Leads in the list will move to the column's general area.",
+    "overdue": "Overdue task",
+    "pending": "Pending task",
+    "menu": {
+      "sms": "SMS",
+      "comment": "Comment",
+      "call": "Call"
+    },
+    "duplicateTitle": "This phone number already exists",
+    "duplicateLead": "A lead with this number already exists: {name}. Save anyway?",
+    "duplicateStudent": "A student with this number already exists: {name}. Save anyway?",
+    "saveAnyway": "Save anyway"
   }
 }
