@@ -1,0 +1,10 @@
+node_modules
+.next
+.turbo
+dist
+.env
+.env.local
+*.log
+.DS_Store
+packages/db/src/generated
+next-env.d.ts

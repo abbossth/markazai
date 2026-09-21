@@ -1,0 +1,47 @@
+{
+  "common": {
+    "appName": "Markazai",
+    "loading": "Yuklanmoqda...",
+    "search": "Qidirish",
+    "noResults": "Hech narsa topilmadi",
+    "comingSoon": "Bu bo'lim tez orada qo'shiladi",
+    "logout": "Chiqish",
+    "language": "Til",
+    "theme": "Mavzu",
+    "light": "Och",
+    "dark": "Qorong'u",
+    "system": "Tizim",
+    "fullscreen": "To'liq ekran",
+    "history": "Tarix",
+    "notifications": "Bildirishnomalar"
+  },
+  "nav": {
+    "dashboard": "Bosh sahifa",
+    "leads": "Lidlar",
+    "teachers": "O'qituvchilar",
+    "groups": "Guruhlar",
+    "students": "Talabalar",
+    "finance": "Moliya",
+    "reports": "Hisobotlar",
+    "settings": "Sozlamalar"
+  },
+  "login": {
+    "title": "Tizimga kirish",
+    "phone": "Telefon",
+    "password": "Parol",
+    "submit": "LOGIN",
+    "showPassword": "Parolni ko'rsatish",
+    "hidePassword": "Parolni yashirish",
+    "invalidCredentials": "Telefon yoki parol noto'g'ri",
+    "invalidPhone": "Telefon raqami noto'g'ri",
+    "required": "Majburiy maydon",
+    "genericError": "Xatolik yuz berdi, qayta urinib ko'ring"
+  },
+  "search": {
+    "placeholder": "Qidirish: ism yoki telefon...",
+    "staff": "Xodimlar"
+  },
+  "dashboard": {
+    "welcome": "Xush kelibsiz, {name}"
+  }
+}

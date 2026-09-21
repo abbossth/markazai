@@ -1,0 +1,47 @@
+{
+  "common": {
+    "appName": "Markazai",
+    "loading": "Загрузка...",
+    "search": "Поиск",
+    "noResults": "Ничего не найдено",
+    "comingSoon": "Этот раздел скоро появится",
+    "logout": "Выйти",
+    "language": "Язык",
+    "theme": "Тема",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "system": "Системная",
+    "fullscreen": "Во весь экран",
+    "history": "История",
+    "notifications": "Уведомления"
+  },
+  "nav": {
+    "dashboard": "Главная",
+    "leads": "Лиды",
+    "teachers": "Преподаватели",
+    "groups": "Группы",
+    "students": "Студенты",
+    "finance": "Финансы",
+    "reports": "Отчёты",
+    "settings": "Настройки"
+  },
+  "login": {
+    "title": "Вход в систему",
+    "phone": "Телефон",
+    "password": "Пароль",
+    "submit": "LOGIN",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
+    "invalidCredentials": "Неверный телефон или пароль",
+    "invalidPhone": "Неверный номер телефона",
+    "required": "Обязательное поле",
+    "genericError": "Произошла ошибка, попробуйте ещё раз"
+  },
+  "search": {
+    "placeholder": "Поиск: имя или телефон...",
+    "staff": "Сотрудники"
+  },
+  "dashboard": {
+    "welcome": "Добро пожаловать, {name}"
+  }
+}

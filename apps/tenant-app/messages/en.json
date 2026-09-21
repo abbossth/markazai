@@ -1,0 +1,47 @@
+{
+  "common": {
+    "appName": "Markazai",
+    "loading": "Loading...",
+    "search": "Search",
+    "noResults": "Nothing found",
+    "comingSoon": "This section is coming soon",
+    "logout": "Log out",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "fullscreen": "Fullscreen",
+    "history": "History",
+    "notifications": "Notifications"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "leads": "Leads",
+    "teachers": "Teachers",
+    "groups": "Groups",
+    "students": "Students",
+    "finance": "Finance",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "login": {
+    "title": "Sign in",
+    "phone": "Phone",
+    "password": "Password",
+    "submit": "LOGIN",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "invalidCredentials": "Invalid phone or password",
+    "invalidPhone": "Invalid phone number",
+    "required": "Required field",
+    "genericError": "Something went wrong, please try again"
+  },
+  "search": {
+    "placeholder": "Search: name or phone...",
+    "staff": "Staff"
+  },
+  "dashboard": {
+    "welcome": "Welcome, {name}"
+  }
+}
