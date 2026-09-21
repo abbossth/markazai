@@ -1,0 +1,31 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { prisma } from "@markazai/db";
+import { sanitizeLayout, type ActionResult } from "@markazai/types";
+import { requireUser } from "@/lib/session";
+import { allowedWidgetIds } from "./queries";
+
+/**
+ * Dashboard tartibini saqlaydi. Kirish qayta tozalanadi (noma'lum/ruxsatsiz vidjetlar va yaroqsiz o'lchamlar
+ * tashlanadi), shuning uchun mijoz ruxsat etilmagan vidjetni "yoqib" ololmaydi.
+ */
+export async function saveDashboardLayout(widgets: unknown): Promise<ActionResult> {
+  const user = await requireUser();
+  const clean = sanitizeLayout(widgets, allowedWidgetIds(user));
+  await prisma.dashboardLayout.upsert({
+    where: { userId: user.id },
+    update: { widgets: clean },
+    create: { organizationId: user.orgId, userId: user.id, widgets: clean },
+  });
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+/** Tartibni sukut bo'yicha holatga qaytaradi. */
+export async function resetDashboardLayout(): Promise<ActionResult> {
+  const user = await requireUser();
+  await prisma.dashboardLayout.deleteMany({ where: { userId: user.id, organizationId: user.orgId } });
+  revalidatePath("/dashboard");
+  return { ok: true };
+}

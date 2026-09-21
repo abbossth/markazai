@@ -67,7 +67,43 @@
     "staff": "Xodimlar"
   },
   "dashboard": {
-    "welcome": "Xush kelibsiz, {name}"
+    "welcome": "Xush kelibsiz, {name}",
+    "updatedAt": "Ma'lumotlar {time} holatiga",
+    "refresh": "Yangilash",
+    "customize": "Sozlash",
+    "addWidget": "Vidjet qo'shish",
+    "addWidgetHint": "Dashboard'ga qo'shmoqchi bo'lgan vidjetni tanlang.",
+    "reset": "Asl holatga",
+    "resetDone": "Dashboard asl holatiga qaytarildi",
+    "emptyLayout": "Dashboard bo'sh. \"Sozlash\" orqali vidjet qo'shing.",
+    "drag": "Sudrab ko'chirish",
+    "size": "O'lcham",
+    "removeWidget": "Vidjetni olib tashlash",
+    "widgets": {
+      "activeStudents": "Faol o'quvchilar",
+      "groups": "Guruhlar soni",
+      "debtors": "Qarzdorlar soni",
+      "activeLeads": "Faol lidlar",
+      "trial": "Sinov darsida",
+      "paidThisMonth": "Joriy oyda to'laganlar",
+      "leftActiveGroup": "Faol guruhni tark etganlar",
+      "trialOverdue": "Sinov muddatidan kechganlar",
+      "centerLoad": "Markaz yuklamasi",
+      "paymentsChart": "Oy davomidagi to'lovlar",
+      "schedule": "Dars jadvali"
+    },
+    "schedule": {
+      "title": "Dars jadvali",
+      "tabs": {
+        "ODD": "Toq",
+        "EVEN": "Juft",
+        "OTHER": "Boshqa"
+      },
+      "empty": "Bu kunlar uchun guruhlar yo'q",
+      "time": "Vaqt",
+      "noRoom": "Xonasiz",
+      "daysLeft": "{count} kun qoldi"
+    }
   },
   "table": {
     "columns": "Ustunlar",

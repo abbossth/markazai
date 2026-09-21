@@ -787,3 +787,19 @@ model SalaryPayment {
   @@index([organizationId, period])
   @@map("salary_payments")
 }
+
+// ─────────────────────────────────────────────────────────────
+// 6-bosqich: Dashboard
+// ─────────────────────────────────────────────────────────────
+
+// Foydalanuvchining dashboard vidjetlari tartibi va o'lchamlari: [{ "id": "activeStudents", "size": "S" }, ...]
+model DashboardLayout {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  userId         String   @unique @map("user_id") @db.Uuid
+  widgets        Json
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([organizationId])
+  @@map("dashboard_layouts")
+}

@@ -67,7 +67,43 @@
     "staff": "Staff"
   },
   "dashboard": {
-    "welcome": "Welcome, {name}"
+    "welcome": "Welcome, {name}",
+    "updatedAt": "Data as of {time}",
+    "refresh": "Refresh",
+    "customize": "Customize",
+    "addWidget": "Add widget",
+    "addWidgetHint": "Choose a widget to add to the dashboard.",
+    "reset": "Reset",
+    "resetDone": "Dashboard reset to defaults",
+    "emptyLayout": "The dashboard is empty. Add widgets via \"Customize\".",
+    "drag": "Drag to move",
+    "size": "Size",
+    "removeWidget": "Remove widget",
+    "widgets": {
+      "activeStudents": "Active students",
+      "groups": "Number of groups",
+      "debtors": "Number of debtors",
+      "activeLeads": "Active leads",
+      "trial": "On trial lesson",
+      "paidThisMonth": "Paid this month",
+      "leftActiveGroup": "Left an active group",
+      "trialOverdue": "Trial period overdue",
+      "centerLoad": "Center load",
+      "paymentsChart": "Payments this month",
+      "schedule": "Class schedule"
+    },
+    "schedule": {
+      "title": "Class schedule",
+      "tabs": {
+        "ODD": "Odd",
+        "EVEN": "Even",
+        "OTHER": "Other"
+      },
+      "empty": "No groups for these days",
+      "time": "Time",
+      "noRoom": "No room",
+      "daysLeft": "{count} days left"
+    }
   },
   "table": {
     "columns": "Columns",
