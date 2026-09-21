@@ -1186,6 +1186,95 @@
           ]
         }
       ]
+    },
+    "receipt": {
+      "header": "Markaz nomi tagidagi satr",
+      "headerPlaceholder": "Masalan: Litsenziya №123",
+      "footer": "Chek pastidagi matn",
+      "showLogo": "Logotipni ko'rsatish",
+      "showBranch": "Filial nomi va manzilini ko'rsatish",
+      "showCashier": "Qabul qilgan xodimni ko'rsatish",
+      "preview": "Jonli ko'rinish (namunaviy ma'lumot)",
+      "thermal": "Termal 80mm",
+      "sample": {
+        "student": "Ali Valiyev",
+        "method": "Naqd",
+        "cashier": "Dilnoza Karimova"
+      }
+    },
+    "leadForm": {
+      "enabled": "Ommaviy formani yoqish",
+      "enabledHint": "Yoqilganda quyidagi havola orqali kirishsiz ariza qoldirish mumkin; ariza Lidlar doskasiga tushadi.",
+      "copyLink": "Havolani nusxalash",
+      "copied": "Havola nusxalandi",
+      "open": "Ochish",
+      "title": "Forma sarlavhasi",
+      "description": "Tavsif",
+      "submitLabel": "Tugma matni",
+      "column": "Yangi lid tushadigan ustun",
+      "firstColumn": "Birinchi ustun",
+      "successMessage": "Muvaffaqiyat xabari",
+      "fields": "Maydonlar",
+      "fieldsHint": "Ism va telefon doim majburiy. Maydon nomini o'zgartirish uchun o'ng tomondagi qatorga yozing.",
+      "required": "Majburiy",
+      "customLabel": "Maydon nomi (ixtiyoriy)",
+      "preview": "Jonli ko'rinish",
+      "defaults": {
+        "title": "Kursga yozilish",
+        "description": "Ma'lumotlaringizni qoldiring — tez orada bog'lanamiz.",
+        "submit": "Yuborish",
+        "success": "Rahmat! Arizangiz qabul qilindi."
+      }
+    },
+    "integrations": {
+      "hint": "Kalitlar bazada shifrlangan saqlanadi va bu sahifada faqat oxirgi 4 belgi ko'rinadi. Eslatma: sozlamalar saqlanadi, ammo to'lov tizimlaridan avtomatik to'lov qabul qilish (webhook) va tashqi tizimlar bilan sinxronlash hali ulanmagan — to'lovlar qo'lda kiritiladi.",
+      "groups": {
+        "payment": "To'lov tizimlari",
+        "marketing": "Marketing va CRM",
+        "staff": "Xodimlar"
+      },
+      "kinds": {
+        "PAYME": "Payme",
+        "CLICK": "Click",
+        "UZUM": "Uzum Bank",
+        "FACEBOOK": "Facebook",
+        "AMOCRM": "amoCRM",
+        "TELEGRAM": "Telegram bot",
+        "WORKLY": "Workly"
+      },
+      "fields": {
+        "merchantId": "Merchant ID",
+        "key": "Kalit",
+        "serviceId": "Service ID",
+        "secretKey": "Maxfiy kalit",
+        "apiKey": "API kalit",
+        "pageId": "Sahifa ID",
+        "accessToken": "Access token",
+        "subdomain": "Subdomen",
+        "botUsername": "Bot nomi",
+        "botToken": "Bot token",
+        "companyId": "Kompaniya ID"
+      },
+      "connected": "Sozlangan",
+      "notConnected": "Sozlanmagan",
+      "enable": "Yoqilgan",
+      "keepHint": "(o'zgartirish uchun yangisini kiriting)"
+    }
+  },
+  "apply": {
+    "fields": {
+      "name": "Ismingiz",
+      "phone": "Telefon raqamingiz",
+      "course": "Qiziqqan kurs",
+      "days": "Qulay kunlar",
+      "note": "Izoh"
+    },
+    "choose": "Tanlang",
+    "unavailable": "Ariza qabul qilish hozircha yopiq.",
+    "errors": {
+      "unavailable": "Ariza qabul qilish hozircha yopiq.",
+      "rateLimited": "Juda ko'p urinish. Birozdan keyin qayta urinib ko'ring.",
+      "generic": "Xatolik yuz berdi. Qayta urinib ko'ring."
     }
   }
 }

@@ -6,6 +6,7 @@ import { prisma } from "@markazai/db";
 import { formatDate, formatMoney, formatPhone } from "@/lib/format";
 import { requireModule } from "@/lib/session";
 import { cn } from "@/lib/utils";
+import { ReceiptView } from "@/components/shared/receipt-view";
 import { ReceiptActions } from "./receipt-actions";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -52,53 +53,26 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<"/
       <style>{`@page { size: ${thermal ? "80mm auto" : "A4"}; margin: ${thermal ? "4mm" : "12mm"}; }`}</style>
       <ReceiptActions paymentId={payment.id} />
 
-      <article className={cn("flex flex-col gap-4 rounded-lg border p-6 print:border-0 print:p-0", thermal && "gap-2 p-3")}>
-        <header className="flex items-center gap-3 border-b pb-3">
-          {settings?.logoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element -- logotip tashqi URL (Sozlamalarda yuklanadi)
-            <img src={settings.logoUrl} alt="" className={cn("object-contain", thermal ? "size-10" : "size-14")} />
-          )}
-          <div className="flex flex-col">
-            <h1 className={cn("font-semibold", thermal ? "text-sm" : "text-xl")}>{settings?.name ?? "Markazai"}</h1>
-            {branch && (
-              <span className="text-muted-foreground">
-                {branch.name}
-                {branch.address ? `, ${branch.address}` : ""}
-              </span>
-            )}
-            {settings?.phone && <span className="text-muted-foreground">{formatPhone(settings.phone)}</span>}
-          </div>
-        </header>
-
-        <div className="flex items-baseline justify-between">
-          <h2 className={cn("font-semibold uppercase", thermal ? "text-xs" : "text-base")}>{t("title")}</h2>
-          <span className="text-muted-foreground">№ {payment.id.slice(0, 8).toUpperCase()}</span>
-        </div>
-
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
-          {rows.map(([label, value]) => (
-            <div key={label} className="contents">
-              <dt className="text-muted-foreground">{label}</dt>
-              <dd className="text-right font-medium">{value}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <div className="flex items-baseline justify-between border-y py-3">
-          <span className="text-muted-foreground">{t("amount")}</span>
-          <span className={cn("font-bold tabular-nums", thermal ? "text-base" : "text-2xl")}>{formatMoney(payment.amount)}</span>
-        </div>
-
-        <footer className="text-muted-foreground flex flex-col gap-0.5">
-          <span>
-            {t("balanceAfter")}: <span className="text-foreground font-medium tabular-nums">{formatMoney(payment.student.balance)}</span>
-          </span>
-          <span>
-            {t("cashier")}: {cashier?.name ?? "—"}
-          </span>
-          <span className="mt-2 text-center">{t("thanks")}</span>
-        </footer>
-      </article>
+      <ReceiptView
+        thermal={thermal}
+        center={{
+          name: settings?.name ?? "Markazai",
+          phone: settings?.phone,
+          logoUrl: settings?.logoUrl,
+          header: settings?.receiptHeader,
+          footer: settings?.receiptFooter,
+          showLogo: settings?.receiptShowLogo ?? true,
+          showBranch: settings?.receiptShowBranch ?? true,
+          showCashier: settings?.receiptShowCashier ?? true,
+        }}
+        branch={branch}
+        number={payment.id.slice(0, 8).toUpperCase()}
+        rows={rows}
+        amount={payment.amount}
+        balance={payment.student.balance}
+        cashier={cashier?.name}
+        labels={{ title: t("title"), amount: t("amount"), balanceAfter: t("balanceAfter"), cashier: t("cashier"), thanks: t("thanks") }}
+      />
     </main>
   );
 }

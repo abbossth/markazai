@@ -1186,6 +1186,95 @@
           ]
         }
       ]
+    },
+    "receipt": {
+      "header": "Line under the center name",
+      "headerPlaceholder": "For example: License No. 123",
+      "footer": "Text at the bottom of the receipt",
+      "showLogo": "Show the logo",
+      "showBranch": "Show the branch name and address",
+      "showCashier": "Show the staff member who took the payment",
+      "preview": "Live preview (sample data)",
+      "thermal": "Thermal 80mm",
+      "sample": {
+        "student": "Ali Valiyev",
+        "method": "Cash",
+        "cashier": "Dilnoza Karimova"
+      }
+    },
+    "leadForm": {
+      "enabled": "Enable the public form",
+      "enabledHint": "When enabled, anyone can submit an application through the link below without signing in; it lands on the Leads board.",
+      "copyLink": "Copy link",
+      "copied": "Link copied",
+      "open": "Open",
+      "title": "Form title",
+      "description": "Description",
+      "submitLabel": "Button text",
+      "column": "Column for new leads",
+      "firstColumn": "First column",
+      "successMessage": "Success message",
+      "fields": "Fields",
+      "fieldsHint": "Name and phone are always required. To rename a field, type its name in the row on the right.",
+      "required": "Required",
+      "customLabel": "Field name (optional)",
+      "preview": "Live preview",
+      "defaults": {
+        "title": "Course enrollment",
+        "description": "Leave your details and we will contact you soon.",
+        "submit": "Submit",
+        "success": "Thank you! Your application has been received."
+      }
+    },
+    "integrations": {
+      "hint": "Keys are stored encrypted in the database and only the last 4 characters are visible on this page. Note: settings are saved, but automatic payment intake from payment systems (webhooks) and syncing with external systems are not connected yet — payments are entered manually.",
+      "groups": {
+        "payment": "Payment systems",
+        "marketing": "Marketing and CRM",
+        "staff": "Staff"
+      },
+      "kinds": {
+        "PAYME": "Payme",
+        "CLICK": "Click",
+        "UZUM": "Uzum Bank",
+        "FACEBOOK": "Facebook",
+        "AMOCRM": "amoCRM",
+        "TELEGRAM": "Telegram bot",
+        "WORKLY": "Workly"
+      },
+      "fields": {
+        "merchantId": "Merchant ID",
+        "key": "Key",
+        "serviceId": "Service ID",
+        "secretKey": "Secret key",
+        "apiKey": "API key",
+        "pageId": "Page ID",
+        "accessToken": "Access token",
+        "subdomain": "Subdomain",
+        "botUsername": "Bot username",
+        "botToken": "Bot token",
+        "companyId": "Company ID"
+      },
+      "connected": "Configured",
+      "notConnected": "Not configured",
+      "enable": "Enabled",
+      "keepHint": "(enter a new one to replace)"
+    }
+  },
+  "apply": {
+    "fields": {
+      "name": "Your name",
+      "phone": "Your phone number",
+      "course": "Course of interest",
+      "days": "Preferred days",
+      "note": "Comment"
+    },
+    "choose": "Choose",
+    "unavailable": "Applications are currently closed.",
+    "errors": {
+      "unavailable": "Applications are currently closed.",
+      "rateLimited": "Too many attempts. Please try again later.",
+      "generic": "Something went wrong. Please try again."
     }
   }
 }

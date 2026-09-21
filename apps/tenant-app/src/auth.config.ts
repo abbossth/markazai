@@ -8,6 +8,8 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
+      // Ommaviy lid formasi (markazning saytiga joylanadi) — kirishsiz ochiq.
+      if (nextUrl.pathname === "/apply") return true;
       if (nextUrl.pathname === "/login") {
         // ?expired=1 — sessiya bor, lekin xodim o'chirilgan/bloklangan: login sahifasi ochiq qoladi.
         return isLoggedIn && !nextUrl.searchParams.has("expired") ? Response.redirect(new URL("/dashboard", nextUrl)) : true;

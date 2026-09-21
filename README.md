@@ -36,6 +36,14 @@ Demo kirish (seed, parol hammasida `password123`):
 
 Bazani noldan qayta yaratish: `npm run reset -w @markazai/db` (**barcha ma'lumotni o'chiradi** — faqat dev bazada).
 
+### Sozlamalar bo'yicha eslatmalar
+
+- **Yuklangan fayllar** (logotip, login banneri) `UPLOAD_DIR` (sukut: `apps/tenant-app/.uploads`) ichida saqlanadi va `/api/files/<org>/<fayl>` orqali beriladi. Ishlab chiqarishda `lib/storage.ts` dagi ikki funksiyani (`saveImage`, `readStored`) S3/R2 bilan almashtiring. SVG ataylab qo'llab-quvvatlanmaydi (skript tashishi mumkin); tur fayl mazmuniga qarab aniqlanadi.
+- **Integratsiya sirlari** AES-256-GCM bilan shifrlanadi (`SECRETS_KEY`, bo'lmasa `AUTH_SECRET`); UI'da faqat oxirgi 4 belgi ko'rinadi. Kalit almashtirilsa, sirlarni qayta kiriting.
+- **Sessiya** har so'rovda bazadagi joriy rollar va `isActive` bilan tekshiriladi: xodim bloklansa/o'chirilsa yoki roli o'zgarsa, amal qilish darhol tugaydi.
+- **Ommaviy forma** (`/apply`) kirishsiz ochiq: IP bo'yicha cheklov (jarayon xotirasida — ko'p nusxali deployda Redis/Upstash bilan almashtiring, `lib/rate-limit.ts`), honeypot maydon va takroriy telefon himoyasi bor.
+- **Dam olish kunlari** dars jadvali, davomat, oylik darslar soni (shu bilan bir dars narxi), o'qituvchi ish kunlari va ish haqiga ta'sir qiladi; qo'shilganda/o'chirilganda shu oydagi tizim yechimlari qayta hisoblanadi.
+
 `.env` fayli monorepo ildizida turadi — Next.js va Prisma ikkalasi shu yerdan o'qiydi.
 
 ## Bosqichlar holati
@@ -46,7 +54,8 @@ Bazani noldan qayta yaratish: `npm run reset -w @markazai/db` (**barcha ma'lumot
 - [x] 4. Moliya (tizim yechimi dars-dars, to'lovlar, xarajatlar, yechib olish, qarzdorlar, chek, Excel/PDF)
 - [x] 5. O'qituvchilar va davomat (profil, ish jadvali, ustoz davomati, ikki xil maosh modeli, Moliya'da ish haqi)
 - [x] 6. Dashboard va Hisobotlar (sozlanadigan vidjetlar + dars jadvali; Reyting, Davomat, Konversiya, Lidlar, Churn, Jurnallar, Excel eksport)
-- [ ] 7–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
+- [x] 7. Sozlamalar (umumiy + brend/logotip/login banneri, xodimlar + Excel import, kurslar, xonalar, teglar, dam olish kunlari, arxiv, chek shabloni, lid forma konstruktori + ommaviy `/apply`, integratsiyalar)
+- [ ] 8–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
 
 ## Testlar
 

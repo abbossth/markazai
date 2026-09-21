@@ -233,6 +233,7 @@ export const leadFormSchema = z.object({
   fields: z.array(leadFormFieldSchema),
 });
 export type LeadFormInput = z.input<typeof leadFormSchema>;
+export type LeadFormOutput = z.output<typeof leadFormSchema>;
 
 export function defaultLeadFormFields(): LeadFormField[] {
   return LEAD_FORM_FIELD_KEYS.map((key) => ({ key, enabled: key !== "days", required: LOCKED_FIELDS.includes(key), label: undefined }));
