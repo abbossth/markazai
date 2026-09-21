@@ -41,3 +41,4 @@ export * from "./finance-forms";
 export * from "./salary";
 export * from "./teacher";
 export * from "./dashboard";
+export * from "./reports";

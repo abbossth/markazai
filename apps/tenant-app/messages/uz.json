@@ -826,5 +826,113 @@
     "extraIncome": "Qo'shimcha tushum",
     "totalSalary": "Jami maosh",
     "total": "Jami"
+  },
+  "reports": {
+    "title": "Hisobotlar",
+    "from": "Sana: dan",
+    "to": "Sana: gacha",
+    "tabs": {
+      "rating": "Reyting",
+      "attendance": "Davomat",
+      "conversion": "Konversiya",
+      "leads": "Lidlar",
+      "churn": "Guruhni tark etganlar",
+      "logs": "Jurnallar"
+    },
+    "search": {
+      "student": "Talaba ismi yoki telefoni",
+      "lead": "Lid ismi yoki telefoni",
+      "log": "Ism yoki telefon"
+    },
+    "columns": {
+      "rank": "O'rin",
+      "student": "Talaba",
+      "phone": "Telefon",
+      "groups": "Guruhlar",
+      "group": "Guruh",
+      "course": "Kurs",
+      "teacher": "O'qituvchi",
+      "avgScore": "O'rtacha ball",
+      "grades": "Baholar soni",
+      "attendance": "Davomat",
+      "lessons": "Darslar",
+      "present": "Kelgan",
+      "absent": "Kelmagan",
+      "excused": "Sababli",
+      "name": "Ism",
+      "source": "Manba",
+      "stage": "Bosqich",
+      "assignee": "Mas'ul",
+      "created": "Yaratilgan",
+      "converted": "Talaba bo'lgan",
+      "joined": "Qo'shilgan",
+      "left": "Chiqqan",
+      "days": "Kun",
+      "status": "Holat",
+      "balance": "Balans",
+      "date": "Sana",
+      "who": "Kim",
+      "direction": "Yo'nalish",
+      "outcome": "Natija",
+      "duration": "Davomiyligi",
+      "note": "Izoh",
+      "staff": "Xodim",
+      "text": "Matn",
+      "provider": "Provayder"
+    },
+    "rating": {
+      "hint": "Reyting — tanlangan davrdagi o'rtacha ball (faqat baholangan talabalar); ball teng bo'lsa — davomat yuqorisi oldinda."
+    },
+    "attendance": {
+      "groups": "Guruhlar",
+      "overall": "Umumiy davomat",
+      "hint": "Davomat foizi = kelgan / (kelgan + kelmagan); sababli darslar hisobga olinmaydi."
+    },
+    "conversion": {
+      "by": {
+        "source": "Manba bo'yicha",
+        "course": "Kurs bo'yicha",
+        "assignee": "Xodim bo'yicha"
+      },
+      "leads": "Lidlar",
+      "convertedCount": "Talabaga aylangan",
+      "paid": "To'lov qilgan",
+      "rate": "Konversiya",
+      "paidRate": "To'lov / talaba",
+      "avgDays": "O'rtacha kun",
+      "noSource": "Manbasiz",
+      "noCourse": "Kursiz",
+      "unassigned": "Biriktirilmagan",
+      "empty": "Tanlangan davrda lidlar yo'q",
+      "hint": "Davrda yaratilgan lidlar bo'yicha (kohorta): hozirgacha nechtasi talabaga aylangan va to'lov qilgan."
+    },
+    "leads": {
+      "total": "Jami lidlar",
+      "converted": "Talaba bo'lganmi",
+      "yes": "Ha",
+      "no": "Yo'q",
+      "stage": "Bosqich",
+      "assignee": "Mas'ul"
+    },
+    "churn": {
+      "count": "Ketgan talabalar",
+      "avgDays": "Guruhda o'rtacha kun",
+      "hint": "Davrda guruhdan chiqqan va hozir hech qaysi guruhda faol bo'lmagan talabalar (boshqa guruhga o'tganlar kirmaydi)."
+    },
+    "logs": {
+      "calls": "Qo'ng'iroqlar",
+      "sms": "SMS",
+      "workly": "Workly",
+      "worklyTitle": "Workly ulanmagan",
+      "worklyHint": "Xodimlar ish vaqti (Workly) integratsiyasi hali sozlanmagan. Sozlamalar → Integratsiyalar bo'limida ulanadi.",
+      "smsStatus": "SMS holati",
+      "empty": "Yozuvlar yo'q",
+      "lead": "Lid",
+      "student": "Talaba"
+    },
+    "export": {
+      "excel": "Excel",
+      "pdf": "PDF"
+    }
   }
 }

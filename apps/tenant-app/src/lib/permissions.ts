@@ -14,7 +14,8 @@ const MODULE_ACCESS: Record<Role, AppModule[]> = {
   INTERN_ADMINISTRATOR: ["dashboard", "leads", "groups", "students"],
   CASHIER: ["dashboard", "students", "finance"],
   MARKETER: ["dashboard", "leads", "reports"],
-  TEACHER: ["dashboard", "groups", "students"],
+  // O'qituvchi Hisobotlarda faqat o'z guruhlari bo'yicha reyting va davomatni ko'radi.
+  TEACHER: ["dashboard", "groups", "students", "reports"],
 };
 
 export type Permission =

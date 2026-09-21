@@ -18,12 +18,14 @@ const ALL = "__all";
 
 type Props = {
   searchPlaceholder: string;
+  /** Qidiruv maydonisiz (faqat filtrlar) — qidiriladigan matn yo'q hisobotlar uchun. */
+  hideSearch?: boolean;
   fields: FilterField[];
   /** Tepa qatorning o'ng tomoni ("Yangisini qo'shish" kabi). */
   actions?: React.ReactNode;
 };
 
-export function FilterBar({ searchPlaceholder, fields, actions }: Props) {
+export function FilterBar({ searchPlaceholder, hideSearch, fields, actions }: Props) {
   const t = useTranslations("filters");
   const { searchParams, update, reset, pending } = useUrlState();
   const [open, setOpen] = useState(() => fields.some((f) => searchParams.get(f.name)));
@@ -60,16 +62,18 @@ export function FilterBar({ searchPlaceholder, fields, actions }: Props) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <div className="relative w-full max-w-sm">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-          <Input key={inputKey} defaultValue={inputKey === 0 ? initialQ : ""} onChange={(e) => onSearchChange(e.target.value)} placeholder={searchPlaceholder} className="pl-8" />
-        </div>
+        {!hideSearch && (
+          <div className="relative w-full max-w-sm">
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
+            <Input key={inputKey} defaultValue={inputKey === 0 ? initialQ : ""} onChange={(e) => onSearchChange(e.target.value)} placeholder={searchPlaceholder} className="pl-8" />
+          </div>
+        )}
         <Button variant={open ? "secondary" : "outline"} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
           <ListFilter className="size-4" />
           {t("filters")}
           {activeCount > 0 && <span className="bg-primary text-primary-foreground rounded-full px-1.5 text-xs">{activeCount}</span>}
         </Button>
-        {(activeCount > 0 || urlQ) && (
+        {(activeCount > 0 || (!hideSearch && urlQ)) && (
           <Button variant="ghost" onClick={clear} disabled={pending}>
             <X className="size-4" />
             {t("reset")}

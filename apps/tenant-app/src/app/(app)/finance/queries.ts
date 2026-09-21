@@ -1,5 +1,6 @@
 import { prisma, type Prisma } from "@markazai/db";
-import { PAYMENT_METHODS, buildDailyTrend, financeTotals, fromISODate, toCenterParts, toISODate } from "@markazai/types";
+import { PAYMENT_METHODS, buildDailyTrend, financeTotals, fromISODate, toISODate } from "@markazai/types";
+import { resolveRange, type Range } from "@/lib/date-range";
 import { intParam, param, sortParam, type RawSearchParams } from "@/lib/search-params";
 import type { SessionUser } from "@/lib/session";
 
@@ -15,19 +16,7 @@ function pageArgs(page: number, all?: boolean): { skip?: number; take: number } 
   return all ? { take: EXPORT_LIMIT } : { skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE };
 }
 
-const ISO = /^\d{4}-\d{2}-\d{2}$/;
-
-/** Sana oralig'i ("YYYY-MM-DD"); berilmasa — joriy oy boshidan bugungacha (markaz vaqti). */
-export function resolveRange(sp: RawSearchParams) {
-  const today = toCenterParts(new Date()).date;
-  let from = param(sp, "from");
-  let to = param(sp, "to");
-  if (!from || !ISO.test(from)) from = `${today.slice(0, 7)}-01`;
-  if (!to || !ISO.test(to)) to = today;
-  if (from > to) [from, to] = [to, from];
-  return { from, to, today };
-}
-export type Range = ReturnType<typeof resolveRange>;
+export { resolveRange, type Range };
 
 const dateRange = (r: Range) => ({ gte: fromISODate(r.from), lte: fromISODate(r.to) });
 

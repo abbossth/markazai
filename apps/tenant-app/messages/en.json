@@ -826,5 +826,113 @@
     "extraIncome": "Extra income",
     "totalSalary": "Total salary",
     "total": "Total"
+  },
+  "reports": {
+    "title": "Reports",
+    "from": "Date: from",
+    "to": "Date: to",
+    "tabs": {
+      "rating": "Rating",
+      "attendance": "Attendance",
+      "conversion": "Conversion",
+      "leads": "Leads",
+      "churn": "Left the group",
+      "logs": "Logs"
+    },
+    "search": {
+      "student": "Student name or phone",
+      "lead": "Lead name or phone",
+      "log": "Name or phone"
+    },
+    "columns": {
+      "rank": "Rank",
+      "student": "Student",
+      "phone": "Phone",
+      "groups": "Groups",
+      "group": "Group",
+      "course": "Course",
+      "teacher": "Teacher",
+      "avgScore": "Average score",
+      "grades": "Grades",
+      "attendance": "Attendance",
+      "lessons": "Lessons",
+      "present": "Present",
+      "absent": "Absent",
+      "excused": "Excused",
+      "name": "Name",
+      "source": "Source",
+      "stage": "Stage",
+      "assignee": "Assignee",
+      "created": "Created",
+      "converted": "Became student",
+      "joined": "Joined",
+      "left": "Left",
+      "days": "Days",
+      "status": "Status",
+      "balance": "Balance",
+      "date": "Date",
+      "who": "Who",
+      "direction": "Direction",
+      "outcome": "Outcome",
+      "duration": "Duration",
+      "note": "Note",
+      "staff": "Staff",
+      "text": "Text",
+      "provider": "Provider"
+    },
+    "rating": {
+      "hint": "Rating — average score in the selected period (graded students only); ties are broken by higher attendance."
+    },
+    "attendance": {
+      "groups": "Groups",
+      "overall": "Overall attendance",
+      "hint": "Attendance = present / (present + absent); excused lessons are not counted."
+    },
+    "conversion": {
+      "by": {
+        "source": "By source",
+        "course": "By course",
+        "assignee": "By staff"
+      },
+      "leads": "Leads",
+      "convertedCount": "Became students",
+      "paid": "Paid",
+      "rate": "Conversion",
+      "paidRate": "Paid / students",
+      "avgDays": "Avg. days",
+      "noSource": "No source",
+      "noCourse": "No course",
+      "unassigned": "Unassigned",
+      "empty": "No leads in the selected period",
+      "hint": "Based on leads created in the period (cohort): how many have become students and paid so far."
+    },
+    "leads": {
+      "total": "Total leads",
+      "converted": "Became student",
+      "yes": "Yes",
+      "no": "No",
+      "stage": "Stage",
+      "assignee": "Assignee"
+    },
+    "churn": {
+      "count": "Students who left",
+      "avgDays": "Avg. days in group",
+      "hint": "Students who left a group in the period and are not active in any group now (transfers to another group don't count)."
+    },
+    "logs": {
+      "calls": "Calls",
+      "sms": "SMS",
+      "workly": "Workly",
+      "worklyTitle": "Workly is not connected",
+      "worklyHint": "The staff time-tracking (Workly) integration is not set up yet. It is connected in Settings → Integrations.",
+      "smsStatus": "SMS status",
+      "empty": "No records",
+      "lead": "Lead",
+      "student": "Student"
+    },
+    "export": {
+      "excel": "Excel",
+      "pdf": "PDF"
+    }
   }
 }

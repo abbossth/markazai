@@ -45,7 +45,7 @@ Bazani noldan qayta yaratish: `npm run reset -w @markazai/db` (**barcha ma'lumot
 - [x] 3. Lidlar (Kanban, drag-and-drop, lid → talaba, qo'ng'iroq/SMS jurnali, eslatmalar)
 - [x] 4. Moliya (tizim yechimi dars-dars, to'lovlar, xarajatlar, yechib olish, qarzdorlar, chek, Excel/PDF)
 - [x] 5. O'qituvchilar va davomat (profil, ish jadvali, ustoz davomati, ikki xil maosh modeli, Moliya'da ish haqi)
-- [ ] 6. Dashboard va Hisobotlar (Dashboard tayyor: sozlanadigan vidjetlar, dars jadvali; hisobotlar — jarayonda)
+- [x] 6. Dashboard va Hisobotlar (sozlanadigan vidjetlar + dars jadvali; Reyting, Davomat, Konversiya, Lidlar, Churn, Jurnallar, Excel eksport)
 - [ ] 7–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
 
 ## Testlar
