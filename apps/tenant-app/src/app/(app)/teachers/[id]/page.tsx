@@ -13,12 +13,13 @@ import { formatDate, formatMoney, formatPhone, initials } from "@/lib/format";
 import { can } from "@/lib/permissions";
 import { param } from "@/lib/search-params";
 import { requireModule } from "@/lib/session";
-import { weekdaysOf } from "@markazai/types";
+import { isPeriod, toCenterParts, weekdaysOf } from "@markazai/types";
 import { loadTeacherLookups, loadTeacherProfile, toEditable } from "../queries";
 import { TeacherHeaderActions } from "./header-actions";
+import { TeacherSalaryTab } from "./salary-tab";
 
-const TABS = ["profile", "history"] as const;
-type Tab = (typeof TABS)[number];
+const ALL_TABS = ["profile", "history", "salary"] as const;
+type Tab = (typeof ALL_TABS)[number];
 
 export async function generateMetadata({ params }: PageProps<"/teachers/[id]">): Promise<Metadata> {
   const { id } = await params;
@@ -43,11 +44,14 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
 
   const { teacher, history, roles } = profile;
   const sp = await searchParams;
-  const requested = param(sp, "tab");
-  const tab: Tab = (TABS as readonly string[]).includes(requested ?? "") ? (requested as Tab) : "profile";
-
   const canWrite = can(user.roles, "teachers:write");
   const canSalary = can(user.roles, "salary:read");
+  // "Ish haqi" tabi faqat salary:read ruxsati borlarga ko'rinadi.
+  const TABS = ALL_TABS.filter((k) => k !== "salary" || canSalary);
+  const requested = param(sp, "tab");
+  const tab: Tab = (TABS as readonly string[]).includes(requested ?? "") ? (requested as Tab) : "profile";
+  const monthParam = param(sp, "month");
+  const period = isPeriod(monthParam) ? monthParam : toCenterParts(new Date()).date.slice(0, 7);
   const roleLabels = (roles.length ? roles : ["TEACHER"]).map((r) => te(`roles.${r as "CEO"}`));
   const days = weekdaysOf("OTHER", teacher.workDays).map((d) => tw(String(d) as "1")).join(", ");
 
@@ -155,6 +159,12 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
             )}
           </section>
         </TabsContent>
+
+        {canSalary && (
+          <TabsContent value="salary" className="pt-4">
+            <TeacherSalaryTab orgId={user.orgId} teacherId={teacher.id} period={period} />
+          </TabsContent>
+        )}
 
         <TabsContent value="history" className="pt-4">
           <HistoryList items={history.map((h) => ({ id: h.id, action: h.action, actorName: h.actorName, createdAt: h.createdAt.toISOString(), details: (h.details as Record<string, unknown> | null) ?? null }))} />

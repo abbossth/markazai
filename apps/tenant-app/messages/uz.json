@@ -329,7 +329,9 @@
       "payment_added": "To'lov qabul qilindi",
       "payment_voided": "To'lov bekor qilindi",
       "activated": "Faollashtirildi",
-      "deactivated": "Nofaol qilindi"
+      "deactivated": "Nofaol qilindi",
+      "attendance_bulk": "Ish kunlari belgilandi",
+      "schedule_updated": "Ish jadvali o'zgartirildi"
     }
   },
   "attendance": {
@@ -706,6 +708,67 @@
       "profile": "Profil",
       "history": "Tarix",
       "salary": "Ish haqi"
+    },
+    "salaryTab": {
+      "empty": "Ma'lumot yo'q",
+      "total": "Jami",
+      "paid": "To'langan",
+      "remaining": "Qoldiq",
+      "group": "Guruh - Kurs",
+      "students": "Talabalar",
+      "lessons": "Darslar · Keldi · Kelmadi",
+      "fixedAmount": "Belgilangan miqdor",
+      "calculated": "Hisoblangan miqdor",
+      "method": "Hisoblash usuli",
+      "salaryType": "Maosh turi",
+      "monthlySalary": "Oylik maosh",
+      "attendanceBased": "{came}/{full} ish kuni",
+      "byAttendance": "Davomat asosida",
+      "byPayments": "To'lovlardan ({payments})",
+      "typeFixed": "Belgilangan oylik",
+      "typePercent": "Foiz",
+      "noGroups": "Bu oyda faol guruhlar yo'q",
+      "totalRow": "Jami",
+      "legend": "Darslar: o'tgan darslar soni · talabalarning \"keldi\" belgilari (yashil) · sababsiz \"kelmadi\" belgilari (qizil).",
+      "payments": "To'lovlar"
     }
+  },
+  "teacherAttendance": {
+    "title": "Ustozlar davomati",
+    "teachers": "O'qituvchilar",
+    "tabs": {
+      "attendance": "Ustozlar davomati",
+      "schedule": "Ustozlar ish jadvali",
+      "payroll": "Oylik maosh hisoblash"
+    },
+    "noTeachers": "Ish jadvali sozlangan o'qituvchilar yo'q",
+    "noTeachersHint": "\"Ustozlar ish jadvali\" bo'limida ish kunlarini belgilang.",
+    "teacher": "O'qituvchi",
+    "came": "Keldi",
+    "absent": "Kelmadi",
+    "extra": "Qo'shimcha",
+    "fullDays": "To'liq ish kuni",
+    "fullHint": "Bugungacha belgilanmagan barcha ish kunlarini \"keldi\" deb belgilash",
+    "fullMarked": "{count} ta ish kuni belgilandi",
+    "legend": "✓ keldi · ✕ kelmadi · + qo'shimcha kun (ish jadvalidan tashqari). Ish kunlari kulrang fonda. Katakni bosib almashtiring.",
+    "empty": "Bo'sh",
+    "dayOff": "Dam olish kuni",
+    "PRESENT": "Keldi",
+    "ABSENT": "Kelmadi",
+    "EXTRA": "Qo'shimcha",
+    "workDays": "Ish kunlari",
+    "workStart": "Ish boshlanishi",
+    "workEnd": "Ish tugashi",
+    "monthlySalary": "Oylik maosh",
+    "workStartDate": "Ish faoliyati boshlanish sanasi",
+    "modelPercent": "Foiz",
+    "modelFixed": "Belgilangan oylik",
+    "percentOfPayments": "{percent}% to'lovdan",
+    "fixedSalary": "Belgilangan maosh",
+    "fullWorkDays": "To'liq ish kuni",
+    "baseSalary": "Asosiy maosh",
+    "extraIncome": "Qo'shimcha tushum",
+    "totalSalary": "Jami maosh",
+    "total": "Jami"
   }
 }

@@ -329,7 +329,9 @@
       "payment_added": "Payment received",
       "payment_voided": "Payment voided",
       "activated": "Activated",
-      "deactivated": "Deactivated"
+      "deactivated": "Deactivated",
+      "attendance_bulk": "Work days marked",
+      "schedule_updated": "Work schedule changed"
     }
   },
   "attendance": {
@@ -706,6 +708,67 @@
       "profile": "Profile",
       "history": "History",
       "salary": "Salary"
+    },
+    "salaryTab": {
+      "empty": "No data",
+      "total": "Total",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "group": "Group - Course",
+      "students": "Students",
+      "lessons": "Lessons · Present · Absent",
+      "fixedAmount": "Set amount",
+      "calculated": "Calculated",
+      "method": "Calculation method",
+      "salaryType": "Salary type",
+      "monthlySalary": "Monthly salary",
+      "attendanceBased": "{came}/{full} work days",
+      "byAttendance": "By attendance",
+      "byPayments": "Of payments ({payments})",
+      "typeFixed": "Fixed monthly",
+      "typePercent": "Percent",
+      "noGroups": "No active groups this month",
+      "totalRow": "Total",
+      "legend": "Lessons: lessons held · students' \"present\" marks (green) · unexcused \"absent\" marks (red).",
+      "payments": "Payments"
     }
+  },
+  "teacherAttendance": {
+    "title": "Teacher attendance",
+    "teachers": "Teachers",
+    "tabs": {
+      "attendance": "Attendance",
+      "schedule": "Work schedule",
+      "payroll": "Payroll"
+    },
+    "noTeachers": "No teachers with a work schedule",
+    "noTeachersHint": "Set work days in the \"Work schedule\" tab.",
+    "teacher": "Teacher",
+    "came": "Present",
+    "absent": "Absent",
+    "extra": "Extra",
+    "fullDays": "Full work days",
+    "fullHint": "Mark all unmarked work days up to today as \"present\"",
+    "fullMarked": "{count} work days marked",
+    "legend": "✓ present · ✕ absent · + extra day (outside the schedule). Work days are shaded. Click a cell to change it.",
+    "empty": "Empty",
+    "dayOff": "Day off",
+    "PRESENT": "Present",
+    "ABSENT": "Absent",
+    "EXTRA": "Extra day",
+    "workDays": "Work days",
+    "workStart": "Work start",
+    "workEnd": "Work end",
+    "monthlySalary": "Monthly salary",
+    "workStartDate": "Employment start date",
+    "modelPercent": "Percent",
+    "modelFixed": "Fixed monthly",
+    "percentOfPayments": "{percent}% of payments",
+    "fixedSalary": "Fixed salary",
+    "fullWorkDays": "Full work days",
+    "baseSalary": "Base salary",
+    "extraIncome": "Extra income",
+    "totalSalary": "Total salary",
+    "total": "Total"
   }
 }
