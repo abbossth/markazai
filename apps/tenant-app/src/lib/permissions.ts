@@ -25,7 +25,11 @@ export type Permission =
   | "attendance:write"
   | "leads:write"
   | "leads:delete"
-  | "leads:configure";
+  | "leads:configure"
+  | "payments:write"
+  | "payments:void"
+  | "expenses:write"
+  | "withdrawals:write";
 
 const ADMIN_PERMISSIONS: Permission[] = [
   "students:write",
@@ -38,14 +42,17 @@ const ADMIN_PERMISSIONS: Permission[] = [
   "leads:configure",
 ];
 
+const FINANCE_STAFF: Permission[] = ["payments:write", "expenses:write"];
+const FINANCE_MANAGER: Permission[] = [...FINANCE_STAFF, "payments:void", "withdrawals:write"];
+
 const PERMISSIONS: Record<Role, Permission[]> = {
-  CEO: ADMIN_PERMISSIONS,
-  BRANCH_DIRECTOR: ADMIN_PERMISSIONS,
-  ADMINISTRATOR: ADMIN_PERMISSIONS,
-  ADMINISTRATOR2: ADMIN_PERMISSIONS,
+  CEO: [...ADMIN_PERMISSIONS, ...FINANCE_MANAGER],
+  BRANCH_DIRECTOR: [...ADMIN_PERMISSIONS, ...FINANCE_MANAGER],
+  ADMINISTRATOR: [...ADMIN_PERMISSIONS, ...FINANCE_STAFF],
+  ADMINISTRATOR2: [...ADMIN_PERMISSIONS, ...FINANCE_STAFF],
   LIMITED_ADMINISTRATOR: ["students:write", "groups:write", "attendance:write", "leads:write"],
   INTERN_ADMINISTRATOR: ["students:write", "attendance:write", "leads:write"],
-  CASHIER: [],
+  CASHIER: FINANCE_STAFF,
   MARKETER: ["leads:write"],
   // O'qituvchi faqat o'z guruhlarida davomat/baho qo'ya oladi (server tomonida egalik tekshiriladi).
   TEACHER: ["attendance:write"],

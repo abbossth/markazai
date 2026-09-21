@@ -128,3 +128,13 @@
     @apply font-sans;
   }
 }
+/* Diagramma ranglari (dataviz: kategorik 1–2-slotlar; validator: CVD ΔE ≥ 24, kontrast ≥ 3:1).
+   Dark rejim — alohida tanlangan qadamlar, oddiy inversiya emas. */
+:root {
+  --viz-1: #2a78d6;
+  --viz-2: #eb6834;
+}
+.dark {
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+}

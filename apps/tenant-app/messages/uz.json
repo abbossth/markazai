@@ -101,7 +101,8 @@
     "teacherConflict": "O'qituvchi shu vaqtda boshqa guruhda dars beradi",
     "invalidUrl": "Havola http:// yoki https:// bilan boshlanishi kerak",
     "passAboveMax": "O'tish balli maksimal balldan oshmasligi kerak",
-    "discountTooLarge": "Chegirma guruh narxidan kam bo'lishi kerak"
+    "discountTooLarge": "Chegirma guruh narxidan kam bo'lishi kerak",
+    "futureDate": "Kelajak sanasini kiritib bo'lmaydi"
   },
   "enums": {
     "studentStatus": {
@@ -283,7 +284,8 @@
     "leadName": "Lid",
     "leadSource": "Manba",
     "leadCreated": "Lid yaratilgan",
-    "leadConverted": "Talabaga aylantirilgan"
+    "leadConverted": "Talabaga aylantirilgan",
+    "pay": "To'lov"
   },
   "comments": {
     "placeholder": "Izoh yozing...",
@@ -310,7 +312,9 @@
       "created_from_lead": "Lid orqali yaratildi",
       "call_logged": "Qo'ng'iroq qayd etildi",
       "sms_sent": "SMS yuborildi",
-      "reminder_added": "Eslatma qo'shildi"
+      "reminder_added": "Eslatma qo'shildi",
+      "payment_added": "To'lov qabul qilindi",
+      "payment_voided": "To'lov bekor qilindi"
     }
   },
   "attendance": {
@@ -518,5 +522,94 @@
     "bellTitle": "Eslatmalar",
     "bellEmpty": "Bugunga eslatmalar yo'q",
     "bellMore": "Yana {count} ta eslatma"
+  },
+  "finance": {
+    "title": "Moliya",
+    "comingSoon": "Bu bo'lim keyingi qadamda qo'shiladi",
+    "tabs": {
+      "payments": "Barcha to'lovlar",
+      "withdrawals": "Yechib olish",
+      "expenses": "Xarajatlar",
+      "salary": "Ish haqi",
+      "debtors": "Qarzdorlar"
+    },
+    "revenue": "Tushum",
+    "accrued": "Hisoblangan",
+    "accruedHint": "Tizim yechimi (darslar uchun)",
+    "expenses": "Xarajat",
+    "profit": "Foyda",
+    "withdrawals": "Yechib olingan",
+    "cashOnHand": "Kassada",
+    "totalDebt": "Jami qarz",
+    "debtorsCount": "{count} ta qarzdor",
+    "trendTitle": "Tushum va xarajat dinamikasi",
+    "trendEmpty": "Tanlangan davrda ma'lumot yo'q",
+    "viewChart": "Diagramma",
+    "viewTable": "Jadval",
+    "period": "Davr",
+    "unitMillion": "mln",
+    "unitThousand": "ming",
+    "from": "Sana: dan",
+    "to": "Sana: gacha",
+    "searchPlaceholder": "Talaba ismi yoki telefoni bo'yicha...",
+    "minAmount": "Summa: dan",
+    "maxAmount": "Summa: gacha",
+    "columns": {
+      "amount": "Summa",
+      "student": "Talaba",
+      "group": "Guruh",
+      "type": "To'lov turi",
+      "teacher": "O'qituvchi",
+      "comment": "Izoh",
+      "staff": "Xodim",
+      "date": "Sana"
+    },
+    "lessonCharge": "{date} dars uchun yechim",
+    "receiptA4": "Chek (A4)",
+    "receiptThermal": "Chek (80 mm)",
+    "void": "To'lovni o'chirish",
+    "voidTitle": "To'lov o'chirilsinmi?",
+    "voidHint": "To'lov o'chiriladi va talaba balansi shu summaga kamayadi. Bu amalni ortga qaytarib bo'lmaydi.",
+    "voided": "To'lov o'chirildi",
+    "print": "Chop etish",
+    "receiptTitle": "To'lov cheki",
+    "presets": {
+      "label": "Tayyor davrlar",
+      "today": "Bugun",
+      "d7": "7 kun",
+      "d30": "30 kun",
+      "month": "Bu oy",
+      "prevMonth": "O'tgan oy"
+    },
+    "payment": {
+      "title": "To'lov qabul qilish",
+      "description": "Talaba to'lovini kiriting. Balans avtomatik yangilanadi.",
+      "student": "Talaba",
+      "searchStudent": "Ism yoki telefon bo'yicha qidiring...",
+      "balance": "Balans",
+      "group": "Guruh",
+      "method": "To'lov usuli",
+      "amount": "Summa (so'm)",
+      "payDebt": "Qarzni yopish: {amount}",
+      "date": "Sana",
+      "comment": "Izoh",
+      "recorded": "To'lov qabul qilindi",
+      "printReceipt": "Chek chop etish"
+    },
+    "receipt": {
+      "title": "To'lov cheki",
+      "student": "Talaba",
+      "phone": "Telefon",
+      "group": "Guruh",
+      "teacher": "O'qituvchi",
+      "groupPrice": "Guruh narxi",
+      "method": "To'lov usuli",
+      "date": "Sana",
+      "comment": "Izoh",
+      "amount": "To'langan summa",
+      "balanceAfter": "Joriy balans",
+      "cashier": "Qabul qildi",
+      "thanks": "To'lovingiz uchun rahmat!"
+    }
   }
 }

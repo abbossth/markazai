@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { buildDailyTrend, expenseSchema, paymentSchema, withdrawalSchema } from "./finance-forms";
 import { activeDiscountTotal, balanceOf, effectivePrice, expectedLessonCharge, financeTotals, isChargeable, lessonAmount } from "./billing";
 
 const d = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
@@ -90,5 +91,37 @@ describe("balanceOf / financeTotals", () => {
       profit: 6_000_000,
       cashOnHand: 3_000_000,
     });
+  });
+});
+
+describe("buildDailyTrend", () => {
+  it("bo'sh kunlarni 0 bilan to'ldiradi va chegaralarni o'z ichiga oladi", () => {
+    const rows = buildDailyTrend("2026-09-01", "2026-09-04", new Map([["2026-09-02", 500]]), new Map([["2026-09-04", 200]]));
+    expect(rows).toEqual([
+      { date: "2026-09-01", revenue: 0, expenses: 0 },
+      { date: "2026-09-02", revenue: 500, expenses: 0 },
+      { date: "2026-09-03", revenue: 0, expenses: 0 },
+      { date: "2026-09-04", revenue: 0, expenses: 200 },
+    ]);
+  });
+  it("oy almashishini to'g'ri hal qiladi", () => {
+    expect(buildDailyTrend("2026-09-29", "2026-10-02", new Map(), new Map()).map((r) => r.date)).toEqual(["2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02"]);
+  });
+});
+
+describe("moliyaviy forma sxemalari", () => {
+  const student = "00000000-0000-4000-8000-000000000001";
+  it("to'lov summasi musbat butun son bo'lishi kerak", () => {
+    const ok = { studentId: student, amount: 450_000, method: "CASH", date: "2026-09-21" };
+    expect(paymentSchema.safeParse(ok).success).toBe(true);
+    for (const amount of [0, -5, 1.5, 2_000_000_000]) expect(paymentSchema.safeParse({ ...ok, amount }).success).toBe(false);
+  });
+  it("noma'lum to'lov usuli rad etiladi", () => {
+    expect(paymentSchema.safeParse({ studentId: student, amount: 1000, method: "BITCOIN", date: "2026-09-21" }).success).toBe(false);
+  });
+  it("xarajat turi majburiy; yechib olishda faqat summa va sana", () => {
+    expect(expenseSchema.safeParse({ category: " ", amount: 1000, date: "2026-09-21" }).success).toBe(false);
+    expect(expenseSchema.safeParse({ category: "Ijara", amount: 1000, date: "2026-09-21" }).success).toBe(true);
+    expect(withdrawalSchema.safeParse({ amount: 1000, date: "2026-09-21" }).success).toBe(true);
   });
 });

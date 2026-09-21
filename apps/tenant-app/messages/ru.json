@@ -101,7 +101,8 @@
     "teacherConflict": "Преподаватель в это время ведёт другую группу",
     "invalidUrl": "Ссылка должна начинаться с http:// или https://",
     "passAboveMax": "Проходной балл не может превышать максимальный",
-    "discountTooLarge": "Скидка должна быть меньше цены группы"
+    "discountTooLarge": "Скидка должна быть меньше цены группы",
+    "futureDate": "Нельзя указать дату в будущем"
   },
   "enums": {
     "studentStatus": {
@@ -283,7 +284,8 @@
     "leadName": "Лид",
     "leadSource": "Источник",
     "leadCreated": "Лид создан",
-    "leadConverted": "Преобразован в студента"
+    "leadConverted": "Преобразован в студента",
+    "pay": "Оплата"
   },
   "comments": {
     "placeholder": "Напишите комментарий...",
@@ -310,7 +312,9 @@
       "created_from_lead": "Создан из лида",
       "call_logged": "Звонок зафиксирован",
       "sms_sent": "SMS отправлено",
-      "reminder_added": "Напоминание добавлено"
+      "reminder_added": "Напоминание добавлено",
+      "payment_added": "Платёж принят",
+      "payment_voided": "Платёж отменён"
     }
   },
   "attendance": {
@@ -518,5 +522,94 @@
     "bellTitle": "Напоминания",
     "bellEmpty": "На сегодня напоминаний нет",
     "bellMore": "Ещё напоминаний: {count}"
+  },
+  "finance": {
+    "title": "Финансы",
+    "comingSoon": "Этот раздел появится на следующем шаге",
+    "tabs": {
+      "payments": "Все платежи",
+      "withdrawals": "Изъятия",
+      "expenses": "Расходы",
+      "salary": "Зарплата",
+      "debtors": "Должники"
+    },
+    "revenue": "Выручка",
+    "accrued": "Начислено",
+    "accruedHint": "Списания системы (за уроки)",
+    "expenses": "Расходы",
+    "profit": "Прибыль",
+    "withdrawals": "Изъято",
+    "cashOnHand": "В кассе",
+    "totalDebt": "Общий долг",
+    "debtorsCount": "Должников: {count}",
+    "trendTitle": "Динамика выручки и расходов",
+    "trendEmpty": "Нет данных за выбранный период",
+    "viewChart": "График",
+    "viewTable": "Таблица",
+    "period": "Период",
+    "unitMillion": "млн",
+    "unitThousand": "тыс",
+    "from": "Дата: с",
+    "to": "Дата: по",
+    "searchPlaceholder": "По имени или телефону студента...",
+    "minAmount": "Сумма: от",
+    "maxAmount": "Сумма: до",
+    "columns": {
+      "amount": "Сумма",
+      "student": "Студент",
+      "group": "Группа",
+      "type": "Тип платежа",
+      "teacher": "Преподаватель",
+      "comment": "Комментарий",
+      "staff": "Сотрудник",
+      "date": "Дата"
+    },
+    "lessonCharge": "Списание за урок {date}",
+    "receiptA4": "Чек (A4)",
+    "receiptThermal": "Чек (80 мм)",
+    "void": "Удалить платёж",
+    "voidTitle": "Удалить платёж?",
+    "voidHint": "Платёж будет удалён, а баланс студента уменьшен на эту сумму. Действие необратимо.",
+    "voided": "Платёж удалён",
+    "print": "Печать",
+    "receiptTitle": "Чек об оплате",
+    "presets": {
+      "label": "Быстрый выбор периода",
+      "today": "Сегодня",
+      "d7": "7 дней",
+      "d30": "30 дней",
+      "month": "Этот месяц",
+      "prevMonth": "Прошлый месяц"
+    },
+    "payment": {
+      "title": "Принять оплату",
+      "description": "Введите платёж студента. Баланс обновится автоматически.",
+      "student": "Студент",
+      "searchStudent": "Поиск по имени или телефону...",
+      "balance": "Баланс",
+      "group": "Группа",
+      "method": "Способ оплаты",
+      "amount": "Сумма (сум)",
+      "payDebt": "Погасить долг: {amount}",
+      "date": "Дата",
+      "comment": "Комментарий",
+      "recorded": "Платёж принят",
+      "printReceipt": "Печать чека"
+    },
+    "receipt": {
+      "title": "Чек об оплате",
+      "student": "Студент",
+      "phone": "Телефон",
+      "group": "Группа",
+      "teacher": "Преподаватель",
+      "groupPrice": "Цена группы",
+      "method": "Способ оплаты",
+      "date": "Дата",
+      "comment": "Комментарий",
+      "amount": "Оплаченная сумма",
+      "balanceAfter": "Текущий баланс",
+      "cashier": "Принял",
+      "thanks": "Спасибо за оплату!"
+    }
   }
 }

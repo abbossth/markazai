@@ -36,3 +36,11 @@ export function initials(name: string) {
     .map((p) => p[0]!.toUpperCase())
     .join("");
 }
+
+/** Qisqa ko'rinish (o'q yorlig'i uchun): 1 250 000 → "1.3 mln". */
+export function formatCompact(amount: number, units: { million: string; thousand: string }) {
+  const abs = Math.abs(amount);
+  if (abs >= 1_000_000) return `${(amount / 1_000_000).toFixed(abs >= 10_000_000 ? 0 : 1).replace(/\.0$/, "")} ${units.million}`;
+  if (abs >= 1_000) return `${Math.round(amount / 1_000)} ${units.thousand}`;
+  return String(amount);
+}

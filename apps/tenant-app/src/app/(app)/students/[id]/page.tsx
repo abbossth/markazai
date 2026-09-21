@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AlertTriangle } from "lucide-react";
 import { z } from "zod";
-import { summarizeByGroupMonth, toISODate } from "@markazai/types";
+import { summarizeByGroupMonth, toCenterParts, toISODate } from "@markazai/types";
 import { CallsTab } from "@/components/shared/calls-tab";
 import { CommentsPanel } from "@/components/shared/comments-panel";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -164,6 +164,12 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
             lookups={lookups}
             canWrite={canWrite}
             canDelete={can(user.roles, "students:delete")}
+            today={toCenterParts(new Date()).date}
+            payStudent={
+              can(user.roles, "payments:write")
+                ? { id: student.id, name: student.name, phone: student.phone, balance: student.balance, groups: activeEnrollments.map((e) => ({ id: e.group.id, name: e.group.name })) }
+                : undefined
+            }
           />
         </div>
       </header>

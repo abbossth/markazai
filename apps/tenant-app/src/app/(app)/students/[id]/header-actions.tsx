@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ChevronDown, Pencil, Trash2, UsersRound } from "lucide-react";
+import { ChevronDown, Pencil, Trash2, UsersRound, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { STUDENT_STATUSES } from "@markazai/types";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PaymentDialog, type PayStudent } from "../../finance/payment-dialog";
 import { AddToGroupDialog } from "../add-to-group-dialog";
 import { deleteStudent, setStudentStatus } from "../actions";
 import { StudentSheet, type EditableStudent } from "../student-form";
@@ -23,9 +24,12 @@ type Props = {
   lookups: StudentLookups;
   canWrite: boolean;
   canDelete: boolean;
+  /** Berilsa — "To'lov" tugmasi ko'rsatiladi (payments:write ruxsati bor foydalanuvchi uchun). */
+  payStudent?: PayStudent;
+  today: string;
 };
 
-export function StudentHeaderActions({ student, status, lookups, canWrite, canDelete }: Props) {
+export function StudentHeaderActions({ student, status, lookups, canWrite, canDelete, payStudent, today }: Props) {
   const t = useTranslations("student");
   const tc = useTranslations("common");
   const te = useTranslations("enums.studentStatus");
@@ -35,9 +39,10 @@ export function StudentHeaderActions({ student, status, lookups, canWrite, canDe
   const [addingToGroup, setAddingToGroup] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [freezeOpen, setFreezeOpen] = useState(false);
+  const [paying, setPaying] = useState(false);
   const [reason, setReason] = useState("");
 
-  if (!canWrite) return null;
+  if (!canWrite && !payStudent) return null;
 
   const changeStatus = (next: string, freezeReason?: string) =>
     startTransition(async () => {
@@ -63,6 +68,14 @@ export function StudentHeaderActions({ student, status, lookups, canWrite, canDe
 
   return (
     <div className="flex flex-wrap items-center gap-2">
+      {payStudent && (
+        <Button size="sm" onClick={() => setPaying(true)}>
+          <Wallet className="size-4" />
+          {t("pay")}
+        </Button>
+      )}
+      {canWrite && (
+      <>
       <Button size="sm" onClick={() => setAddingToGroup(true)}>
         <UsersRound className="size-4" />
         {t("addToGroup")}
@@ -92,6 +105,10 @@ export function StudentHeaderActions({ student, status, lookups, canWrite, canDe
           {tc("delete")}
         </Button>
       )}
+      </>
+      )}
+
+      {payStudent && <PaymentDialog open={paying} onOpenChange={setPaying} student={payStudent} today={today} />}
 
       <StudentSheet open={editing} onOpenChange={setEditing} lookups={lookups} student={student} />
       {addingToGroup && <AddToGroupDialog open onOpenChange={setAddingToGroup} studentIds={[student.id]} groups={lookups.groups} />}

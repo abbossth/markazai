@@ -101,7 +101,8 @@
     "teacherConflict": "The teacher teaches another group at that time",
     "invalidUrl": "The link must start with http:// or https://",
     "passAboveMax": "Pass score cannot exceed the maximum score",
-    "discountTooLarge": "The discount must be less than the group price"
+    "discountTooLarge": "The discount must be less than the group price",
+    "futureDate": "A future date cannot be entered"
   },
   "enums": {
     "studentStatus": {
@@ -283,7 +284,8 @@
     "leadName": "Lead",
     "leadSource": "Source",
     "leadCreated": "Lead created",
-    "leadConverted": "Converted to student"
+    "leadConverted": "Converted to student",
+    "pay": "Payment"
   },
   "comments": {
     "placeholder": "Write a comment...",
@@ -310,7 +312,9 @@
       "created_from_lead": "Created from lead",
       "call_logged": "Call logged",
       "sms_sent": "SMS sent",
-      "reminder_added": "Reminder added"
+      "reminder_added": "Reminder added",
+      "payment_added": "Payment received",
+      "payment_voided": "Payment voided"
     }
   },
   "attendance": {
@@ -518,5 +522,94 @@
     "bellTitle": "Reminders",
     "bellEmpty": "No reminders for today",
     "bellMore": "{count} more reminders"
+  },
+  "finance": {
+    "title": "Finance",
+    "comingSoon": "This section will be added in the next step",
+    "tabs": {
+      "payments": "All payments",
+      "withdrawals": "Withdrawals",
+      "expenses": "Expenses",
+      "salary": "Salaries",
+      "debtors": "Debtors"
+    },
+    "revenue": "Revenue",
+    "accrued": "Accrued",
+    "accruedHint": "System charges (for lessons)",
+    "expenses": "Expenses",
+    "profit": "Profit",
+    "withdrawals": "Withdrawn",
+    "cashOnHand": "Cash on hand",
+    "totalDebt": "Total debt",
+    "debtorsCount": "{count} debtors",
+    "trendTitle": "Revenue and expenses over time",
+    "trendEmpty": "No data for the selected period",
+    "viewChart": "Chart",
+    "viewTable": "Table",
+    "period": "Period",
+    "unitMillion": "M",
+    "unitThousand": "K",
+    "from": "Date: from",
+    "to": "Date: to",
+    "searchPlaceholder": "By student name or phone...",
+    "minAmount": "Amount: from",
+    "maxAmount": "Amount: to",
+    "columns": {
+      "amount": "Amount",
+      "student": "Student",
+      "group": "Group",
+      "type": "Payment type",
+      "teacher": "Teacher",
+      "comment": "Note",
+      "staff": "Staff",
+      "date": "Date"
+    },
+    "lessonCharge": "Charge for the lesson on {date}",
+    "receiptA4": "Receipt (A4)",
+    "receiptThermal": "Receipt (80 mm)",
+    "void": "Delete payment",
+    "voidTitle": "Delete this payment?",
+    "voidHint": "The payment will be deleted and the student's balance reduced by this amount. This cannot be undone.",
+    "voided": "Payment deleted",
+    "print": "Print",
+    "receiptTitle": "Payment receipt",
+    "presets": {
+      "label": "Period presets",
+      "today": "Today",
+      "d7": "7 days",
+      "d30": "30 days",
+      "month": "This month",
+      "prevMonth": "Last month"
+    },
+    "payment": {
+      "title": "Receive payment",
+      "description": "Enter the student's payment. The balance updates automatically.",
+      "student": "Student",
+      "searchStudent": "Search by name or phone...",
+      "balance": "Balance",
+      "group": "Group",
+      "method": "Payment method",
+      "amount": "Amount (UZS)",
+      "payDebt": "Pay off debt: {amount}",
+      "date": "Date",
+      "comment": "Note",
+      "recorded": "Payment received",
+      "printReceipt": "Print receipt"
+    },
+    "receipt": {
+      "title": "Payment receipt",
+      "student": "Student",
+      "phone": "Phone",
+      "group": "Group",
+      "teacher": "Teacher",
+      "groupPrice": "Group price",
+      "method": "Payment method",
+      "date": "Date",
+      "comment": "Note",
+      "amount": "Amount paid",
+      "balanceAfter": "Current balance",
+      "cashier": "Received by",
+      "thanks": "Thank you for your payment!"
+    }
   }
 }
