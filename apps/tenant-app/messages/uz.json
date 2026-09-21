@@ -140,7 +140,10 @@
     "discountTooLarge": "Chegirma guruh narxidan kam bo'lishi kerak",
     "futureDate": "Kelajak sanasini kiritib bo'lmaydi",
     "phoneTaken": "Bu telefon raqami band",
-    "passwordShort": "Parol kamida 8 ta belgidan iborat bo'lishi kerak"
+    "passwordShort": "Parol kamida 8 ta belgidan iborat bo'lishi kerak",
+    "rolesRequired": "Kamida bitta rolni tanlang",
+    "invalidColor": "Rang #rrggbb ko'rinishida bo'lishi kerak",
+    "rangeTooLong": "Oraliq 31 kundan oshmasligi kerak"
   },
   "enums": {
     "studentStatus": {
@@ -998,6 +1001,80 @@
       "gamification": "Gamifikatsiya (coin tizimi)",
       "gamificationHint": "Yoqilsa, talabalar davomat va baholar uchun coin oladi.",
       "previewButton": "Ko'rinish"
+    },
+    "staff": {
+      "columns": {
+        "id": "ID",
+        "name": "Ism",
+        "roles": "Rollar",
+        "position": "Lavozim",
+        "phone": "Telefon",
+        "status": "Holat",
+        "email": "Email",
+        "password": "Parol"
+      },
+      "active": "Faol",
+      "inactive": "Nofaol",
+      "search": "Ism, telefon yoki lavozim",
+      "add": "Xodim qo'shish",
+      "edit": "Xodimni tahrirlash",
+      "sendEmail": "Email yuborish",
+      "resetPassword": "Parolni tiklash",
+      "deleteTitle": "{name} o'chirilsinmi?",
+      "deleteHint": "Xodim tizimga kira olmaydi. Uning o'qituvchi yozuvi (agar bo'lsa) saqlanadi, faqat kirish bog'lanishi uziladi.",
+      "resetTitle": "{name}: parol tiklansinmi?",
+      "resetHint": "Yangi tasodifiy parol yaratiladi. Eski parol ishlamay qoladi.",
+      "newPasswordTitle": "{name}: yangi parol",
+      "newPasswordHint": "Parolni hozir nusxalab oling — u boshqa ko'rsatilmaydi.",
+      "copy": "Nusxalash",
+      "copied": "Nusxalandi",
+      "newPasswordOptional": "Yangi parol (bo'sh — o'zgarmaydi)",
+      "branches": "Filiallar",
+      "activeHint": "Faol (tizimga kira oladi)",
+      "errors": {
+        "lastCeo": "Oxirgi faol CEO'ni o'chirib yoki bloklab bo'lmaydi",
+        "cannotDeactivateSelf": "O'zingizni bloklab bo'lmaydi",
+        "cannotDeleteSelf": "O'zingizni o'chirib bo'lmaydi",
+        "notFound": "Xodim topilmadi"
+      },
+      "import": {
+        "button": "Import",
+        "title": "Xodimlarni Excel'dan import qilish",
+        "hint": "Ustunlar: Ism, Telefon, Rollar (vergul bilan), Lavozim, Email, Parol. Parol bo'sh bo'lsa, tasodifiy parol yaratiladi.",
+        "template": "Namuna yuklab olish",
+        "submit": "Import qilish",
+        "created": "{count} ta xodim qo'shildi",
+        "passwordsHint": "Parollarni hozir nusxalab oling — ular boshqa ko'rsatilmaydi.",
+        "copy": "Hammasini nusxalash",
+        "copied": "Nusxalandi",
+        "skipped": "{count} ta qator o'tkazib yuborildi",
+        "rowError": "{row}-qator: {reason}",
+        "fields": {
+          "name": "ism noto'g'ri",
+          "phone": "telefon noto'g'ri",
+          "roles": "rol noto'g'ri yoki bo'sh",
+          "email": "email noto'g'ri",
+          "password": "parol juda qisqa",
+          "duplicate": "fayl ichida takrorlangan telefon",
+          "phoneTaken": "telefon allaqachon mavjud",
+          "forbidden": "bu rolni berishga ruxsat yo'q"
+        },
+        "errors": {
+          "tooLarge": "Fayl 1 MB dan oshmasligi kerak",
+          "noFile": "Fayl tanlanmagan",
+          "invalidFile": "Fayl .xlsx formatida emas yoki o'qib bo'lmadi"
+        },
+        "sheet": "Xodimlar",
+        "rolesSheet": "Rollar",
+        "cols": {
+          "name": "Ism",
+          "phone": "Telefon",
+          "roles": "Rollar",
+          "position": "Lavozim",
+          "email": "Email",
+          "password": "Parol"
+        }
+      }
     }
   }
 }

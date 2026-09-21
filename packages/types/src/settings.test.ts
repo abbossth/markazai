@@ -93,7 +93,7 @@ describe("parseStaffImport", () => {
       ["Bir Ikki", "902223344", "NOROLE"],
     ]);
     expect(valid.map((v) => v.phone)).toEqual(["998901234567", "998901112233"]);
-    expect(valid[0]).toMatchObject({ roles: ["CASHIER", "MARKETER"], position: "Kassir", email: "ali@x.uz", password: "parol12345" });
+    expect(valid[0]).toMatchObject({ row: 2, roles: ["CASHIER", "MARKETER"], position: "Kassir", email: "ali@x.uz", password: "parol12345" });
     expect(errors).toEqual([
       { row: 4, field: "name" },
       { row: 6, field: "duplicate" },

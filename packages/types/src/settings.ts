@@ -102,7 +102,7 @@ export function canManageRoles(actorRoles: string[], targetRoles: string[]): boo
   return !targetRoles.some((r) => (PRIVILEGED_ROLES as readonly string[]).includes(r));
 }
 
-export type StaffImportRow = { name: string; phone: string; roles: (typeof ROLES)[number][]; position?: string; email?: string; password?: string };
+export type StaffImportRow = { row: number; name: string; phone: string; roles: (typeof ROLES)[number][]; position?: string; email?: string; password?: string };
 export type StaffImportError = { row: number; field: "name" | "phone" | "roles" | "email" | "password" | "duplicate" };
 
 /**
@@ -144,7 +144,7 @@ export function parseStaffImport(rows: string[][]): { valid: StaffImportRow[]; e
       return;
     }
     seen.add(parsed.data.phone);
-    valid.push({ name: parsed.data.name, phone: parsed.data.phone, roles: parsed.data.roles, position: parsed.data.position, email: parsed.data.email, password: parsed.data.password });
+    valid.push({ row, name: parsed.data.name, phone: parsed.data.phone, roles: parsed.data.roles, position: parsed.data.position, email: parsed.data.email, password: parsed.data.password });
   });
   return { valid, errors };
 }

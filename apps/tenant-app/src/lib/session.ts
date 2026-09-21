@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { prisma } from "@markazai/db";
 import { auth } from "@/auth";
@@ -12,11 +13,24 @@ export type SessionUser = {
   teacherId?: string;
 };
 
-export async function requireUser(): Promise<SessionUser> {
+// Sessiya JWT'da rollar eskirib qolishi mumkin (rol o'zgartirilgan yoki xodim o'chirilgan/bloklangan bo'lsa),
+// shuning uchun har so'rovda foydalanuvchi bazadan tekshiriladi (birlamchi kalit bo'yicha, so'rov ichida keshlanadi).
+const findAccount = cache(async (id: string) => prisma.user.findUnique({ where: { id }, select: { name: true, roles: true, organizationId: true, isActive: true } }));
+
+/** Amaldagi foydalanuvchi; sessiya yo'q, xodim o'chirilgan yoki bloklangan bo'lsa — null. Rollar bazadagi joriy qiymat. */
+export async function getSessionUser(): Promise<SessionUser | null> {
   const session = await auth();
-  if (!session?.user) redirect("/login");
-  const { id, name, organizationId, roles } = session.user;
-  return { id, name: name ?? "", orgId: organizationId, roles };
+  if (!session?.user) return null;
+  const account = await findAccount(session.user.id);
+  if (!account || !account.isActive) return null;
+  return { id: session.user.id, name: account.name, orgId: account.organizationId, roles: account.roles };
+}
+
+export async function requireUser(): Promise<SessionUser> {
+  const user = await getSessionUser();
+  // "expired" — proksi bu holatda /login'ni ochiq qoldiradi (aks holda yaroqsiz cookie bilan cheksiz yo'naltirish bo'lardi).
+  if (!user) redirect("/login?expired=1");
+  return user;
 }
 
 /** Sahifa/route'ni modul bo'yicha himoyalaydi. Ruxsat bo'lmasa — bosh sahifaga. */

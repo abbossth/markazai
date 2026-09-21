@@ -140,7 +140,10 @@
     "discountTooLarge": "The discount must be less than the group price",
     "futureDate": "A future date cannot be entered",
     "phoneTaken": "This phone number is taken",
-    "passwordShort": "The password must be at least 8 characters"
+    "passwordShort": "The password must be at least 8 characters",
+    "rolesRequired": "Select at least one role",
+    "invalidColor": "Color must be in #rrggbb format",
+    "rangeTooLong": "The range must not exceed 31 days"
   },
   "enums": {
     "studentStatus": {
@@ -998,6 +1001,80 @@
       "gamification": "Gamification (coin system)",
       "gamificationHint": "When on, students earn coins for attendance and grades.",
       "previewButton": "Preview"
+    },
+    "staff": {
+      "columns": {
+        "id": "ID",
+        "name": "Name",
+        "roles": "Roles",
+        "position": "Position",
+        "phone": "Phone",
+        "status": "Status",
+        "email": "Email",
+        "password": "Password"
+      },
+      "active": "Active",
+      "inactive": "Inactive",
+      "search": "Name, phone or position",
+      "add": "Add staff member",
+      "edit": "Edit staff member",
+      "sendEmail": "Send email",
+      "resetPassword": "Reset password",
+      "deleteTitle": "Delete {name}?",
+      "deleteHint": "The staff member will no longer be able to sign in. Their teacher record (if any) is kept; only the sign-in link is removed.",
+      "resetTitle": "{name}: reset password?",
+      "resetHint": "A new random password will be generated. The old one stops working.",
+      "newPasswordTitle": "{name}: new password",
+      "newPasswordHint": "Copy the password now — it will not be shown again.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "newPasswordOptional": "New password (empty — unchanged)",
+      "branches": "Branches",
+      "activeHint": "Active (can sign in)",
+      "errors": {
+        "lastCeo": "The last active CEO cannot be deleted or blocked",
+        "cannotDeactivateSelf": "You cannot block yourself",
+        "cannotDeleteSelf": "You cannot delete yourself",
+        "notFound": "Staff member not found"
+      },
+      "import": {
+        "button": "Import",
+        "title": "Import staff from Excel",
+        "hint": "Columns: Name, Phone, Roles (comma-separated), Position, Email, Password. If the password is empty, a random one is generated.",
+        "template": "Download template",
+        "submit": "Import",
+        "created": "{count} staff members added",
+        "passwordsHint": "Copy the passwords now — they will not be shown again.",
+        "copy": "Copy all",
+        "copied": "Copied",
+        "skipped": "{count} rows skipped",
+        "rowError": "Row {row}: {reason}",
+        "fields": {
+          "name": "invalid name",
+          "phone": "invalid phone",
+          "roles": "invalid or empty role",
+          "email": "invalid email",
+          "password": "password too short",
+          "duplicate": "duplicate phone in the file",
+          "phoneTaken": "phone already exists",
+          "forbidden": "not allowed to grant this role"
+        },
+        "errors": {
+          "tooLarge": "The file must not exceed 1 MB",
+          "noFile": "No file selected",
+          "invalidFile": "Not an .xlsx file or it could not be read"
+        },
+        "sheet": "Staff",
+        "rolesSheet": "Roles",
+        "cols": {
+          "name": "Name",
+          "phone": "Phone",
+          "roles": "Roles",
+          "position": "Position",
+          "email": "Email",
+          "password": "Password"
+        }
+      }
     }
   }
 }

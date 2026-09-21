@@ -1,12 +1,11 @@
 import ExcelJS from "exceljs";
 import { getTranslations } from "next-intl/server";
 import { CONVERSION_GROUPINGS, LOG_KEYS, REPORT_KEYS, type ReportKey } from "@markazai/types";
-import { auth } from "@/auth";
 import { prisma } from "@markazai/db";
 import { resolveRange } from "@/lib/date-range";
 import { canAccess, isTeacherOnly } from "@/lib/permissions";
 import type { RawSearchParams } from "@/lib/search-params";
-import type { SessionUser } from "@/lib/session";
+import { getSessionUser } from "@/lib/session";
 import { visibleReports } from "../access";
 import { listAttendance, listCallLog, listChurn, listLeadsReport, listRating, listSmsLog, loadConversion } from "../queries";
 
@@ -18,13 +17,12 @@ type Col = { header: string; key: string; width: number; fmt?: string };
 
 /** Excel (.xlsx) eksport: joriy hisobot va filtrlar bilan. Ruxsat — sahifadagi bilan bir xil (`visibleReports`). */
 export async function GET(request: Request) {
-  const session = await auth();
-  if (!session?.user) return new Response("Unauthorized", { status: 401 });
-  const { id, name, organizationId, roles } = session.user;
+  const user = await getSessionUser();
+  if (!user) return new Response("Unauthorized", { status: 401 });
+  const { roles } = user;
   if (!canAccess(roles, "reports")) return new Response("Forbidden", { status: 403 });
-  const user: SessionUser = { id, name: name ?? "", orgId: organizationId, roles };
   // Faqat-o'qituvchi uchun o'z guruhlari ko'lami: sahifadagi requireModule kabi Teacher yozuvini topamiz.
-  if (isTeacherOnly(roles)) user.teacherId = (await prisma.teacher.findFirst({ where: { organizationId, userId: id }, select: { id: true } }))?.id;
+  if (isTeacherOnly(roles)) user.teacherId = (await prisma.teacher.findFirst({ where: { organizationId: user.orgId, userId: user.id }, select: { id: true } }))?.id;
 
   const sp: RawSearchParams = Object.fromEntries(new URL(request.url).searchParams.entries());
   const report = REPORT_KEYS.find((k) => k === sp.report) as ReportKey | undefined;

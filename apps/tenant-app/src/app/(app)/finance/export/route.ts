@@ -1,9 +1,8 @@
 import ExcelJS from "exceljs";
 import { getTranslations } from "next-intl/server";
-import { auth } from "@/auth";
 import { canAccess } from "@/lib/permissions";
 import type { RawSearchParams } from "@/lib/search-params";
-import type { SessionUser } from "@/lib/session";
+import { getSessionUser } from "@/lib/session";
 import { listDebtors, listExpenses, listPayments, listWithdrawals, resolveRange } from "../queries";
 
 // exceljs Node API'lariga tayanadi.
@@ -14,11 +13,9 @@ type Exportable = (typeof EXPORTABLE)[number];
 
 /** Excel (.xlsx) eksport: joriy tab va filtrlar bilan. Hujjat ruxsati — Moliya moduli. */
 export async function GET(request: Request) {
-  const session = await auth();
-  if (!session?.user) return new Response("Unauthorized", { status: 401 });
-  const { id, name, organizationId, roles } = session.user;
-  if (!canAccess(roles, "finance")) return new Response("Forbidden", { status: 403 });
-  const user: SessionUser = { id, name: name ?? "", orgId: organizationId, roles };
+  const user = await getSessionUser();
+  if (!user) return new Response("Unauthorized", { status: 401 });
+  if (!canAccess(user.roles, "finance")) return new Response("Forbidden", { status: 403 });
 
   const url = new URL(request.url);
   const sp: RawSearchParams = Object.fromEntries(url.searchParams.entries());

@@ -9,7 +9,8 @@ export const authConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       if (nextUrl.pathname === "/login") {
-        return isLoggedIn ? Response.redirect(new URL("/dashboard", nextUrl)) : true;
+        // ?expired=1 — sessiya bor, lekin xodim o'chirilgan/bloklangan: login sahifasi ochiq qoladi.
+        return isLoggedIn && !nextUrl.searchParams.has("expired") ? Response.redirect(new URL("/dashboard", nextUrl)) : true;
       }
       return isLoggedIn; // false → /login'ga yo'naltiriladi
     },
