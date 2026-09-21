@@ -37,7 +37,8 @@ model Branch {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
-  users UserBranch[]
+  users    UserBranch[]
+  teachers TeacherBranch[]
 
   @@index([organizationId])
   @@map("branches")
@@ -199,21 +200,47 @@ model Tag {
   @@map("tags")
 }
 
+// PERCENT — talaba to'lovlaridan foiz; FIXED — belgilangan oylik + ustoz davomati.
+enum SalaryType {
+  PERCENT
+  FIXED
+}
+
+// PRESENT/ABSENT — ish kuni bo'yicha; EXTRA — ish jadvalidan tashqari kunda ishlagan.
+enum TeacherAttendanceStatus {
+  PRESENT
+  ABSENT
+  EXTRA
+}
+
 model Teacher {
-  id             String    @id @default(uuid()) @db.Uuid
-  organizationId String    @map("organization_id") @db.Uuid
+  id             String     @id @default(uuid()) @db.Uuid
+  organizationId String     @map("organization_id") @db.Uuid
   // Tizimga kira oladigan bo'lsa, TEACHER rolli User bilan bog'lanadi.
-  userId         String?   @unique @map("user_id") @db.Uuid
+  userId         String?    @unique @map("user_id") @db.Uuid
   name           String
   phone          String
-  birthDate      DateTime? @map("birth_date") @db.Date
+  birthDate      DateTime?  @map("birth_date") @db.Date
   gender         Gender?
-  photoUrl       String?   @map("photo_url")
-  isActive       Boolean   @default(true) @map("is_active")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  photoUrl       String?    @map("photo_url")
+  isActive       Boolean    @default(true) @map("is_active")
+  salaryType     SalaryType @default(PERCENT) @map("salary_type")
+  // salaryType = PERCENT: talaba to'lovlaridan foiz (0–100)
+  percent        Int?
+  // salaryType = FIXED: oylik maosh (so'm) va ish jadvali
+  fixedSalary    Int?       @map("fixed_salary")
+  // 1 = Dushanba ... 7 = Yakshanba
+  workDays       Int[]      @default([]) @map("work_days")
+  workStart      String?    @map("work_start") // "HH:mm"
+  workEnd        String?    @map("work_end")
+  workStartDate  DateTime?  @map("work_start_date") @db.Date
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
 
-  groups Group[]
+  groups         Group[]
+  branches       TeacherBranch[]
+  attendance     TeacherAttendance[]
+  salaryPayments SalaryPayment[]
 
   @@unique([organizationId, phone])
   @@index([organizationId])
@@ -708,4 +735,55 @@ model Withdrawal {
 
   @@index([organizationId, date])
   @@map("withdrawals")
+}
+
+// ─────────────────────────────────────────────────────────────
+// 5-bosqich: O'qituvchilar davomati va ish haqi
+// ─────────────────────────────────────────────────────────────
+
+model TeacherBranch {
+  organizationId String  @map("organization_id") @db.Uuid
+  teacherId      String  @map("teacher_id") @db.Uuid
+  branchId       String  @map("branch_id") @db.Uuid
+  teacher        Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  branch         Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@id([teacherId, branchId])
+  @@index([organizationId])
+  @@map("teacher_branches")
+}
+
+// Faqat belgilangan kunlar saqlanadi; yozuv yo'qligi = "bo'sh".
+model TeacherAttendance {
+  id             String                  @id @default(uuid()) @db.Uuid
+  organizationId String                  @map("organization_id") @db.Uuid
+  teacherId      String                  @map("teacher_id") @db.Uuid
+  date           DateTime                @db.Date
+  status         TeacherAttendanceStatus
+  markedById     String?                 @map("marked_by_id") @db.Uuid
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, date])
+  @@index([organizationId, date])
+  @@map("teacher_attendance")
+}
+
+// Ish haqi to'lovi. Har biriga mos Expense ("Ish haqi") yaratiladi, shunda foyda hisobida ko'rinadi.
+model SalaryPayment {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  teacherId      String   @map("teacher_id") @db.Uuid
+  period         String // "YYYY-MM"
+  amount         Int
+  date           DateTime @db.Date
+  note           String?
+  expenseId      String?  @unique @map("expense_id") @db.Uuid
+  createdById    String   @map("created_by_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, period])
+  @@map("salary_payments")
 }

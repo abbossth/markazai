@@ -29,7 +29,10 @@ export type Permission =
   | "payments:write"
   | "payments:void"
   | "expenses:write"
-  | "withdrawals:write";
+  | "withdrawals:write"
+  | "teachers:write"
+  | "salary:read"
+  | "salary:pay";
 
 const ADMIN_PERMISSIONS: Permission[] = [
   "students:write",
@@ -40,10 +43,11 @@ const ADMIN_PERMISSIONS: Permission[] = [
   "leads:write",
   "leads:delete",
   "leads:configure",
+  "teachers:write",
 ];
 
 const FINANCE_STAFF: Permission[] = ["payments:write", "expenses:write"];
-const FINANCE_MANAGER: Permission[] = [...FINANCE_STAFF, "payments:void", "withdrawals:write"];
+const FINANCE_MANAGER: Permission[] = [...FINANCE_STAFF, "payments:void", "withdrawals:write", "salary:read", "salary:pay"];
 
 const PERMISSIONS: Record<Role, Permission[]> = {
   CEO: [...ADMIN_PERMISSIONS, ...FINANCE_MANAGER],

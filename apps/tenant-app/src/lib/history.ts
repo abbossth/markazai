@@ -3,7 +3,7 @@ import type { SessionUser } from "./session";
 
 export async function logHistory(
   user: SessionUser,
-  entityType: "student" | "group" | "lead",
+  entityType: "student" | "group" | "lead" | "teacher",
   entityId: string,
   action: string,
   details?: Record<string, string | number | null | undefined>,

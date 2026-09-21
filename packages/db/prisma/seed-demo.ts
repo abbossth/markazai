@@ -388,3 +388,68 @@ export async function seedFinanceData(prisma: PrismaClient, orgId: string, actor
   });
   console.log("Demo xarajatlar: 6 ta xarajat, 2 ta yechib olish.");
 }
+
+/**
+ * Demo o'qituvchi ma'lumotlari: maosh modellari (foiz / belgilangan), ish jadvali, filial, ustoz davomati.
+ * Mavjud bo'lsa (maosh modeli sozlangan o'qituvchi bor), hech narsa qilmaydi (idempotent).
+ */
+export async function seedTeacherData(prisma: PrismaClient, orgId: string, branchId: string) {
+  if ((await prisma.teacher.count({ where: { organizationId: orgId, OR: [{ percent: { not: null } }, { fixedSalary: { not: null } }] } })) > 0) {
+    console.log("Demo o'qituvchi ma'lumotlari allaqachon mavjud — o'tkazib yuborildi.");
+    return;
+  }
+  const teachers = await prisma.teacher.findMany({ where: { organizationId: orgId }, orderBy: { name: "asc" } });
+  const now = new Date();
+  const y = now.getUTCFullYear();
+  const m = now.getUTCMonth() + 1;
+  const start = new Date(Date.UTC(y, m - 4, 1));
+  const todayIso = new Date(Date.UTC(y, m - 1, now.getUTCDate())).toISOString().slice(0, 10);
+
+  const plans: Record<string, { type: "PERCENT" | "FIXED"; percent?: number; fixed?: number; days?: number[] }> = {
+    "Bobur Mirzayev": { type: "PERCENT", percent: 40 },
+    "Sherzod Aliyev": { type: "PERCENT", percent: 35 },
+    "Nodira Yusupova": { type: "FIXED", fixed: 3_000_000, days: [1, 3, 5] },
+    "Gulbahor Rasulova": { type: "FIXED", fixed: 2_600_000, days: [2, 4, 6] },
+  };
+
+  for (const t of teachers) {
+    const plan = plans[t.name];
+    if (!plan) continue;
+    await prisma.teacher.update({
+      where: { id: t.id },
+      data: {
+        salaryType: plan.type,
+        percent: plan.percent ?? null,
+        fixedSalary: plan.fixed ?? null,
+        workDays: plan.days ?? [],
+        workStart: plan.days ? "09:00" : null,
+        workEnd: plan.days ? "18:00" : null,
+        workStartDate: start,
+        birthDate: new Date(Date.UTC(1988 + (teachers.indexOf(t) % 6), 2 + teachers.indexOf(t), 10)),
+      },
+    });
+    await prisma.teacherBranch.create({ data: { organizationId: orgId, teacherId: t.id, branchId } });
+  }
+
+  // Belgilangan oyliklilar uchun o'tgan va joriy oy davomati (bugungacha).
+  const { lessonDatesBetween, fromISODate } = await import("@markazai/types");
+  const rows: { organizationId: string; teacherId: string; date: Date; status: "PRESENT" | "ABSENT" | "EXTRA" }[] = [];
+  let i = 0;
+  for (const t of teachers) {
+    const plan = plans[t.name];
+    if (plan?.type !== "FIXED" || !plan.days) continue;
+    const from = new Date(Date.UTC(y, m - 2, 1));
+    const to = fromISODate(todayIso);
+    const dates = lessonDatesBetween({ days: "OTHER", customDays: plan.days, startDate: from }, from, to);
+    for (const iso of dates) {
+      i++;
+      rows.push({ organizationId: orgId, teacherId: t.id, date: fromISODate(iso), status: i % 9 === 0 ? "ABSENT" : "PRESENT" });
+    }
+    // Bitta "qo'shimcha" kun: o'tgan oyning birinchi yakshanbasi
+    const firstSunday = new Date(Date.UTC(y, m - 2, 1));
+    while (firstSunday.getUTCDay() !== 0) firstSunday.setUTCDate(firstSunday.getUTCDate() + 1);
+    rows.push({ organizationId: orgId, teacherId: t.id, date: firstSunday, status: "EXTRA" });
+  }
+  await prisma.teacherAttendance.createMany({ data: rows });
+  console.log(`Demo o'qituvchilar: maosh modellari sozlandi, ${rows.length} ta ustoz davomati.`);
+}
