@@ -13,7 +13,28 @@
     "system": "System",
     "fullscreen": "Fullscreen",
     "history": "History",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Add new",
+    "add": "Add",
+    "close": "Close",
+    "back": "Back",
+    "saved": "Saved",
+    "deleted": "Deleted",
+    "error": "Something went wrong",
+    "confirmDelete": "Are you sure you want to delete?",
+    "yes": "Yes",
+    "no": "No",
+    "actions": "Actions",
+    "comments": "Comments",
+    "date": "Date",
+    "from": "From",
+    "to": "To",
+    "forbidden": "You don't have permission for this action",
+    "notFound": "Not found"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -43,5 +64,21 @@
   },
   "dashboard": {
     "welcome": "Welcome, {name}"
+  },
+  "table": {
+    "columns": "Columns",
+    "selectAll": "Select all",
+    "selectRow": "Select row",
+    "selected": "{count} selected",
+    "empty": "No data found",
+    "range": "{from}–{to} of {total}",
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "filters": {
+    "filters": "Filters",
+    "reset": "Reset",
+    "apply": "Apply",
+    "all": "All"
   }
 }

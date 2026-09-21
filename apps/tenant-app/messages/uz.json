@@ -13,7 +13,28 @@
     "system": "Tizim",
     "fullscreen": "To'liq ekran",
     "history": "Tarix",
-    "notifications": "Bildirishnomalar"
+    "notifications": "Bildirishnomalar",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "create": "Yangisini qo'shish",
+    "add": "Qo'shish",
+    "close": "Yopish",
+    "back": "Orqaga",
+    "saved": "Saqlandi",
+    "deleted": "O'chirildi",
+    "error": "Xatolik yuz berdi",
+    "confirmDelete": "Rostdan ham o'chirmoqchimisiz?",
+    "yes": "Ha",
+    "no": "Yo'q",
+    "actions": "Amallar",
+    "comments": "Izohlar",
+    "date": "Sana",
+    "from": "Dan",
+    "to": "Gacha",
+    "forbidden": "Bu amal uchun ruxsat yo'q",
+    "notFound": "Topilmadi"
   },
   "nav": {
     "dashboard": "Bosh sahifa",
@@ -43,5 +64,21 @@
   },
   "dashboard": {
     "welcome": "Xush kelibsiz, {name}"
+  },
+  "table": {
+    "columns": "Ustunlar",
+    "selectAll": "Hammasini tanlash",
+    "selectRow": "Qatorni tanlash",
+    "selected": "{count} ta tanlandi",
+    "empty": "Ma'lumot topilmadi",
+    "range": "{from}–{to} / {total}",
+    "prev": "Oldingi",
+    "next": "Keyingi"
+  },
+  "filters": {
+    "filters": "Filtrlar",
+    "reset": "Tozalash",
+    "apply": "Qo'llash",
+    "all": "Hammasi"
   }
 }

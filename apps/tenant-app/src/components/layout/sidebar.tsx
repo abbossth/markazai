@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MAIN_NAV, SETTINGS_NAV, type NavItem } from "@/config/nav";
+import { canAccess, type AppModule } from "@/lib/permissions";
 
 function NavLink({ item, active }: { item: NavItem; active: boolean }) {
   const t = useTranslations("nav");
@@ -25,7 +26,7 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ roles }: { roles: string[] }) {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
@@ -39,14 +40,16 @@ export function Sidebar() {
       </Link>
 
       <nav className="flex flex-1 flex-col gap-1 px-3 py-2">
-        {MAIN_NAV.map((item) => (
+        {MAIN_NAV.filter((item) => canAccess(roles, item.key as AppModule)).map((item) => (
           <NavLink key={item.key} item={item} active={isActive(item.href)} />
         ))}
       </nav>
 
-      <div className="border-sidebar-border border-t p-3">
-        <NavLink item={SETTINGS_NAV} active={isActive(SETTINGS_NAV.href)} />
-      </div>
+      {canAccess(roles, "settings") && (
+        <div className="border-sidebar-border border-t p-3">
+          <NavLink item={SETTINGS_NAV} active={isActive(SETTINGS_NAV.href)} />
+        </div>
+      )}
     </aside>
   );
 }

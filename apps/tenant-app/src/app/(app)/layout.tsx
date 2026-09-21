@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar />
+      <Sidebar roles={roles} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header user={{ name: name ?? "", phone, image, roles }} />
         <main className="bg-muted/30 flex-1 overflow-auto p-6">{children}</main>
