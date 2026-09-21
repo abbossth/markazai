@@ -54,3 +54,22 @@ export function lessonDatesInMonth(group: ScheduleInput, year: number, month: nu
   }
   return out;
 }
+
+/** [from, to] oralig'idagi (ikkala chegara kiradi) barcha dars kunlari, guruh chegaralari bilan. */
+export function lessonDatesBetween(group: ScheduleInput, from: Date, to: Date): string[] {
+  const out: string[] = [];
+  let y = from.getUTCFullYear();
+  let m = from.getUTCMonth() + 1;
+  const last = to.getUTCFullYear() * 12 + to.getUTCMonth();
+  const fromIso = toISODate(from);
+  const toIso = toISODate(to);
+  while (y * 12 + (m - 1) <= last) {
+    for (const d of lessonDatesInMonth(group, y, m)) if (d >= fromIso && d <= toIso) out.push(d);
+    m++;
+    if (m > 12) {
+      m = 1;
+      y++;
+    }
+  }
+  return out;
+}

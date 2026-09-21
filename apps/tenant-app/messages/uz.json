@@ -36,7 +36,8 @@
     "forbidden": "Bu amal uchun ruxsat yo'q",
     "notFound": "Topilmadi",
     "more": "(ko'proq)",
-    "less": "(kamroq)"
+    "less": "(kamroq)",
+    "print": "Chop etish"
   },
   "nav": {
     "dashboard": "Bosh sahifa",
@@ -129,6 +130,10 @@
       "nodebt": "Qarzi yo'q",
       "positive": "Ijobiy balansi",
       "paidThisMonth": "Joriy oyda to'lagan"
+    },
+    "paymentType": {
+      "SYSTEM": "Tizim",
+      "MANUAL": "To'lov"
     }
   },
   "student": {
@@ -180,6 +185,77 @@
     "financeStatus": "Moliyaviy holat",
     "groupsCount": "Guruhlar soni",
     "dateFrom": "dan",
-    "dateTo": "gacha"
+    "dateTo": "gacha",
+    "changeStatus": "Holatni o'zgartirish",
+    "freezeTitle": "Talabani muzlatish",
+    "noActiveGroupWarning": "Talaba hech qaysi faol guruhga biriktirilmagan",
+    "rating": "Reyting",
+    "noGroups": "Talaba hali hech qaysi guruhda bo'lmagan",
+    "leftOn": "Chiqdi: {date}",
+    "callsEmpty": "Qo'ng'iroqlar tarixi yo'q",
+    "smsEmpty": "SMS tarixi yo'q",
+    "integrationHint": "Telefoniya/SMS integratsiyasi ulangandan keyin shu yerda ko'rinadi",
+    "leadsEmpty": "Lid tarixi yo'q",
+    "leadsHint": "Lid talabaga aylantirilganda uning tarixi shu yerda ko'rinadi",
+    "tabs": {
+      "groups": "Guruhlar",
+      "comments": "Izohlar",
+      "attendance": "Davomat",
+      "calls": "Qo'ng'iroq tarixi",
+      "sms": "SMS",
+      "history": "Tarix",
+      "leads": "Lid tarixi"
+    },
+    "payments": {
+      "title": "To'lovlar",
+      "empty": "To'lovlar yo'q",
+      "date": "Sana",
+      "group": "Guruh",
+      "type": "Turi",
+      "amount": "Summa",
+      "description": "Tavsif",
+      "receivedBy": "Qabul qildi",
+      "month": {
+        "paid": "To'langan",
+        "partial": "Qisman",
+        "debt": "Qarz",
+        "none": "—"
+      }
+    }
+  },
+  "comments": {
+    "placeholder": "Izoh yozing...",
+    "add": "Izoh qo'shish",
+    "empty": "Hali izohlar yo'q"
+  },
+  "history": {
+    "empty": "Tarix bo'sh",
+    "actions": {
+      "created": "Yaratildi",
+      "updated": "Tahrirlandi",
+      "status_changed": "Holat o'zgardi",
+      "joined_group": "Guruhga qo'shildi",
+      "left_group": "Guruhdan chiqdi",
+      "student_joined": "Talaba qo'shildi",
+      "student_left": "Talaba chiqdi",
+      "group_status_changed": "Guruh holati o'zgardi"
+    }
+  },
+  "attendance": {
+    "noGroups": "Talaba hech qaysi guruhga biriktirilmagan",
+    "calendar": "Taqvim",
+    "list": "Ro'yxat",
+    "present": "Bor edi",
+    "absent": "Yo'q",
+    "excused": "Sababli",
+    "empty": "Bo'sh",
+    "percent": "Qatnashish",
+    "upcoming": "Kelgusi dars",
+    "noLessons": "Darslar hali bo'lmagan",
+    "prevMonth": "Oldingi oy",
+    "nextMonth": "Keyingi oy",
+    "PRESENT": "Bor edi",
+    "ABSENT": "Yo'q",
+    "EXCUSED": "Sababli"
   }
 }

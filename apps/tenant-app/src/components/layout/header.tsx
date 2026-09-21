@@ -38,7 +38,7 @@ export function Header({ user }: Props) {
   const t = useTranslations("common");
 
   return (
-    <header className="bg-background flex h-14 shrink-0 items-center gap-3 border-b px-4">
+    <header className="bg-background flex h-14 shrink-0 items-center gap-3 border-b px-4 print:hidden">
       <GlobalSearch />
       <div className="ml-auto flex items-center gap-0.5">
         <LocaleSwitcher />

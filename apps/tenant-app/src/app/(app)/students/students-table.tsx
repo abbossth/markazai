@@ -17,7 +17,7 @@ import { ExpandableText } from "@/components/shared/expandable-text";
 import { Money } from "@/components/shared/money";
 import { StudentQuickCard } from "@/components/shared/student-quick-card";
 import { StudentStatusBadge } from "@/components/shared/status-badge";
-import { formatPhone } from "@/lib/format";
+import { formatPhone, initials } from "@/lib/format";
 import { AddToGroupDialog } from "./add-to-group-dialog";
 import { deleteStudent } from "./actions";
 import { StudentSheet } from "./student-form";
@@ -33,15 +33,6 @@ type Props = {
   canWrite: boolean;
   canDelete: boolean;
 };
-
-export function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]!.toUpperCase())
-    .join("");
-}
 
 export function StudentsTable({ rows, total, page, pageSize, sort, lookups, canWrite, canDelete }: Props) {
   const t = useTranslations("student");

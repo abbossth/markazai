@@ -36,7 +36,8 @@
     "forbidden": "You don't have permission for this action",
     "notFound": "Not found",
     "more": "(more)",
-    "less": "(less)"
+    "less": "(less)",
+    "print": "Print"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -129,6 +130,10 @@
       "nodebt": "No debt",
       "positive": "Positive balance",
       "paidThisMonth": "Paid this month"
+    },
+    "paymentType": {
+      "SYSTEM": "System",
+      "MANUAL": "Payment"
     }
   },
   "student": {
@@ -180,6 +185,77 @@
     "financeStatus": "Financial status",
     "groupsCount": "Number of groups",
     "dateFrom": "from",
-    "dateTo": "to"
+    "dateTo": "to",
+    "changeStatus": "Change status",
+    "freezeTitle": "Freeze student",
+    "noActiveGroupWarning": "The student is not assigned to any active group",
+    "rating": "Rating",
+    "noGroups": "The student has not been in any group yet",
+    "leftOn": "Left: {date}",
+    "callsEmpty": "No call history",
+    "smsEmpty": "No SMS history",
+    "integrationHint": "Will appear here once telephony/SMS is connected",
+    "leadsEmpty": "No lead history",
+    "leadsHint": "When a lead is converted to a student, its history will appear here",
+    "tabs": {
+      "groups": "Groups",
+      "comments": "Comments",
+      "attendance": "Attendance",
+      "calls": "Call history",
+      "sms": "SMS",
+      "history": "History",
+      "leads": "Lead history"
+    },
+    "payments": {
+      "title": "Payments",
+      "empty": "No payments",
+      "date": "Date",
+      "group": "Group",
+      "type": "Type",
+      "amount": "Amount",
+      "description": "Description",
+      "receivedBy": "Received by",
+      "month": {
+        "paid": "Paid",
+        "partial": "Partial",
+        "debt": "Debt",
+        "none": "—"
+      }
+    }
+  },
+  "comments": {
+    "placeholder": "Write a comment...",
+    "add": "Add comment",
+    "empty": "No comments yet"
+  },
+  "history": {
+    "empty": "History is empty",
+    "actions": {
+      "created": "Created",
+      "updated": "Updated",
+      "status_changed": "Status changed",
+      "joined_group": "Joined group",
+      "left_group": "Left group",
+      "student_joined": "Student joined",
+      "student_left": "Student left",
+      "group_status_changed": "Group status changed"
+    }
+  },
+  "attendance": {
+    "noGroups": "The student is not assigned to any group",
+    "calendar": "Calendar",
+    "list": "List",
+    "present": "Present",
+    "absent": "Absent",
+    "excused": "Excused",
+    "empty": "Empty",
+    "percent": "Attendance",
+    "upcoming": "Upcoming lesson",
+    "noLessons": "No lessons yet",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "PRESENT": "Present",
+    "ABSENT": "Absent",
+    "EXCUSED": "Excused"
   }
 }

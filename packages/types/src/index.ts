@@ -29,3 +29,5 @@ export * from "./schedule";
 export * from "./phone";
 export * from "./student";
 export * from "./common";
+export * from "./finance";
+export * from "./attendance";

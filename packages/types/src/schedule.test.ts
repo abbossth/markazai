@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fromISODate, isoWeekday, lessonDatesInMonth, weekdaysOf } from "./schedule";
+import { fromISODate, isoWeekday, lessonDatesBetween, lessonDatesInMonth, weekdaysOf } from "./schedule";
 
 describe("weekdaysOf", () => {
   it("toq/juft/har kuni/dam olish kuni", () => {
@@ -43,5 +43,19 @@ describe("lessonDatesInMonth", () => {
 
   it("guruh hali boshlanmagan oyda bo'sh ro'yxat", () => {
     expect(lessonDatesInMonth({ ...base, startDate: fromISODate("2026-10-01") }, 2026, 9)).toEqual([]);
+  });
+});
+
+describe("lessonDatesBetween", () => {
+  it("oylar oralig'ida chegaralar bilan dars kunlarini qaytaradi", () => {
+    const g = { days: "WEEKEND" as const, startDate: fromISODate("2026-01-01") };
+    const dates = lessonDatesBetween(g, fromISODate("2026-08-29"), fromISODate("2026-09-06"));
+    expect(dates).toEqual(["2026-08-29", "2026-08-30", "2026-09-05", "2026-09-06"]);
+  });
+
+  it("yil almashishini to'g'ri hal qiladi", () => {
+    const g = { days: "EVERY_DAY" as const, startDate: fromISODate("2025-01-01") };
+    const dates = lessonDatesBetween(g, fromISODate("2025-12-30"), fromISODate("2026-01-02"));
+    expect(dates).toEqual(["2025-12-30", "2025-12-31", "2026-01-01", "2026-01-02"]);
   });
 });

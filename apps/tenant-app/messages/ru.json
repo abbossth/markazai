@@ -36,7 +36,8 @@
     "forbidden": "Нет прав для этого действия",
     "notFound": "Не найдено",
     "more": "(ещё)",
-    "less": "(скрыть)"
+    "less": "(скрыть)",
+    "print": "Печать"
   },
   "nav": {
     "dashboard": "Главная",
@@ -129,6 +130,10 @@
       "nodebt": "Без долга",
       "positive": "Положительный баланс",
       "paidThisMonth": "Оплатил в этом месяце"
+    },
+    "paymentType": {
+      "SYSTEM": "Система",
+      "MANUAL": "Оплата"
     }
   },
   "student": {
@@ -180,6 +185,77 @@
     "financeStatus": "Финансовый статус",
     "groupsCount": "Количество групп",
     "dateFrom": "с",
-    "dateTo": "по"
+    "dateTo": "по",
+    "changeStatus": "Изменить статус",
+    "freezeTitle": "Заморозить студента",
+    "noActiveGroupWarning": "Студент не привязан ни к одной активной группе",
+    "rating": "Рейтинг",
+    "noGroups": "Студент ещё не был ни в одной группе",
+    "leftOn": "Вышел: {date}",
+    "callsEmpty": "Истории звонков нет",
+    "smsEmpty": "Истории SMS нет",
+    "integrationHint": "Появится здесь после подключения телефонии/SMS",
+    "leadsEmpty": "Истории лида нет",
+    "leadsHint": "Когда лид станет студентом, его история появится здесь",
+    "tabs": {
+      "groups": "Группы",
+      "comments": "Комментарии",
+      "attendance": "Посещаемость",
+      "calls": "История звонков",
+      "sms": "SMS",
+      "history": "История",
+      "leads": "История лида"
+    },
+    "payments": {
+      "title": "Платежи",
+      "empty": "Платежей нет",
+      "date": "Дата",
+      "group": "Группа",
+      "type": "Тип",
+      "amount": "Сумма",
+      "description": "Описание",
+      "receivedBy": "Принял",
+      "month": {
+        "paid": "Оплачено",
+        "partial": "Частично",
+        "debt": "Долг",
+        "none": "—"
+      }
+    }
+  },
+  "comments": {
+    "placeholder": "Напишите комментарий...",
+    "add": "Добавить комментарий",
+    "empty": "Комментариев пока нет"
+  },
+  "history": {
+    "empty": "История пуста",
+    "actions": {
+      "created": "Создано",
+      "updated": "Изменено",
+      "status_changed": "Статус изменён",
+      "joined_group": "Добавлен в группу",
+      "left_group": "Вышел из группы",
+      "student_joined": "Студент добавлен",
+      "student_left": "Студент вышел",
+      "group_status_changed": "Статус группы изменён"
+    }
+  },
+  "attendance": {
+    "noGroups": "Студент не привязан ни к одной группе",
+    "calendar": "Календарь",
+    "list": "Список",
+    "present": "Был",
+    "absent": "Не был",
+    "excused": "Уважительная",
+    "empty": "Пусто",
+    "percent": "Посещаемость",
+    "upcoming": "Предстоящий урок",
+    "noLessons": "Уроков ещё не было",
+    "prevMonth": "Предыдущий месяц",
+    "nextMonth": "Следующий месяц",
+    "PRESENT": "Был",
+    "ABSENT": "Не был",
+    "EXCUSED": "Уважительная"
   }
 }

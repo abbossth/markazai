@@ -14,17 +14,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/app/(app)/actions";
+import { initials } from "@/lib/format";
 
 type Props = { name: string; phone: string; image?: string | null; roles: string[] };
-
-function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]!.toUpperCase())
-    .join("");
-}
 
 export function UserMenu({ name, phone, image, roles }: Props) {
   const t = useTranslations("common");

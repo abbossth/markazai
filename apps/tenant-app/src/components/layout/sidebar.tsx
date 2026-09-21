@@ -31,7 +31,7 @@ export function Sidebar({ roles }: { roles: string[] }) {
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-60 shrink-0 flex-col border-r md:flex">
+    <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-60 shrink-0 flex-col border-r md:flex print:hidden">
       <Link href="/dashboard" className="flex h-14 items-center gap-2 px-5 font-semibold">
         <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
           <GraduationCap className="size-5" />
