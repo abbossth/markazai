@@ -47,6 +47,7 @@ export const generalSettingsSchema = z.object({
   logoUrl: fileUrl,
   loginBannerUrl: fileUrl,
   gamificationEnabled: z.boolean(),
+  coinsPerLesson: z.number("required").int("invalid").min(0, "invalid").max(100, "invalid"),
 });
 export type GeneralSettingsInput = z.input<typeof generalSettingsSchema>;
 export type GeneralSettingsOutput = z.output<typeof generalSettingsSchema>;

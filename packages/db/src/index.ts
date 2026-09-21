@@ -22,3 +22,4 @@ export * from "./lead-defaults";
 export * from "./billing";
 export * from "./holidays";
 export * from "./secrets";
+export * from "./gamification";

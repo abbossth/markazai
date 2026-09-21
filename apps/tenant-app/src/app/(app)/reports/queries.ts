@@ -7,6 +7,7 @@ import {
   daysBetween,
   fromISODate,
   groupConversion,
+  rankByCoins,
   rankByRating,
   toCenterParts,
   toISODate,
@@ -282,6 +283,33 @@ export async function listChurn(user: SessionUser, sp: RawSearchParams, range: R
   );
   const page = paginate(rows, sp, sort, (r, k) => (k === "name" ? r.name : k === "days" ? r.days : k === "balance" ? r.balance : r.leftAt), opts);
   return { ...page, summary: { count: rows.length, avgDays: rows.length ? Math.round((rows.reduce((s, r) => s + r.days, 0) / rows.length) * 10) / 10 : null } };
+}
+
+// ───────────── Coin reytingi ─────────────
+
+export type CoinRow = { id: string; rank: number; name: string; groups: string[]; attendance: number; manual: number; total: number };
+
+/** Davrdagi coin reytingi: davomat va qo'lda berilgan coinlar alohida ko'rsatiladi. Guruh filtri (yoki o'qituvchi ko'lami) bo'lsa faqat guruhga bog'liq yozuvlar. */
+export async function listCoins(user: SessionUser, sp: RawSearchParams, range: Range, opts: Opts = {}) {
+  const sort = sortParam(sp, ["rank", "name", "attendance", "manual", "total"] as const, { key: "rank", dir: "asc" });
+  const filtered = !!(teacherScope(user) || param(sp, "groupId") || param(sp, "courseId") || param(sp, "teacherId"));
+  const where: Prisma.CoinLogWhereInput = {
+    organizationId: user.orgId,
+    date: dateRange(range),
+    ...(filtered && { group: groupWhere(user, sp) }),
+    student: studentSearch(param(sp, "q")),
+  };
+  const grouped = await prisma.coinLog.groupBy({ by: ["studentId", "kind"], where, _sum: { amount: true } });
+  const ids = [...new Set(grouped.map((g) => g.studentId))];
+  const students = ids.length
+    ? await prisma.student.findMany({ where: { organizationId: user.orgId, id: { in: ids } }, select: { id: true, name: true, enrollments: { where: { leftAt: null, ...(filtered && { group: groupWhere(user, sp) }) }, select: { group: { select: { name: true } } } } } })
+    : [];
+  const byId = new Map(students.map((s) => [s.id, s]));
+  const sum = (id: string, kind: "ATTENDANCE" | "MANUAL") => grouped.find((g) => g.studentId === id && g.kind === kind)?._sum.amount ?? 0;
+
+  const ranked = rankByCoins(ids.map((id) => ({ id, coins: sum(id, "ATTENDANCE") + sum(id, "MANUAL") })));
+  const rows: CoinRow[] = ranked.map((r) => ({ id: r.id, rank: r.rank, name: byId.get(r.id)?.name ?? "—", groups: byId.get(r.id)?.enrollments.map((e) => e.group.name) ?? [], attendance: sum(r.id, "ATTENDANCE"), manual: sum(r.id, "MANUAL"), total: r.coins }));
+  return paginate(rows, sp, sort, (r, k) => (k === "name" ? r.name : k === "attendance" ? r.attendance : k === "manual" ? r.manual : k === "total" ? r.total : r.rank), opts);
 }
 
 // ───────────── Jurnallar ─────────────

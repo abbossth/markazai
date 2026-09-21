@@ -9,9 +9,13 @@ const REQUIRES: Record<ReportKey, AppModule> = {
   leads: "leads",
   churn: "students",
   logs: "leads",
+  coins: "students",
 };
 
-/** Foydalanuvchi ko'ra oladigan hisobotlar. Faqat-o'qituvchi: faqat reyting va davomat (o'z guruhlari). */
-export function visibleReports(roles: string[]): ReportKey[] {
-  return REPORT_KEYS.filter((k) => canAccess(roles, REQUIRES[k]) && !(isTeacherOnly(roles) && (k === "churn" || k === "logs")));
+/**
+ * Foydalanuvchi ko'ra oladigan hisobotlar. Faqat-o'qituvchi: reyting, davomat va coin (o'z guruhlari).
+ * "coins" faqat gamifikatsiya yoqilgan bo'lsa.
+ */
+export function visibleReports(roles: string[], gamification = false): ReportKey[] {
+  return REPORT_KEYS.filter((k) => canAccess(roles, REQUIRES[k]) && !(isTeacherOnly(roles) && (k === "churn" || k === "logs")) && (k !== "coins" || gamification));
 }

@@ -94,6 +94,14 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
     holidays: await loadHolidayDates(prisma, user.orgId),
   };
   const canMark = can(user.roles, "attendance:write");
+  // Gamifikatsiya yoqilgan bo'lsa davomat tabida coin ustuni ko'rsatiladi.
+  const center = await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } });
+  const coinInfo = center?.gamificationEnabled
+    ? {
+        totals: Object.fromEntries((await prisma.coinLog.groupBy({ by: ["studentId"], where: { organizationId: user.orgId, groupId: group.id }, _sum: { amount: true } })).map((r) => [r.studentId, r._sum.amount ?? 0])),
+        canAward: canMark,
+      }
+    : undefined;
 
   return (
     <div className="flex flex-col gap-5">
@@ -197,6 +205,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
             <TabsContent value="attendance" className="pt-4">
               <LessonGrid
                 mode="attendance"
+                coins={coinInfo}
                 group={schedule}
                 members={members}
                 today={today}

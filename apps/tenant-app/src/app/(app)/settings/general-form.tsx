@@ -41,6 +41,7 @@ export function GeneralForm({ initial }: { initial: GeneralSettingsInput }) {
     defaultValues: initial,
   });
   const color = watch("brandColor");
+  const gamification = watch("gamificationEnabled");
 
   const submit = (values: GeneralSettingsOutput) =>
     startTransition(async () => {
@@ -171,6 +172,12 @@ export function GeneralForm({ initial }: { initial: GeneralSettingsInput }) {
             </label>
           )}
         />
+        {gamification && (
+          <Field label={t("coinsPerLesson")} error={err(errors.coinsPerLesson?.message)}>
+            <Input type="number" min={0} max={100} inputMode="numeric" className="w-32" {...register("coinsPerLesson", { valueAsNumber: true })} />
+            <p className="text-muted-foreground text-xs">{t("coinsPerLessonHint")}</p>
+          </Field>
+        )}
       </Section>
 
       <div className="flex justify-end">

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { StudentCoins } from "@/components/shared/coins";
+import { loadStudentCoins } from "@/lib/coins";
 import { loadHolidayDates, prisma } from "@markazai/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -72,6 +74,11 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
   const enrollments = isTeacherOnly(user.roles) ? student.enrollments.filter((e) => e.group.teacherId === user.teacherId) : student.enrollments;
   const activeEnrollments = enrollments.filter((e) => !e.leftAt);
   const rating = grades._avg.score;
+  // Gamifikatsiya: yoqilgan bo'lsa coin jami va tarixi (faqat-o'qituvchi faqat o'z guruhlaridagi yozuvlarni ko'radi).
+  const center = await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } });
+  const coins = center?.gamificationEnabled
+    ? await loadStudentCoins(user.orgId, student.id, isTeacherOnly(user.roles) ? enrollments.map((e) => e.groupId) : null)
+    : null;
 
   // Oxirgi 3 oy (joriy oy bilan) — oylik balans kartochkalari uchun.
   const months = Array.from({ length: 3 }, (_, i) => {
@@ -144,6 +151,9 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
               <div className="text-muted-foreground text-xs">{t("balance")}</div>
               <Money value={student.balance} className="text-2xl" />
             </div>
+          )}
+          {coins && (
+            <StudentCoins studentId={student.id} studentName={student.name} total={coins.total} history={coins.history} canAward={can(user.roles, "attendance:write") && !isTeacherOnly(user.roles)} />
           )}
           <div>
             <div className="text-muted-foreground text-xs">{t("rating")}</div>

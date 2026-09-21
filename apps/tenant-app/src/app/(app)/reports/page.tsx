@@ -12,8 +12,9 @@ import { cn } from "@/lib/utils";
 import { RangePresets } from "../finance/range-presets";
 import { visibleReports } from "./access";
 import { ConversionSection } from "./conversion-section";
-import { PAGE_SIZE, listAttendance, listCallLog, listChurn, listLeadsReport, listRating, listSmsLog, loadReportLookups, type ReportLookups } from "./queries";
-import { AttendanceTable, CallsTable, ChurnTable, ExportButtons, LeadsReportTable, RatingTable, SmsTable } from "./report-tables";
+import { prisma } from "@markazai/db";
+import { PAGE_SIZE, listAttendance, listCallLog, listChurn, listCoins, listLeadsReport, listRating, listSmsLog, loadReportLookups, type ReportLookups } from "./queries";
+import { AttendanceTable, CallsTable, ChurnTable, CoinsTable, ExportButtons, LeadsReportTable, RatingTable, SmsTable } from "./report-tables";
 import { SummaryTiles } from "./summary-tiles";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,7 +26,8 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const user = await requireModule("reports");
   const sp = await searchParams;
   const t = await getTranslations("reports");
-  const tabs = visibleReports(user.roles);
+  const gamification = (await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } }))?.gamificationEnabled ?? false;
+  const tabs = visibleReports(user.roles, gamification);
   const requested = param(sp, "report");
   const report: ReportKey | undefined = tabs.find((k) => k === requested) ?? tabs[0];
   const range = resolveRange(sp);
@@ -61,6 +63,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
           {report === "leads" && <LeadsSection user={user} sp={sp} lookups={lookups} />}
           {report === "churn" && <ChurnSection user={user} sp={sp} lookups={lookups} />}
           {report === "logs" && <LogsSection user={user} sp={sp} />}
+          {report === "coins" && <CoinsSection user={user} sp={sp} lookups={lookups} />}
         </>
       )}
     </div>
@@ -141,6 +144,18 @@ async function LeadsSection({ user, sp, lookups }: WithLookups) {
       <SummaryTiles items={[{ label: t("leads.total"), value: String(list.total) }, ...list.stages.map((s) => ({ label: s.name, value: String(s.count) }))]} />
       <FilterBar searchPlaceholder={t("search.lead")} fields={fields} actions={<ExportButtons report="leads" />} />
       <LeadsReportTable rows={list.rows} total={list.total} page={list.page} pageSize={PAGE_SIZE} sort={list.sort} />
+    </>
+  );
+}
+
+async function CoinsSection({ user, sp, lookups }: WithLookups) {
+  const t = await getTranslations("reports");
+  const list = await listCoins(user, sp, resolveRange(sp));
+  return (
+    <>
+      <p className="text-muted-foreground text-sm">{t("coins.hint")}</p>
+      <FilterBar searchPlaceholder={t("search.student")} fields={[...(await dateFields()), ...(await groupFields(lookups))]} actions={<ExportButtons report="coins" />} />
+      <CoinsTable rows={list.rows} total={list.total} page={list.page} pageSize={PAGE_SIZE} sort={list.sort} />
     </>
   );
 }

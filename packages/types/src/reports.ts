@@ -3,7 +3,7 @@
  * Server so'rovlari (`reports/queries.ts`) xom sonlarni yig'adi, ma'no shu yerda.
  */
 
-export const REPORT_KEYS = ["rating", "attendance", "conversion", "leads", "churn", "logs"] as const;
+export const REPORT_KEYS = ["rating", "attendance", "conversion", "leads", "churn", "logs", "coins"] as const;
 export type ReportKey = (typeof REPORT_KEYS)[number];
 
 export const LOG_KEYS = ["calls", "sms", "workly"] as const;

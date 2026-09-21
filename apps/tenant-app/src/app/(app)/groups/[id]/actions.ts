@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { loadMonthHolidays, prisma, recalculateStudentGroup, syncLessonCharge } from "@markazai/db";
+import { loadMonthHolidays, prisma, recalculateStudentGroup, syncAttendanceCoins, syncLessonCharge } from "@markazai/db";
 import {
   discountSchema,
   examSchema,
@@ -87,6 +87,8 @@ export async function setAttendance(groupId: string, studentId: string, date: st
       });
     }
     await syncLessonCharge(tx, { organizationId: user.orgId, groupId, studentId, date: check.date });
+    // Gamifikatsiya yoqilgan bo'lsa "keldi" darsi coin beradi (holat o'zgarsa moslanadi).
+    await syncAttendanceCoins(tx, { organizationId: user.orgId, groupId, studentId, date: check.date });
   });
   // Har bir katak uchun audit-log yozilmaydi (juda ko'p bo'lardi); revalidate ham kerak emas — UI optimistik.
   revalidatePath(`/students/${studentId}`);

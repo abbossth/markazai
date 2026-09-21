@@ -11,7 +11,7 @@ import { Money } from "@/components/shared/money";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatDateTime, formatPhone } from "@/lib/format";
-import type { AttendanceRow, CallLogRow, ChurnRow, LeadReportRow, RatingRow, SmsLogRow } from "./queries";
+import type { AttendanceRow, CallLogRow, ChurnRow, CoinRow, LeadReportRow, RatingRow, SmsLogRow } from "./queries";
 
 type TableProps<R> = { rows: R[]; total: number; page: number; pageSize: number; sort?: { key: string; dir: "asc" | "desc" } };
 
@@ -61,6 +61,30 @@ export function RatingTable(props: TableProps<RatingRow>) {
     [t],
   );
   return <DataTable columns={columns} data={props.rows} total={props.total} page={props.page} pageSize={props.pageSize} sort={props.sort} getRowId={(r) => r.id} storageKey="report-rating" />;
+}
+
+export function CoinsTable(props: TableProps<CoinRow>) {
+  const t = useTranslations("reports.columns");
+  const columns = useMemo<AnyColumnDef<CoinRow>[]>(
+    () => [
+      { id: "rank", ...col(t("rank"), "rank", "w-16"), cell: ({ row }) => <span className="font-semibold tabular-nums">{row.original.rank}</span> },
+      {
+        id: "student",
+        ...col(t("student"), "name"),
+        cell: ({ row }) => (
+          <Link href={`/students/${row.original.id}`} className="font-medium hover:underline">
+            {row.original.name}
+          </Link>
+        ),
+      },
+      { id: "groups", ...col(t("groups")), cell: ({ row }) => (row.original.groups.length ? row.original.groups.join(", ") : "—") },
+      { id: "attendance", ...col(t("coinsAttendance"), "attendance", "text-right"), cell: ({ row }) => <span className="tabular-nums">{row.original.attendance}</span> },
+      { id: "manual", ...col(t("coinsManual"), "manual", "text-right"), cell: ({ row }) => <span className="tabular-nums">{row.original.manual}</span> },
+      { id: "total", ...col(t("coinsTotal"), "total", "text-right"), cell: ({ row }) => <span className="font-semibold tabular-nums">{row.original.total}</span> },
+    ],
+    [t],
+  );
+  return <DataTable columns={columns} data={props.rows} total={props.total} page={props.page} pageSize={props.pageSize} sort={props.sort} getRowId={(r) => r.id} storageKey="report-coins" />;
 }
 
 export function AttendanceTable(props: TableProps<AttendanceRow>) {

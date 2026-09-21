@@ -109,6 +109,8 @@ model CenterSettings {
   receiptShowLogo      Boolean  @default(true) @map("receipt_show_logo")
   receiptShowBranch    Boolean  @default(true) @map("receipt_show_branch")
   receiptShowCashier   Boolean  @default(true) @map("receipt_show_cashier")
+  // Gamifikatsiya: har bir "keldi" dars uchun beriladigan coin (0 — faqat qo'lda beriladi).
+  coinsPerLesson       Int      @default(1) @map("coins_per_lesson")
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
@@ -290,6 +292,7 @@ model Group {
   onlineLessons OnlineLesson[]
   payments      Payment[]
   reminders     Reminder[]
+  coinLogs      CoinLog[]
 
   @@unique([organizationId, name])
   @@index([organizationId, status])
@@ -330,6 +333,7 @@ model Student {
   reminders   Reminder[]
   calls       CallLog[]
   smsLogs     SmsLog[]
+  coinLogs    CoinLog[]
 
   @@index([organizationId, status])
   @@index([organizationId, name])
@@ -860,4 +864,38 @@ model Integration {
 
   @@unique([organizationId, kind])
   @@map("integrations")
+}
+
+// ─────────────────────────────────────────────────────────────
+// 8-bosqich: Gamifikatsiya
+// ─────────────────────────────────────────────────────────────
+
+// ATTENDANCE — "keldi" darsi uchun avtomatik (davomat o'zgarsa moslanadi); MANUAL — xodim bergan/olgan.
+enum CoinKind {
+  ATTENDANCE
+  MANUAL
+}
+
+// Coin tarixi. Talaba coini = amount yig'indisi. amount manfiy bo'lishi mumkin (jarima/ayirish).
+model CoinLog {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  studentId      String    @map("student_id") @db.Uuid
+  groupId        String?   @map("group_id") @db.Uuid
+  amount         Int
+  kind           CoinKind
+  reason         String?
+  date           DateTime  @db.Date
+  // Faqat ATTENDANCE uchun: qaysi dars kuni uchun berilgan (bir dars — bir yozuv).
+  lessonDate     DateTime? @map("lesson_date") @db.Date
+  createdById    String?   @map("created_by_id") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  group   Group?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
+
+  @@unique([studentId, groupId, lessonDate, kind])
+  @@index([organizationId, studentId])
+  @@index([organizationId, date])
+  @@map("coin_logs")
 }

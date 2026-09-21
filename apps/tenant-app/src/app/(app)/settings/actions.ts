@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@markazai/db";
+import { backfillAttendanceCoins, prisma } from "@markazai/db";
 import { generalSettingsSchema, type GeneralSettingsInput } from "@markazai/types";
 import { fieldErrorsOf, guardSettings, type Result } from "./guard";
 
@@ -30,8 +30,12 @@ export async function saveGeneralSettings(input: GeneralSettingsInput): Promise<
     logoUrl: d.logoUrl ?? null,
     loginBannerUrl: d.loginBannerUrl ?? null,
     gamificationEnabled: d.gamificationEnabled,
+    coinsPerLesson: d.coinsPerLesson,
   };
+  const before = await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true, coinsPerLesson: true } });
   await prisma.centerSettings.upsert({ where: { organizationId: user.orgId }, update: data, create: { organizationId: user.orgId, ...data } });
+  // Gamifikatsiya yoqilganda yoki coin qiymati o'zgarganda mavjud davomat coinlari tenglashtiriladi.
+  if (d.gamificationEnabled && (!before?.gamificationEnabled || before.coinsPerLesson !== d.coinsPerLesson)) await backfillAttendanceCoins(prisma, user.orgId, d.coinsPerLesson);
   revalidatePath("/", "layout");
   return { ok: true };
 }

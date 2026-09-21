@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Coins, Eye, EyeOff, Plus } from "lucide-react";
 import { toast } from "sonner";
 import {
   attendanceStats,
@@ -13,6 +13,7 @@ import {
   type DaysPattern,
 } from "@markazai/types";
 import { Button } from "@/components/ui/button";
+import { AwardCoinsDialog } from "@/components/shared/coins";
 import { EmptyState } from "@/components/shared/empty-state";
 import { cn } from "@/lib/utils";
 import { setAttendance, setGrade } from "./actions";
@@ -24,7 +25,11 @@ type Props =
   | { mode: "attendance"; records: { studentId: string; date: string; value: AttendanceValue }[] }
   | { mode: "grades"; records: { studentId: string; date: string; value: number }[] };
 
-type CommonProps = { group: GroupSchedule; members: Member[]; today: string; canEdit: boolean };
+/** Gamifikatsiya (faqat davomat tabida): talabaning shu guruhdagi coin jami va berish huquqi. */
+type CoinsProp = { totals: Record<string, number>; canAward: boolean };
+type CommonProps = { group: GroupSchedule; members: Member[]; today: string; canEdit: boolean; coins?: CoinsProp };
+
+const COINS_PREF_KEY = "markazai.showCoins";
 
 const NEXT: Record<string, AttendanceValue | null> = { "": "PRESENT", PRESENT: "ABSENT", ABSENT: "EXCUSED", EXCUSED: null };
 const SYMBOL: Record<AttendanceValue, string> = { PRESENT: "✓", ABSENT: "✕", EXCUSED: "С" };
@@ -39,7 +44,23 @@ export function LessonGrid(props: Props & CommonProps) {
   const tc = useTranslations("common");
   const tw = useTranslations("enums.weekdaysShort");
   const tm = useTranslations("enums.months");
-  const { group, members, today, canEdit } = props;
+  const { group, members, today, canEdit, coins } = props;
+  const [showCoins, setShowCoins] = useState(true);
+  const [awarding, setAwarding] = useState<Member | null>(null);
+  // "Show/Hide coins" tanlovi brauzerda eslab qolinadi (boshlang'ich qiymat serverdagi bilan bir xil — hydration mos).
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(COINS_PREF_KEY) === "0") setShowCoins(false);
+    } catch {}
+  }, []);
+  const toggleCoins = () =>
+    setShowCoins((v) => {
+      try {
+        localStorage.setItem(COINS_PREF_KEY, v ? "0" : "1");
+      } catch {}
+      return !v;
+    });
+  const coinsVisible = props.mode === "attendance" && !!coins && showCoins;
   const [, startTransition] = useTransition();
   const [cursor, setCursor] = useState({ y: Number(today.slice(0, 4)), m: Number(today.slice(5, 7)) });
   // Optimistik holat: "studentId|date" → qiymat
@@ -104,6 +125,13 @@ export function LessonGrid(props: Props & CommonProps) {
         <Button variant="ghost" size="icon-sm" onClick={() => shift(1)} aria-label={t("nextMonth")}>
           <ChevronRight className="size-4" />
         </Button>
+        {props.mode === "attendance" && coins && (
+          <Button variant="ghost" size="sm" className="ml-auto" onClick={toggleCoins} aria-pressed={showCoins}>
+            {showCoins ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            <Coins className="size-4 text-amber-500" />
+            {showCoins ? t("hideCoins") : t("showCoins")}
+          </Button>
+        )}
       </div>
 
       {dates.length === 0 ? (
@@ -123,6 +151,7 @@ export function LessonGrid(props: Props & CommonProps) {
                   </th>
                 ))}
                 {props.mode === "attendance" && <th className="px-3 py-2 text-center font-medium">%</th>}
+                {coinsVisible && <th className="px-3 py-2 text-center font-medium">{t("coins")}</th>}
                 {props.mode === "grades" && <th className="px-3 py-2 text-center font-medium">{t("average")}</th>}
               </tr>
             </thead>
@@ -181,6 +210,18 @@ export function LessonGrid(props: Props & CommonProps) {
                     <td className="text-muted-foreground px-3 text-center text-xs tabular-nums">
                       {props.mode === "attendance" ? (pct === null ? "—" : `${pct}%`) : avg === null ? "—" : avg}
                     </td>
+                    {coinsVisible && (
+                      <td className="px-3 text-center text-xs tabular-nums">
+                        <span className="inline-flex items-center gap-1">
+                          <span className="font-medium">{coins?.totals[member.studentId] ?? 0}</span>
+                          {coins?.canAward && (
+                            <Button variant="ghost" size="icon-xs" aria-label={t("awardCoins")} onClick={() => setAwarding(member)}>
+                              <Plus className="size-3.5" />
+                            </Button>
+                          )}
+                        </span>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -188,6 +229,7 @@ export function LessonGrid(props: Props & CommonProps) {
           </table>
         </div>
       )}
+      {awarding && <AwardCoinsDialog studentId={awarding.studentId} studentName={awarding.name} groupId={group.id} onClose={() => setAwarding(null)} />}
     </div>
   );
 }

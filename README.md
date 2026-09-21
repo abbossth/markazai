@@ -42,6 +42,7 @@ Bazani noldan qayta yaratish: `npm run reset -w @markazai/db` (**barcha ma'lumot
 - **Integratsiya sirlari** AES-256-GCM bilan shifrlanadi (`SECRETS_KEY`, bo'lmasa `AUTH_SECRET`); UI'da faqat oxirgi 4 belgi ko'rinadi. Kalit almashtirilsa, sirlarni qayta kiriting.
 - **Sessiya** har so'rovda bazadagi joriy rollar va `isActive` bilan tekshiriladi: xodim bloklansa/o'chirilsa yoki roli o'zgarsa, amal qilish darhol tugaydi.
 - **Ommaviy forma** (`/apply`) kirishsiz ochiq: IP bo'yicha cheklov (jarayon xotirasida — ko'p nusxali deployda Redis/Upstash bilan almashtiring, `lib/rate-limit.ts`), honeypot maydon va takroriy telefon himoyasi bor.
+- **Gamifikatsiya** (Sozlamalar → Umumiy → Modullar) o'chiq bo'lsa hamma joyda yashirin. Yoqilganda har bir "keldi" darsi `coinsPerLesson` coin beradi (davomat o'zgarsa moslanadi — `syncAttendanceCoins`, `syncLessonCharge` kabi idempotent); yoqilganda/qiymat o'zgarganda mavjud davomat bo'yicha coinlar tenglashtiriladi. Qo'lda berish/ayirishga sabab majburiy, umumiy coin manfiyga tushmaydi.
 - **Dam olish kunlari** dars jadvali, davomat, oylik darslar soni (shu bilan bir dars narxi), o'qituvchi ish kunlari va ish haqiga ta'sir qiladi; qo'shilganda/o'chirilganda shu oydagi tizim yechimlari qayta hisoblanadi.
 
 `.env` fayli monorepo ildizida turadi — Next.js va Prisma ikkalasi shu yerdan o'qiydi.
@@ -55,7 +56,8 @@ Bazani noldan qayta yaratish: `npm run reset -w @markazai/db` (**barcha ma'lumot
 - [x] 5. O'qituvchilar va davomat (profil, ish jadvali, ustoz davomati, ikki xil maosh modeli, Moliya'da ish haqi)
 - [x] 6. Dashboard va Hisobotlar (sozlanadigan vidjetlar + dars jadvali; Reyting, Davomat, Konversiya, Lidlar, Churn, Jurnallar, Excel eksport)
 - [x] 7. Sozlamalar (umumiy + brend/logotip/login banneri, xodimlar + Excel import, kurslar, xonalar, teglar, dam olish kunlari, arxiv, chek shabloni, lid forma konstruktori + ommaviy `/apply`, integratsiyalar)
-- [ ] 8–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
+- [x] 8. Gamifikatsiya (coin: davomat uchun avtomatik + qo'lda berish/ayirish, tarix, guruh davomatida ko'rsatish/yashirish, coin reytingi hisoboti, Sozlamalarda yoqish)
+- [ ] 9–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
 
 ## Testlar
 

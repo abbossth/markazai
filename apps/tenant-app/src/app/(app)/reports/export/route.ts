@@ -7,7 +7,7 @@ import { canAccess, isTeacherOnly } from "@/lib/permissions";
 import type { RawSearchParams } from "@/lib/search-params";
 import { getSessionUser } from "@/lib/session";
 import { visibleReports } from "../access";
-import { listAttendance, listCallLog, listChurn, listLeadsReport, listRating, listSmsLog, loadConversion } from "../queries";
+import { listAttendance, listCallLog, listChurn, listCoins, listLeadsReport, listRating, listSmsLog, loadConversion } from "../queries";
 
 // exceljs Node API'lariga tayanadi.
 export const runtime = "nodejs";
@@ -27,7 +27,8 @@ export async function GET(request: Request) {
   const sp: RawSearchParams = Object.fromEntries(new URL(request.url).searchParams.entries());
   const report = REPORT_KEYS.find((k) => k === sp.report) as ReportKey | undefined;
   if (!report) return new Response("Bad request", { status: 400 });
-  if (!visibleReports(roles).includes(report)) return new Response("Forbidden", { status: 403 });
+  const gamification = (await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } }))?.gamificationEnabled ?? false;
+  if (!visibleReports(roles, gamification).includes(report)) return new Response("Forbidden", { status: 403 });
 
   const range = resolveRange(sp);
   const [t, tc, te, tcalls] = await Promise.all([getTranslations("reports"), getTranslations("reports.columns"), getTranslations("enums"), getTranslations("calls")]);
@@ -50,6 +51,17 @@ export async function GET(request: Request) {
       { header: tc("attendance"), key: "att", width: 12, fmt: "0.0%" },
     ];
     rows = list.rows.map((r) => ({ rank: r.rank, student: r.name, groups: r.groups.join(", "), avg: r.avgScore, grades: r.gradesCount, att: pct(r.attendancePct) }));
+  } else if (report === "coins") {
+    const list = await listCoins(user, sp, range, { all: true });
+    columns = [
+      { header: tc("rank"), key: "rank", width: 8 },
+      { header: tc("student"), key: "student", width: 28 },
+      { header: tc("groups"), key: "groups", width: 28 },
+      { header: tc("coinsAttendance"), key: "att", width: 16 },
+      { header: tc("coinsManual"), key: "manual", width: 16 },
+      { header: tc("coinsTotal"), key: "total", width: 14 },
+    ];
+    rows = list.rows.map((r) => ({ rank: r.rank, student: r.name, groups: r.groups.join(", "), att: r.attendance, manual: r.manual, total: r.total }));
   } else if (report === "attendance") {
     const list = await listAttendance(user, sp, range, { all: true });
     columns = [

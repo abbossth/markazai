@@ -32,6 +32,7 @@ export default async function GeneralSettingsPage() {
     logoUrl: s?.logoUrl ?? "",
     loginBannerUrl: s?.loginBannerUrl ?? "",
     gamificationEnabled: s?.gamificationEnabled ?? false,
+    coinsPerLesson: s?.coinsPerLesson ?? 1,
   };
   return <GeneralForm initial={initial} />;
 }

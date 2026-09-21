@@ -391,7 +391,11 @@
     "EXCUSED": "Excused",
     "student": "Student",
     "average": "Average",
-    "noStudents": "No students in the group this month"
+    "noStudents": "No students in the group this month",
+    "coins": "Coins",
+    "showCoins": "Show coins",
+    "hideCoins": "Hide coins",
+    "awardCoins": "Award coins"
   },
   "group": {
     "title": "Groups",
@@ -840,7 +844,8 @@
       "conversion": "Conversion",
       "leads": "Leads",
       "churn": "Left the group",
-      "logs": "Logs"
+      "logs": "Logs",
+      "coins": "Coin ranking"
     },
     "search": {
       "student": "Student name or phone",
@@ -881,7 +886,10 @@
       "note": "Note",
       "staff": "Staff",
       "text": "Text",
-      "provider": "Provider"
+      "provider": "Provider",
+      "coinsAttendance": "For attendance",
+      "coinsManual": "Awarded manually",
+      "coinsTotal": "Total coins"
     },
     "rating": {
       "hint": "Rating — average score in the selected period (graded students only); ties are broken by higher attendance."
@@ -936,6 +944,9 @@
     "export": {
       "excel": "Excel",
       "pdf": "PDF"
+    },
+    "coins": {
+      "hint": "Coins earned in the selected period: automatic for attendance and awarded by staff. With a group filter, only that group's coins count."
     }
   },
   "settings": {
@@ -1000,7 +1011,9 @@
       "offerHint": "Public offer or agreement text (to show on the receipt/public form).",
       "gamification": "Gamification (coin system)",
       "gamificationHint": "When on, students earn coins for attendance and grades.",
-      "previewButton": "Preview"
+      "previewButton": "Preview",
+      "coinsPerLesson": "Coins per attended lesson",
+      "coinsPerLessonHint": "Awarded automatically when attendance is marked; 0 — manual only."
     },
     "staff": {
       "columns": {
@@ -1275,6 +1288,22 @@
       "unavailable": "Applications are currently closed.",
       "rateLimited": "Too many attempts. Please try again later.",
       "generic": "Something went wrong. Please try again."
+    }
+  },
+  "coins": {
+    "title": "Coins",
+    "history": "Coin history",
+    "historyTitle": "{name}: coins (total {total})",
+    "empty": "No coins yet",
+    "forLesson": "For the lesson on {date}",
+    "award": "Award / deduct coins",
+    "awardTitle": "{name}: coins",
+    "amount": "Number of coins",
+    "amountHint": "Positive — award, negative — deduct.",
+    "reason": "Reason",
+    "reasonPlaceholder": "For example: took an active part in the lesson",
+    "errors": {
+      "coinsBelowZero": "Coins must not go below zero"
     }
   }
 }

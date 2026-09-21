@@ -391,7 +391,11 @@
     "EXCUSED": "Sababli",
     "student": "Talaba",
     "average": "O'rtacha",
-    "noStudents": "Bu oyda guruhda talabalar yo'q"
+    "noStudents": "Bu oyda guruhda talabalar yo'q",
+    "coins": "Coin",
+    "showCoins": "Coinlarni ko'rsatish",
+    "hideCoins": "Coinlarni yashirish",
+    "awardCoins": "Coin berish"
   },
   "group": {
     "title": "Guruhlar",
@@ -840,7 +844,8 @@
       "conversion": "Konversiya",
       "leads": "Lidlar",
       "churn": "Guruhni tark etganlar",
-      "logs": "Jurnallar"
+      "logs": "Jurnallar",
+      "coins": "Coin reytingi"
     },
     "search": {
       "student": "Talaba ismi yoki telefoni",
@@ -881,7 +886,10 @@
       "note": "Izoh",
       "staff": "Xodim",
       "text": "Matn",
-      "provider": "Provayder"
+      "provider": "Provayder",
+      "coinsAttendance": "Davomat uchun",
+      "coinsManual": "Qo'lda berilgan",
+      "coinsTotal": "Jami coin"
     },
     "rating": {
       "hint": "Reyting — tanlangan davrdagi o'rtacha ball (faqat baholangan talabalar); ball teng bo'lsa — davomat yuqorisi oldinda."
@@ -936,6 +944,9 @@
     "export": {
       "excel": "Excel",
       "pdf": "PDF"
+    },
+    "coins": {
+      "hint": "Tanlangan davrda olingan coinlar: davomat uchun avtomatik va xodim bergan. Guruh filtri tanlansa, faqat shu guruhga bog'liq coinlar hisoblanadi."
     }
   },
   "settings": {
@@ -1000,7 +1011,9 @@
       "offerHint": "Ommaviy oferta yoki shartnoma matni (chekda/ommaviy formada ko'rsatish uchun).",
       "gamification": "Gamifikatsiya (coin tizimi)",
       "gamificationHint": "Yoqilsa, talabalar davomat va baholar uchun coin oladi.",
-      "previewButton": "Ko'rinish"
+      "previewButton": "Ko'rinish",
+      "coinsPerLesson": "Har bir \"keldi\" dars uchun coin",
+      "coinsPerLessonHint": "Davomat belgilanganda avtomatik beriladi; 0 — faqat qo'lda beriladi."
     },
     "staff": {
       "columns": {
@@ -1275,6 +1288,22 @@
       "unavailable": "Ariza qabul qilish hozircha yopiq.",
       "rateLimited": "Juda ko'p urinish. Birozdan keyin qayta urinib ko'ring.",
       "generic": "Xatolik yuz berdi. Qayta urinib ko'ring."
+    }
+  },
+  "coins": {
+    "title": "Coinlar",
+    "history": "Coin tarixi",
+    "historyTitle": "{name}: coinlar (jami {total})",
+    "empty": "Hali coin yo'q",
+    "forLesson": "{date} darsi uchun",
+    "award": "Coin berish / ayirish",
+    "awardTitle": "{name}: coin",
+    "amount": "Coin soni",
+    "amountHint": "Musbat — berish, manfiy — ayirish.",
+    "reason": "Sabab",
+    "reasonPlaceholder": "Masalan: darsda faol qatnashdi",
+    "errors": {
+      "coinsBelowZero": "Coin manfiyga tushib qolmasligi kerak"
     }
   }
 }

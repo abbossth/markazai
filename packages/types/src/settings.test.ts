@@ -15,7 +15,7 @@ import {
   staffSchema,
 } from "./settings";
 
-const general = { name: "Markaz", lessonStartStep: 30, defaultTheme: "system", locales: ["uz"], gamificationEnabled: false } as const;
+const general = { name: "Markaz", lessonStartStep: 30, defaultTheme: "system", locales: ["uz"], gamificationEnabled: false, coinsPerLesson: 1 } as const;
 
 describe("generalSettingsSchema", () => {
   it("minimal to'g'ri kirish", () => {
@@ -25,6 +25,12 @@ describe("generalSettingsSchema", () => {
     expect(generalSettingsSchema.safeParse({ ...general, lessonStartStep: 7 }).success).toBe(false);
     expect(generalSettingsSchema.safeParse({ ...general, brandColor: "red" }).success).toBe(false);
     expect(generalSettingsSchema.safeParse({ ...general, brandColor: "#2563eb" }).success).toBe(true);
+  });
+  it("coinsPerLesson 0–100 butun son", () => {
+    expect(generalSettingsSchema.safeParse({ ...general, coinsPerLesson: -1 }).success).toBe(false);
+    expect(generalSettingsSchema.safeParse({ ...general, coinsPerLesson: 101 }).success).toBe(false);
+    expect(generalSettingsSchema.safeParse({ ...general, coinsPerLesson: 1.5 }).success).toBe(false);
+    expect(generalSettingsSchema.safeParse({ ...general, coinsPerLesson: 0 }).success).toBe(true);
   });
   it("kamida bitta til kerak", () => {
     expect(generalSettingsSchema.safeParse({ ...general, locales: [] }).success).toBe(false);
