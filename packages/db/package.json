@@ -13,7 +13,7 @@
     "migrate:dev": "prisma migrate dev && prisma generate",
     "migrate:deploy": "prisma migrate deploy",
     "seed": "tsx prisma/seed.ts",
-    "reset": "prisma migrate reset --force --skip-seed && npm run seed"
+    "reset": "prisma migrate reset --force && npm run seed"
   },
   "devDependencies": {
     "@types/pg": "^8.23.1",

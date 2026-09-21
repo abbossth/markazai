@@ -145,7 +145,7 @@ export async function seedDemoData(prisma: PrismaClient, orgId: string, actor: {
         data: {
           organizationId: orgId,
           name,
-          phone: `9989${String(10 + (i % 9))}${String(1000000 + i * 37331).slice(0, 7)}`,
+          phone: `998${90 + (i % 9)}${String(1000000 + i * 37331).slice(0, 7)}`,
           gender: female ? "FEMALE" : "MALE",
           birthDate: utcDate(2004 + (i % 10), 1 + (i % 12), 1 + (i % 27)),
           status: plan.status,

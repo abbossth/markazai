@@ -34,7 +34,9 @@
     "from": "From",
     "to": "To",
     "forbidden": "You don't have permission for this action",
-    "notFound": "Not found"
+    "notFound": "Not found",
+    "more": "(more)",
+    "less": "(less)"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -80,5 +82,104 @@
     "reset": "Reset",
     "apply": "Apply",
     "all": "All"
+  },
+  "validation": {
+    "required": "Required field",
+    "nameRequired": "Name must be at least 2 characters",
+    "invalidPhone": "Invalid phone number",
+    "invalidDate": "Invalid date",
+    "invalidEmail": "Invalid email",
+    "invalid": "Invalid value",
+    "freezeReasonRequired": "Enter the freeze reason"
+  },
+  "enums": {
+    "studentStatus": {
+      "ACTIVE": "Active",
+      "FROZEN": "Frozen",
+      "NO_GROUP": "No group",
+      "TRIAL": "On trial lesson",
+      "LEFT_AFTER_TRIAL": "Left after trial",
+      "LEFT_ACTIVE_GROUP": "Left active group",
+      "JOINED_THIS_MONTH": "Joined this month"
+    },
+    "groupStatus": {
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived",
+      "COMPLETED": "Completed"
+    },
+    "days": {
+      "ODD": "Odd days",
+      "EVEN": "Even days",
+      "EVERY_DAY": "Every day",
+      "WEEKEND": "Weekends",
+      "OTHER": "Other"
+    },
+    "weekdaysShort": {
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat",
+      "7": "Sun"
+    },
+    "financeFilter": {
+      "debt": "Has debt",
+      "discount": "Has discounts",
+      "nodebt": "No debt",
+      "positive": "Positive balance",
+      "paidThisMonth": "Paid this month"
+    }
+  },
+  "student": {
+    "title": "Students",
+    "new": "New student",
+    "newTitle": "New student",
+    "newDescription": "Enter the student's details",
+    "editTitle": "Edit student",
+    "searchPlaceholder": "Search by name or phone...",
+    "name": "Name",
+    "phone": "Phone",
+    "extraPhones": "Additional phones",
+    "addPhone": "Add phone",
+    "birthDate": "Date of birth",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "note": "Note",
+    "group": "Group",
+    "noGroup": "No group",
+    "joinedAt": "Start date",
+    "tags": "Tags",
+    "moreContacts": "More contact details",
+    "lessContacts": "Hide",
+    "contactPerson": "Contact person",
+    "email": "Email",
+    "telegram": "Telegram",
+    "socialLink": "Social network",
+    "externalId": "External ID",
+    "address": "Address",
+    "groupInactive": "This group is not active",
+    "debtor": "Debtor",
+    "freezeReason": "Freeze reason",
+    "balance": "Balance",
+    "addedOn": "Date added",
+    "goToProfile": "Go to profile",
+    "groups": "Groups",
+    "teachers": "Teachers",
+    "schedule": "Schedule",
+    "addToGroup": "Add to group",
+    "addToGroupDescription": "{count} selected student(s) will be added to the group",
+    "selectGroup": "Select a group",
+    "addedToGroup": "{added} added, {skipped} already in the group",
+    "overCapacity": "Warning: the group now exceeds the room capacity",
+    "deleteTitle": "Delete \"{name}\"?",
+    "hasPayments": "A student with payments cannot be deleted",
+    "course": "Course",
+    "status": "Student status",
+    "financeStatus": "Financial status",
+    "groupsCount": "Number of groups",
+    "dateFrom": "from",
+    "dateTo": "to"
   }
 }

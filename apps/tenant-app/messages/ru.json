@@ -34,7 +34,9 @@
     "from": "С",
     "to": "По",
     "forbidden": "Нет прав для этого действия",
-    "notFound": "Не найдено"
+    "notFound": "Не найдено",
+    "more": "(ещё)",
+    "less": "(скрыть)"
   },
   "nav": {
     "dashboard": "Главная",
@@ -80,5 +82,104 @@
     "reset": "Сбросить",
     "apply": "Применить",
     "all": "Все"
+  },
+  "validation": {
+    "required": "Обязательное поле",
+    "nameRequired": "Имя должно содержать минимум 2 символа",
+    "invalidPhone": "Неверный номер телефона",
+    "invalidDate": "Неверная дата",
+    "invalidEmail": "Неверный email",
+    "invalid": "Неверное значение",
+    "freezeReasonRequired": "Укажите причину заморозки"
+  },
+  "enums": {
+    "studentStatus": {
+      "ACTIVE": "Активный",
+      "FROZEN": "Заморожен",
+      "NO_GROUP": "Без группы",
+      "TRIAL": "На пробном уроке",
+      "LEFT_AFTER_TRIAL": "Ушёл после пробного",
+      "LEFT_ACTIVE_GROUP": "Покинул активную группу",
+      "JOINED_THIS_MONTH": "Добавлен в этом месяце"
+    },
+    "groupStatus": {
+      "ACTIVE": "Активная",
+      "ARCHIVED": "Архив",
+      "COMPLETED": "Завершённая"
+    },
+    "days": {
+      "ODD": "Нечётные дни",
+      "EVEN": "Чётные дни",
+      "EVERY_DAY": "Каждый день",
+      "WEEKEND": "Выходные",
+      "OTHER": "Другое"
+    },
+    "weekdaysShort": {
+      "1": "Пн",
+      "2": "Вт",
+      "3": "Ср",
+      "4": "Чт",
+      "5": "Пт",
+      "6": "Сб",
+      "7": "Вс"
+    },
+    "financeFilter": {
+      "debt": "Есть долг",
+      "discount": "Есть скидки",
+      "nodebt": "Без долга",
+      "positive": "Положительный баланс",
+      "paidThisMonth": "Оплатил в этом месяце"
+    }
+  },
+  "student": {
+    "title": "Студенты",
+    "new": "Новый студент",
+    "newTitle": "Новый студент",
+    "newDescription": "Введите данные студента",
+    "editTitle": "Редактирование студента",
+    "searchPlaceholder": "Поиск по имени или телефону...",
+    "name": "Имя",
+    "phone": "Телефон",
+    "extraPhones": "Дополнительные телефоны",
+    "addPhone": "Добавить телефон",
+    "birthDate": "Дата рождения",
+    "gender": "Пол",
+    "male": "Мужской",
+    "female": "Женский",
+    "note": "Комментарий",
+    "group": "Группа",
+    "noGroup": "Без группы",
+    "joinedAt": "Дата начала",
+    "tags": "Теги",
+    "moreContacts": "Дополнительные контакты",
+    "lessContacts": "Скрыть",
+    "contactPerson": "Контактное лицо",
+    "email": "Email",
+    "telegram": "Telegram",
+    "socialLink": "Соцсеть",
+    "externalId": "Внешний ID",
+    "address": "Адрес",
+    "groupInactive": "Эта группа неактивна",
+    "debtor": "Должник",
+    "freezeReason": "Причина заморозки",
+    "balance": "Баланс",
+    "addedOn": "Дата добавления",
+    "goToProfile": "Перейти в профиль",
+    "groups": "Группы",
+    "teachers": "Преподаватели",
+    "schedule": "Расписание",
+    "addToGroup": "Добавить в группу",
+    "addToGroupDescription": "Выбранные студенты ({count}) будут добавлены в группу",
+    "selectGroup": "Выберите группу",
+    "addedToGroup": "Добавлено: {added}, уже в группе: {skipped}",
+    "overCapacity": "Внимание: превышена вместимость аудитории",
+    "deleteTitle": "Удалить «{name}»?",
+    "hasPayments": "Нельзя удалить студента с платежами",
+    "course": "Курс",
+    "status": "Статус студента",
+    "financeStatus": "Финансовый статус",
+    "groupsCount": "Количество групп",
+    "dateFrom": "с",
+    "dateTo": "по"
   }
 }

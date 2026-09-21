@@ -34,7 +34,9 @@
     "from": "Dan",
     "to": "Gacha",
     "forbidden": "Bu amal uchun ruxsat yo'q",
-    "notFound": "Topilmadi"
+    "notFound": "Topilmadi",
+    "more": "(ko'proq)",
+    "less": "(kamroq)"
   },
   "nav": {
     "dashboard": "Bosh sahifa",
@@ -80,5 +82,104 @@
     "reset": "Tozalash",
     "apply": "Qo'llash",
     "all": "Hammasi"
+  },
+  "validation": {
+    "required": "Majburiy maydon",
+    "nameRequired": "Ism kamida 2 ta belgidan iborat bo'lishi kerak",
+    "invalidPhone": "Telefon raqami noto'g'ri",
+    "invalidDate": "Sana noto'g'ri",
+    "invalidEmail": "Email noto'g'ri",
+    "invalid": "Qiymat noto'g'ri",
+    "freezeReasonRequired": "Muzlatish sababini kiriting"
+  },
+  "enums": {
+    "studentStatus": {
+      "ACTIVE": "Faol",
+      "FROZEN": "Muzlatilgan",
+      "NO_GROUP": "Guruhsiz",
+      "TRIAL": "Sinov darsida",
+      "LEFT_AFTER_TRIAL": "Sinov darsidan keyin ketdi",
+      "LEFT_ACTIVE_GROUP": "Faol guruhni tark etdi",
+      "JOINED_THIS_MONTH": "Bu oy qo'shildi"
+    },
+    "groupStatus": {
+      "ACTIVE": "Faol",
+      "ARCHIVED": "Arxiv",
+      "COMPLETED": "Yakunlangan"
+    },
+    "days": {
+      "ODD": "Toq kunlar",
+      "EVEN": "Juft kunlar",
+      "EVERY_DAY": "Har kuni",
+      "WEEKEND": "Dam olish kunlari",
+      "OTHER": "Boshqa"
+    },
+    "weekdaysShort": {
+      "1": "Du",
+      "2": "Se",
+      "3": "Chor",
+      "4": "Pay",
+      "5": "Ju",
+      "6": "Shan",
+      "7": "Yak"
+    },
+    "financeFilter": {
+      "debt": "Qarz bor",
+      "discount": "Chegirmalar mavjud",
+      "nodebt": "Qarzi yo'q",
+      "positive": "Ijobiy balansi",
+      "paidThisMonth": "Joriy oyda to'lagan"
+    }
+  },
+  "student": {
+    "title": "Talabalar",
+    "new": "Yangi talaba",
+    "newTitle": "Yangi talaba",
+    "newDescription": "Talaba ma'lumotlarini kiriting",
+    "editTitle": "Talabani tahrirlash",
+    "searchPlaceholder": "Ism yoki telefon bo'yicha qidirish...",
+    "name": "Ism",
+    "phone": "Telefon",
+    "extraPhones": "Qo'shimcha telefonlar",
+    "addPhone": "Telefon qo'shish",
+    "birthDate": "Tug'ilgan sana",
+    "gender": "Jins",
+    "male": "Erkak",
+    "female": "Ayol",
+    "note": "Izoh",
+    "group": "Guruh",
+    "noGroup": "Guruhsiz",
+    "joinedAt": "Boshlanish sanasi",
+    "tags": "Teglar",
+    "moreContacts": "Qo'shimcha aloqa ma'lumotlari",
+    "lessContacts": "Yashirish",
+    "contactPerson": "Kontakt shaxs",
+    "email": "Email",
+    "telegram": "Telegram",
+    "socialLink": "Ijtimoiy tarmoq",
+    "externalId": "Tashqi ID",
+    "address": "Manzil",
+    "groupInactive": "Bu guruh faol emas",
+    "debtor": "Qarzdor",
+    "freezeReason": "Muzlatish sababi",
+    "balance": "Balans",
+    "addedOn": "Qo'shilgan sana",
+    "goToProfile": "Profilga o'ting",
+    "groups": "Guruhlar",
+    "teachers": "O'qituvchilar",
+    "schedule": "Mashg'ulot sanalari",
+    "addToGroup": "Guruhga qo'shish",
+    "addToGroupDescription": "{count} ta talaba tanlangan guruhga qo'shiladi",
+    "selectGroup": "Guruhni tanlang",
+    "addedToGroup": "{added} ta talaba qo'shildi, {skipped} tasi allaqachon a'zo",
+    "overCapacity": "Diqqat: guruh xona sig'imidan oshib ketdi",
+    "deleteTitle": "\"{name}\" o'chirilsinmi?",
+    "hasPayments": "To'lovlari mavjud talabani o'chirib bo'lmaydi",
+    "course": "Kurs",
+    "status": "Talaba holati",
+    "financeStatus": "Moliyaviy holat",
+    "groupsCount": "Guruhlar soni",
+    "dateFrom": "dan",
+    "dateTo": "gacha"
   }
 }
