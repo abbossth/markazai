@@ -2,7 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@markazai/db";
-import { fromISODate, paymentSchema, toCenterParts, type ActionResult, type PaymentInput } from "@markazai/types";
+import {
+  expenseSchema,
+  fromISODate,
+  paymentSchema,
+  toCenterParts,
+  withdrawalSchema,
+  type ActionResult,
+  type ExpenseInput,
+  type PaymentInput,
+  type WithdrawalInput,
+} from "@markazai/types";
 import { logHistory } from "@/lib/history";
 import { requirePermission, type SessionUser } from "@/lib/session";
 
@@ -109,4 +119,64 @@ export async function searchStudentsForPayment(q: string) {
     take: 8,
   });
   return students.map((s) => ({ id: s.id, name: s.name, phone: s.phone, balance: s.balance, groups: s.enrollments.map((e) => e.group) }));
+}
+
+function issues(list: { path: PropertyKey[]; message: string }[]) {
+  const fieldErrors: Record<string, string> = {};
+  for (const i of list) fieldErrors[String(i.path[0] ?? "form")] ??= i.message;
+  return fieldErrors;
+}
+
+const isFuture = (date: string) => date > toCenterParts(new Date()).date;
+
+// ───────────── Xarajatlar ─────────────
+
+export async function saveExpense(id: string | null, input: ExpenseInput): Promise<Result> {
+  const user = await guard("expenses:write");
+  if (!user) return { ok: false, error: "forbidden" };
+  const parsed = expenseSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "validation", fieldErrors: issues(parsed.error.issues) };
+  const d = parsed.data;
+  if (isFuture(d.date)) return { ok: false, error: "validation", fieldErrors: { date: "futureDate" } };
+
+  const data = { category: d.category, amount: d.amount, date: fromISODate(d.date), description: d.description ?? null };
+  if (id) {
+    const res = await prisma.expense.updateMany({ where: { id, organizationId: user.orgId }, data });
+    if (res.count === 0) return { ok: false, error: "notFound" };
+  } else {
+    await prisma.expense.create({ data: { ...data, organizationId: user.orgId, createdById: user.id } });
+  }
+  revalidatePath("/finance");
+  return { ok: true };
+}
+
+export async function deleteExpense(id: string): Promise<Result> {
+  const user = await guard("expenses:write");
+  if (!user) return { ok: false, error: "forbidden" };
+  const res = await prisma.expense.deleteMany({ where: { id, organizationId: user.orgId } });
+  revalidatePath("/finance");
+  return res.count ? { ok: true } : { ok: false, error: "notFound" };
+}
+
+// ───────────── Yechib olish (faqat rahbariyat) ─────────────
+
+export async function createWithdrawal(input: WithdrawalInput): Promise<Result> {
+  const user = await guard("withdrawals:write");
+  if (!user) return { ok: false, error: "forbidden" };
+  const parsed = withdrawalSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "validation", fieldErrors: issues(parsed.error.issues) };
+  const d = parsed.data;
+  if (isFuture(d.date)) return { ok: false, error: "validation", fieldErrors: { date: "futureDate" } };
+
+  await prisma.withdrawal.create({ data: { organizationId: user.orgId, amount: d.amount, date: fromISODate(d.date), note: d.note, createdById: user.id } });
+  revalidatePath("/finance");
+  return { ok: true };
+}
+
+export async function deleteWithdrawal(id: string): Promise<Result> {
+  const user = await guard("withdrawals:write");
+  if (!user) return { ok: false, error: "forbidden" };
+  const res = await prisma.withdrawal.deleteMany({ where: { id, organizationId: user.orgId } });
+  revalidatePath("/finance");
+  return res.count ? { ok: true } : { ok: false, error: "notFound" };
 }

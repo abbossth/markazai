@@ -43,13 +43,22 @@ Bazani noldan qayta yaratish: `npm run reset -w @markazai/db` (**barcha ma'lumot
 - [x] 1. Fundament: auth (telefon+parol), UZ/RU/EN, dark/light, layout, global qidiruv
 - [x] 2. Talabalar va Guruhlar (ro'yxat/filtr/CRUD, talaba profili, guruh profili, davomat va baholash)
 - [x] 3. Lidlar (Kanban, drag-and-drop, lid → talaba, qo'ng'iroq/SMS jurnali, eslatmalar)
-- [ ] 4–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
+- [x] 4. Moliya (tizim yechimi dars-dars, to'lovlar, xarajatlar, yechib olish, qarzdorlar, chek, Excel/PDF)
+- [ ] 5–10. `markazai-prompt-v3.md` 8-bo'limiga qarang
 
 ## Testlar
 
 ```bash
-cd packages/types && npx vitest run   # jadval, davomat va moliyaviy hisob-kitob mantig'i
+cd packages/types && npx vitest run   # jadval, davomat va moliyaviy hisob-kitob mantig'i (bazasiz)
+cd packages/db && npx vitest run      # hisob-kitob integratsion testlari (haqiqiy baza kerak; rollback qilinadi)
 ```
+
+## Moliya qoidalari
+
+- Tizim yechimi **dars-dars**: davomat belgilanganda avtomatik yoziladi. "Keldi" va "sababsiz kelmadi" yechiladi; "sababli" va belgilanmagan darslar yechilmaydi.
+- Dars ulushi = oylik narx (chegirmadan keyin) / oydagi dars soni, kumulyativ yaxlitlash bilan (oy yig'indisi aniq narxga teng).
+- `Student.balance` = to'lovlar yig'indisi (SYSTEM manfiy, MANUAL musbat). Buzilgan bo'lsa: `npm run billing:rebuild -w @markazai/db`.
+- Foyda = tushum − xarajat; kassadan yechib olish foydaga ta'sir qilmaydi, faqat kassa qoldig'iga.
 
 ## SMS
 

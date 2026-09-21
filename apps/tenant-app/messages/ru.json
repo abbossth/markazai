@@ -610,6 +610,35 @@
       "balanceAfter": "Текущий баланс",
       "cashier": "Принял",
       "thanks": "Спасибо за оплату!"
+    },
+    "salaryComingSoon": "Раздел зарплаты появится на 5-м этапе (Преподаватели и посещаемость).",
+    "export": {
+      "excel": "Excel",
+      "pdf": "PDF"
+    },
+    "ledger": {
+      "category": "Тип расхода",
+      "amount": "Сумма",
+      "comment": "Комментарий",
+      "staff": "Сотрудник",
+      "date": "Дата",
+      "addExpense": "Добавить расход",
+      "editExpense": "Редактирование расхода",
+      "deleteExpense": "Удалить расход «{category}»?",
+      "addWithdrawal": "Изъять из кассы",
+      "deleteWithdrawal": "Удалить запись об изъятии?",
+      "totalExpenses": "Расходы за период",
+      "totalWithdrawals": "Изъято за период",
+      "totalDebt": "Общий долг (должников: {count})",
+      "searchExpense": "По типу или комментарию...",
+      "searchNote": "По комментарию...",
+      "student": "Студент",
+      "phone": "Телефон",
+      "group": "Группы",
+      "debt": "Долг",
+      "lastPayment": "Последний платёж",
+      "never": "Ещё не платил",
+      "pay": "Оплата"
     }
   }
 }

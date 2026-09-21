@@ -610,6 +610,35 @@
       "balanceAfter": "Current balance",
       "cashier": "Received by",
       "thanks": "Thank you for your payment!"
+    },
+    "salaryComingSoon": "The salaries section will be added in stage 5 (Teachers and attendance).",
+    "export": {
+      "excel": "Excel",
+      "pdf": "PDF"
+    },
+    "ledger": {
+      "category": "Expense type",
+      "amount": "Amount",
+      "comment": "Note",
+      "staff": "Staff",
+      "date": "Date",
+      "addExpense": "Add expense",
+      "editExpense": "Edit expense",
+      "deleteExpense": "Delete the \"{category}\" expense?",
+      "addWithdrawal": "Withdraw cash",
+      "deleteWithdrawal": "Delete this withdrawal record?",
+      "totalExpenses": "Expenses in period",
+      "totalWithdrawals": "Withdrawn in period",
+      "totalDebt": "Total debt ({count} debtors)",
+      "searchExpense": "By type or note...",
+      "searchNote": "By note...",
+      "student": "Student",
+      "phone": "Phone",
+      "group": "Groups",
+      "debt": "Debt",
+      "lastPayment": "Last payment",
+      "never": "Has not paid yet",
+      "pay": "Pay"
     }
   }
 }

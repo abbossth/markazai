@@ -11,6 +11,8 @@ import { FinanceChart } from "./finance-chart";
 import { NewPaymentButton, PaymentsTable } from "./payments-table";
 import { FINANCE_TABS, PAGE_SIZE, listPayments, loadPaymentLookups, loadSummary, loadTrend, resolveRange, type FinanceTab } from "./queries";
 import { RangePresets } from "./range-presets";
+import { DebtorsSection, ExpensesSection, WithdrawalsSection } from "./sections";
+import { ExportButtons } from "./export-buttons";
 import { SummaryCards } from "./summary-cards";
 import type { RawSearchParams } from "@/lib/search-params";
 
@@ -43,7 +45,11 @@ export default async function FinancePage({ searchParams }: PageProps<"/finance"
         ))}
       </nav>
 
-      {tab === "payments" ? <PaymentsSection user={user} sp={sp} /> : <p className="text-muted-foreground py-10 text-center text-sm">{t("comingSoon")}</p>}
+      {tab === "payments" && <PaymentsSection user={user} sp={sp} />}
+      {tab === "expenses" && <ExpensesSection user={user} sp={sp} />}
+      {tab === "withdrawals" && <WithdrawalsSection user={user} sp={sp} />}
+      {tab === "debtors" && <DebtorsSection user={user} sp={sp} />}
+      {tab === "salary" && <p className="text-muted-foreground py-10 text-center text-sm">{t("salaryComingSoon")}</p>}
     </div>
   );
 }
@@ -71,7 +77,13 @@ async function PaymentsSection({ user, sp }: { user: SessionUser; sp: RawSearchP
       <RangePresets from={range.from} to={range.to} today={range.today} />
       <SummaryCards summary={summary} />
       <FinanceChart granularity={trend.granularity} points={trend.points} />
-      <FilterBar searchPlaceholder={t("searchPlaceholder")} fields={fields} actions={can(user.roles, "payments:write") ? <NewPaymentButton today={range.today} /> : null} />
+      <FilterBar searchPlaceholder={t("searchPlaceholder")} fields={fields} actions={
+          <>
+            <ExportButtons tab="payments" />
+            {can(user.roles, "payments:write") && <NewPaymentButton today={range.today} />}
+          </>
+        }
+      />
       <PaymentsTable rows={list.rows} total={list.total} page={list.page} pageSize={PAGE_SIZE} sort={list.sort} canVoid={can(user.roles, "payments:void")} />
     </>
   );

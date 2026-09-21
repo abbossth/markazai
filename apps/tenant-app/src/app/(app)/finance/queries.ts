@@ -8,6 +8,12 @@ export const FINANCE_TABS = ["payments", "withdrawals", "expenses", "salary", "d
 export type FinanceTab = (typeof FINANCE_TABS)[number];
 const SORT_KEYS = ["date", "amount"] as const;
 const MAX_DAILY_POINTS = 92;
+export const EXPORT_LIMIT = 20_000;
+
+/** Sahifalash argumentlari; `all` (eksport) bo'lsa — sahifalarsiz, EXPORT_LIMIT bilan cheklangan. */
+function pageArgs(page: number, all?: boolean): { skip?: number; take: number } {
+  return all ? { take: EXPORT_LIMIT } : { skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE };
+}
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -86,7 +92,7 @@ export type PaymentRow = {
   receiptPrinted: boolean;
 };
 
-export async function listPayments(user: SessionUser, sp: RawSearchParams, range: Range) {
+export async function listPayments(user: SessionUser, sp: RawSearchParams, range: Range, opts: { all?: boolean } = {}) {
   const q = param(sp, "q");
   const groupId = param(sp, "groupId");
   const teacherId = param(sp, "teacherId");
@@ -118,8 +124,7 @@ export async function listPayments(user: SessionUser, sp: RawSearchParams, range
     prisma.payment.findMany({
       where,
       orderBy: [{ [sort.key]: sort.dir }, { createdAt: "desc" }],
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
+      ...pageArgs(page, opts.all),
       include: { student: { select: { name: true } }, group: { select: { name: true, teacher: { select: { name: true } } } } },
     }),
   ]);
@@ -151,4 +156,113 @@ export async function loadPaymentLookups(user: SessionUser) {
     prisma.teacher.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
   return { groups, teachers };
+}
+
+// ───────────── Xarajatlar ─────────────
+
+export type ExpenseRow = { id: string; category: string; amount: number; date: string; description: string | null; createdByName: string | null };
+
+export async function listExpenses(user: SessionUser, sp: RawSearchParams, range: Range, opts: { all?: boolean } = {}) {
+  const q = param(sp, "q");
+  const category = param(sp, "category");
+  const page = intParam(sp, "page", 1);
+  const sort = sortParam(sp, SORT_KEYS, { key: "date", dir: "desc" });
+
+  const where: Prisma.ExpenseWhereInput = {
+    organizationId: user.orgId,
+    date: dateRange(range),
+    ...(category && { category: { equals: category, mode: "insensitive" } }),
+    ...(q && { OR: [{ description: { contains: q, mode: "insensitive" } }, { category: { contains: q, mode: "insensitive" } }] }),
+  };
+  const [total, sum, rows] = await Promise.all([
+    prisma.expense.count({ where }),
+    prisma.expense.aggregate({ where, _sum: { amount: true } }),
+    prisma.expense.findMany({
+      where,
+      orderBy: [{ [sort.key]: sort.dir }, { createdAt: "desc" }],
+      ...pageArgs(page, opts.all),
+    }),
+  ]);
+  const names = await userNames(user, rows.map((r) => r.createdById));
+  const items: ExpenseRow[] = rows.map((r) => ({ id: r.id, category: r.category, amount: r.amount, date: r.date.toISOString(), description: r.description, createdByName: names.get(r.createdById) ?? null }));
+  return { rows: items, total, page, sort, sum: sum._sum.amount ?? 0 };
+}
+
+/** Xarajat turlari: standart ro'yxat + bazadagi mavjudlari (takliflar uchun). */
+export async function loadExpenseCategories(user: SessionUser) {
+  const existing = await prisma.expense.findMany({ where: { organizationId: user.orgId }, distinct: ["category"], select: { category: true }, orderBy: { category: "asc" } });
+  return [...new Set(existing.map((e) => e.category))];
+}
+
+// ───────────── Yechib olish ─────────────
+
+export type WithdrawalRow = { id: string; amount: number; date: string; note: string | null; createdByName: string | null };
+
+export async function listWithdrawals(user: SessionUser, sp: RawSearchParams, range: Range, opts: { all?: boolean } = {}) {
+  const q = param(sp, "q");
+  const page = intParam(sp, "page", 1);
+  const sort = sortParam(sp, SORT_KEYS, { key: "date", dir: "desc" });
+  const where: Prisma.WithdrawalWhereInput = { organizationId: user.orgId, date: dateRange(range), ...(q && { note: { contains: q, mode: "insensitive" } }) };
+
+  const [total, sum, rows] = await Promise.all([
+    prisma.withdrawal.count({ where }),
+    prisma.withdrawal.aggregate({ where, _sum: { amount: true } }),
+    prisma.withdrawal.findMany({ where, orderBy: [{ [sort.key]: sort.dir }, { createdAt: "desc" }], ...pageArgs(page, opts.all) }),
+  ]);
+  const names = await userNames(user, rows.map((r) => r.createdById));
+  const items: WithdrawalRow[] = rows.map((r) => ({ id: r.id, amount: r.amount, date: r.date.toISOString(), note: r.note, createdByName: names.get(r.createdById) ?? null }));
+  return { rows: items, total, page, sort, sum: sum._sum.amount ?? 0 };
+}
+
+// ───────────── Qarzdorlar ─────────────
+
+export type DebtorRow = {
+  id: string;
+  name: string;
+  phone: string;
+  balance: number;
+  groups: { id: string; name: string }[];
+  lastPaymentDate: string | null;
+};
+
+export async function listDebtors(user: SessionUser, sp: RawSearchParams, opts: { all?: boolean } = {}) {
+  const q = param(sp, "q");
+  const groupId = param(sp, "groupId");
+  const page = intParam(sp, "page", 1);
+  const digits = q?.replace(/\D/g, "") ?? "";
+
+  const where: Prisma.StudentWhereInput = {
+    organizationId: user.orgId,
+    balance: { lt: 0 },
+    ...(groupId && { enrollments: { some: { groupId, leftAt: null } } }),
+    ...(q && { OR: [{ name: { contains: q, mode: "insensitive" } }, ...(digits.length >= 2 ? [{ phone: { contains: digits } }] : [])] }),
+  };
+  const [total, sum, students] = await Promise.all([
+    prisma.student.count({ where }),
+    prisma.student.aggregate({ where, _sum: { balance: true } }),
+    prisma.student.findMany({
+      where,
+      orderBy: [{ balance: "asc" }, { name: "asc" }],
+      ...pageArgs(page, opts.all),
+      include: {
+        enrollments: { where: { leftAt: null }, select: { group: { select: { id: true, name: true } } } },
+        payments: { where: { type: "MANUAL" }, orderBy: { date: "desc" }, take: 1, select: { date: true } },
+      },
+    }),
+  ]);
+  const rows: DebtorRow[] = students.map((s) => ({
+    id: s.id,
+    name: s.name,
+    phone: s.phone,
+    balance: s.balance,
+    groups: s.enrollments.map((e) => e.group),
+    lastPaymentDate: s.payments[0]?.date.toISOString() ?? null,
+  }));
+  return { rows, total, page, totalDebt: -(sum._sum.balance ?? 0) };
+}
+
+async function userNames(user: SessionUser, ids: string[]) {
+  const unique = [...new Set(ids)];
+  const users = unique.length ? await prisma.user.findMany({ where: { organizationId: user.orgId, id: { in: unique } }, select: { id: true, name: true } }) : [];
+  return new Map(users.map((u) => [u.id, u.name]));
 }

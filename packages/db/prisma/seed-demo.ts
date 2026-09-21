@@ -358,3 +358,33 @@ export async function seedLeadsData(prisma: PrismaClient, orgId: string, actor: 
   });
   console.log(`Demo lidlar: ${leads.length} lid, ${lists.length} ro'yxat, 3 eslatma.`);
 }
+
+/** Demo xarajatlar va kassadan yechib olish (bu va o'tgan oy). Mavjud bo'lsa, hech narsa qilmaydi (idempotent). */
+export async function seedFinanceData(prisma: PrismaClient, orgId: string, actor: { id: string }) {
+  if ((await prisma.expense.count({ where: { organizationId: orgId } })) > 0) {
+    console.log("Demo xarajatlar allaqachon mavjud — o'tkazib yuborildi.");
+    return;
+  }
+  const now = new Date();
+  const y = now.getUTCFullYear();
+  const m = now.getUTCMonth() + 1;
+  const day = (offsetMonths: number, d: number) => new Date(Date.UTC(y, m - 1 + offsetMonths, Math.min(d, offsetMonths === 0 ? Math.max(1, now.getUTCDate()) : 28)));
+
+  await prisma.expense.createMany({
+    data: [
+      { category: "Ijara", amount: 5_000_000, date: day(-1, 1), description: "Bino ijarasi" },
+      { category: "Kommunal", amount: 820_000, date: day(-1, 12), description: "Elektr va suv" },
+      { category: "Marketing", amount: 1_200_000, date: day(-1, 20), description: "Instagram reklama" },
+      { category: "Ijara", amount: 5_000_000, date: day(0, 1), description: "Bino ijarasi" },
+      { category: "Kommunal", amount: 790_000, date: day(0, 10), description: "Elektr va suv" },
+      { category: "Jihozlar", amount: 640_000, date: day(0, 15), description: "Marker va doska" },
+    ].map((e) => ({ ...e, organizationId: orgId, createdById: actor.id })),
+  });
+  await prisma.withdrawal.createMany({
+    data: [
+      { amount: 3_000_000, date: day(-1, 25), note: "Egasi uchun" },
+      { amount: 2_000_000, date: day(0, 14), note: "Egasi uchun" },
+    ].map((w) => ({ ...w, organizationId: orgId, createdById: actor.id })),
+  });
+  console.log("Demo xarajatlar: 6 ta xarajat, 2 ta yechib olish.");
+}

@@ -610,6 +610,35 @@
       "balanceAfter": "Joriy balans",
       "cashier": "Qabul qildi",
       "thanks": "To'lovingiz uchun rahmat!"
+    },
+    "salaryComingSoon": "Ish haqi bo'limi 5-bosqichda (O'qituvchilar va davomat) qo'shiladi.",
+    "export": {
+      "excel": "Excel",
+      "pdf": "PDF"
+    },
+    "ledger": {
+      "category": "Xarajat turi",
+      "amount": "Summa",
+      "comment": "Izoh",
+      "staff": "Xodim",
+      "date": "Sana",
+      "addExpense": "Xarajat qo'shish",
+      "editExpense": "Xarajatni tahrirlash",
+      "deleteExpense": "\"{category}\" xarajati o'chirilsinmi?",
+      "addWithdrawal": "Yechib olish",
+      "deleteWithdrawal": "Yechib olish yozuvi o'chirilsinmi?",
+      "totalExpenses": "Davrdagi xarajat",
+      "totalWithdrawals": "Davrdagi yechib olingan",
+      "totalDebt": "Jami qarz ({count} ta qarzdor)",
+      "searchExpense": "Tur yoki izoh bo'yicha...",
+      "searchNote": "Izoh bo'yicha...",
+      "student": "Talaba",
+      "phone": "Telefon",
+      "group": "Guruhlar",
+      "debt": "Qarz",
+      "lastPayment": "Oxirgi to'lov",
+      "never": "Hali to'lamagan",
+      "pay": "To'lov"
     }
   }
 }
