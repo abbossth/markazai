@@ -183,6 +183,14 @@
       "SENT": "Sent",
       "FAILED": "Failed",
       "MOCK": "Test mode"
+    },
+    "paymentMethod": {
+      "CASH": "Cash",
+      "CARD": "Card",
+      "TRANSFER": "Transfer",
+      "PAYME": "Payme",
+      "CLICK": "Click",
+      "UZUM": "Uzum"
     }
   },
   "student": {
@@ -269,7 +277,8 @@
         "partial": "Partial",
         "debt": "Debt",
         "none": "—"
-      }
+      },
+      "lessonCharge": "Charge for the lesson on {date}"
     },
     "leadName": "Lead",
     "leadSource": "Source",

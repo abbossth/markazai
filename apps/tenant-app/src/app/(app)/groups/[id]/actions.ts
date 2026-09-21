@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@markazai/db";
+import { prisma, recalculateStudentGroup, syncLessonCharge } from "@markazai/db";
 import {
   discountSchema,
   examSchema,
@@ -74,16 +74,21 @@ export async function setAttendance(groupId: string, studentId: string, date: st
   if (!check.ok) return { ok: false, error: check.error };
 
   const key = { groupId_studentId_date: { groupId, studentId, date: check.date } };
-  if (status === null) {
-    await prisma.attendance.deleteMany({ where: { groupId, studentId, date: check.date, organizationId: user.orgId } });
-  } else {
-    await prisma.attendance.upsert({
-      where: key,
-      update: { status, markedById: user.id },
-      create: { organizationId: user.orgId, groupId, studentId, date: check.date, status, markedById: user.id },
-    });
-  }
+  // Davomat va tizim yechimi bitta tranzaksiyada: balans hech qachon davomatdan orqada qolmaydi.
+  await prisma.$transaction(async (tx) => {
+    if (status === null) {
+      await tx.attendance.deleteMany({ where: { groupId, studentId, date: check.date, organizationId: user.orgId } });
+    } else {
+      await tx.attendance.upsert({
+        where: key,
+        update: { status, markedById: user.id },
+        create: { organizationId: user.orgId, groupId, studentId, date: check.date, status, markedById: user.id },
+      });
+    }
+    await syncLessonCharge(tx, { organizationId: user.orgId, groupId, studentId, date: check.date });
+  });
   // Har bir katak uchun audit-log yozilmaydi (juda ko'p bo'lardi); revalidate ham kerak emas — UI optimistik.
+  revalidatePath(`/students/${studentId}`);
   return { ok: true };
 }
 
@@ -149,6 +154,8 @@ export async function addDiscount(groupId: string, input: DiscountInput): Promis
       reason: d.reason,
     },
   });
+  // Chegirma amal qiladigan davrdagi allaqachon yechilgan darslar qayta hisoblanadi.
+  await recalculateStudentGroup(prisma, { organizationId: user.orgId, groupId, studentId: d.studentId, from: fromISODate(d.fromDate) });
   await logHistory(user, "group", groupId, "discount_added", { summary: `${student?.name ?? ""}: −${d.amount}` });
   revalidatePath(`/groups/${groupId}`);
   return { ok: true };
@@ -157,7 +164,9 @@ export async function addDiscount(groupId: string, input: DiscountInput): Promis
 export async function deleteDiscount(groupId: string, id: string): Promise<Result> {
   const { user, group, error } = await requireGroupWriter(groupId);
   if (!group) return { ok: false, error };
+  const discount = await prisma.discount.findFirst({ where: { id, groupId, organizationId: user.orgId } });
   await prisma.discount.deleteMany({ where: { id, groupId, organizationId: user.orgId } });
+  if (discount) await recalculateStudentGroup(prisma, { organizationId: user.orgId, groupId, studentId: discount.studentId, from: discount.fromDate });
   await logHistory(user, "group", groupId, "discount_removed");
   revalidatePath(`/groups/${groupId}`);
   return { ok: true };

@@ -183,6 +183,14 @@
       "SENT": "Yuborildi",
       "FAILED": "Xatolik",
       "MOCK": "Test rejimi"
+    },
+    "paymentMethod": {
+      "CASH": "Naqd",
+      "CARD": "Karta",
+      "TRANSFER": "O'tkazma",
+      "PAYME": "Payme",
+      "CLICK": "Click",
+      "UZUM": "Uzum"
     }
   },
   "student": {
@@ -269,7 +277,8 @@
         "partial": "Qisman",
         "debt": "Qarz",
         "none": "—"
-      }
+      },
+      "lessonCharge": "{date} dars uchun yechim"
     },
     "leadName": "Lid",
     "leadSource": "Manba",

@@ -183,6 +183,14 @@
       "SENT": "Отправлено",
       "FAILED": "Ошибка",
       "MOCK": "Тестовый режим"
+    },
+    "paymentMethod": {
+      "CASH": "Наличные",
+      "CARD": "Карта",
+      "TRANSFER": "Перевод",
+      "PAYME": "Payme",
+      "CLICK": "Click",
+      "UZUM": "Uzum"
     }
   },
   "student": {
@@ -269,7 +277,8 @@
         "partial": "Частично",
         "debt": "Долг",
         "none": "—"
-      }
+      },
+      "lessonCharge": "Списание за урок {date}"
     },
     "leadName": "Лид",
     "leadSource": "Источник",

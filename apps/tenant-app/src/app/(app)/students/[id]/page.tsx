@@ -243,7 +243,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
                         <TableCell className="text-right">
                           <Money value={p.amount} />
                         </TableCell>
-                        <TableCell>{p.description ?? "—"}</TableCell>
+                        <TableCell>{p.type === "SYSTEM" && p.lessonDate ? tp("lessonCharge", { date: formatDate(p.lessonDate) }) : (p.description ?? "—")}</TableCell>
                         <TableCell>{p.receivedById ? (userNames.get(p.receivedById) ?? "—") : "—"}</TableCell>
                       </TableRow>
                     ))}

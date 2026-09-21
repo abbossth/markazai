@@ -144,6 +144,15 @@ enum PaymentType {
   MANUAL
 }
 
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  PAYME
+  CLICK
+  UZUM
+}
+
 model Course {
   id             String   @id @default(uuid()) @db.Uuid
   organizationId String   @map("organization_id") @db.Uuid
@@ -419,21 +428,25 @@ model OnlineLesson {
 // amount ishorali: SYSTEM yozuvlar manfiy (yechilgan), MANUAL yozuvlar musbat (to'langan).
 // Student.balance = shu yozuvlar yig'indisi. Moliya logikasi 4-bosqichda Vitest bilan.
 model Payment {
-  id             String      @id @default(uuid()) @db.Uuid
-  organizationId String      @map("organization_id") @db.Uuid
-  studentId      String      @map("student_id") @db.Uuid
-  groupId        String?     @map("group_id") @db.Uuid
+  id             String        @id @default(uuid()) @db.Uuid
+  organizationId String        @map("organization_id") @db.Uuid
+  studentId      String        @map("student_id") @db.Uuid
+  groupId        String?       @map("group_id") @db.Uuid
   amount         Int
-  date           DateTime    @db.Date
+  date           DateTime      @db.Date
   type           PaymentType
+  method         PaymentMethod @default(CASH)
+  // SYSTEM yozuvlar uchun: qaysi dars kuni uchun yechilgan (talaba+guruh+kun bo'yicha yagona).
+  lessonDate     DateTime?     @map("lesson_date") @db.Date
   description    String?
-  receivedById   String?     @map("received_by_id") @db.Uuid
-  receiptPrinted Boolean     @default(false) @map("receipt_printed")
-  createdAt      DateTime    @default(now()) @map("created_at")
+  receivedById   String?       @map("received_by_id") @db.Uuid
+  receiptPrinted Boolean       @default(false) @map("receipt_printed")
+  createdAt      DateTime      @default(now()) @map("created_at")
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
   group   Group?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
+  @@unique([studentId, groupId, lessonDate])
   @@index([organizationId, date])
   @@index([studentId])
   @@map("payments")
@@ -662,4 +675,37 @@ model SmsLog {
   @@index([organizationId, leadId])
   @@index([organizationId, studentId])
   @@map("sms_logs")
+}
+
+// ─────────────────────────────────────────────────────────────
+// 4-bosqich: Moliya
+// ─────────────────────────────────────────────────────────────
+
+model Expense {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  // Xarajat turi (Ijara, Kommunal, Marketing ...) — erkin matn.
+  category       String
+  amount         Int
+  date           DateTime @db.Date
+  description    String?
+  createdById    String   @map("created_by_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([organizationId, date])
+  @@map("expenses")
+}
+
+// Kassadan pul yechib olish (egasi/rahbariyat). Xarajat emas — foydaga ta'sir qilmaydi, kassa qoldig'ini kamaytiradi.
+model Withdrawal {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  amount         Int
+  date           DateTime @db.Date
+  note           String?
+  createdById    String   @map("created_by_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([organizationId, date])
+  @@map("withdrawals")
 }

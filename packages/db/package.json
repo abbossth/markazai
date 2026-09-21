@@ -13,13 +13,16 @@
     "migrate:dev": "prisma migrate dev && prisma generate",
     "migrate:deploy": "prisma migrate deploy",
     "seed": "tsx prisma/seed.ts",
-    "reset": "prisma migrate reset --force && npm run seed"
+    "reset": "prisma migrate reset --force && npm run seed",
+    "billing:rebuild": "tsx prisma/rebuild-billing.ts",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@types/pg": "^8.23.1",
     "dotenv": "^18.0.1",
     "prisma": "^7.10.0",
-    "tsx": "^4.23.15"
+    "tsx": "^4.23.15",
+    "vitest": "^5.0.1"
   },
   "dependencies": {
     "@markazai/types": "^0.1.0",

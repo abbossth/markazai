@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@markazai/db";
+import { prisma, recalculateStudentGroup } from "@markazai/db";
 import {
   GROUP_STATUSES,
   fromISODate,
@@ -113,7 +113,7 @@ export async function updateGroup(id: string, input: GroupInput): Promise<Result
   if (!parsed.success) return { ok: false, error: "validation", fieldErrors: fieldErrors(parsed.error.issues) };
   const d = parsed.data;
 
-  const existing = await prisma.group.findFirst({ where: { id, organizationId: user.orgId }, select: { id: true } });
+  const existing = await prisma.group.findFirst({ where: { id, organizationId: user.orgId } });
   if (!existing) return { ok: false, error: "notFound" };
 
   const refs = await validateRefs(user, d, id);
@@ -143,6 +143,14 @@ export async function updateGroup(id: string, input: GroupInput): Promise<Result
     prisma.groupTag.deleteMany({ where: { groupId: id } }),
     prisma.groupTag.createMany({ data: refs.tagIds.map((tagId) => ({ organizationId: user.orgId, groupId: id, tagId })) }),
   ]);
+  // Narx yoki dars kunlari o'zgarsa, bugundan keyingi (belgilangan) darslar yangi shartlar bilan qayta hisoblanadi;
+  // o'tgan darslar tarixiy narxda qoladi.
+  const scheduleChanged = existing.price !== d.price || existing.days !== d.days || existing.customDays.join() !== (d.days === "OTHER" ? d.customDays : []).join();
+  if (scheduleChanged) {
+    const from = fromISODate(new Date().toISOString().slice(0, 10));
+    const members = await prisma.groupStudent.findMany({ where: { groupId: id, leftAt: null }, select: { studentId: true } });
+    for (const m of members) await recalculateStudentGroup(prisma, { organizationId: user.orgId, groupId: id, studentId: m.studentId, from });
+  }
   await logHistory(user, "group", id, "updated");
   revalidatePath("/groups");
   revalidatePath(`/groups/${id}`);

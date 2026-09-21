@@ -184,8 +184,6 @@ export async function seedDemoData(prisma: PrismaClient, orgId: string, actor: {
   const attendance: { organizationId: string; groupId: string; studentId: string; date: Date; status: "PRESENT" | "ABSENT" | "EXCUSED" }[] = [];
   const grades: { organizationId: string; groupId: string; studentId: string; date: Date; score: number }[] = [];
   const payments: { organizationId: string; studentId: string; groupId: string; amount: number; date: Date; type: "SYSTEM" | "MANUAL"; description: string; receivedById?: string }[] = [];
-  const balances = new Map<string, number>();
-  const addBalance = (studentId: string, amount: number) => balances.set(studentId, (balances.get(studentId) ?? 0) + amount);
 
   const activeEnrollments = enrollments.filter((e) => !e.leftAt);
   for (const group of groups) {
@@ -215,11 +213,8 @@ export async function seedDemoData(prisma: PrismaClient, orgId: string, actor: {
           }
         }
 
-        // Oylik yechim (tizim) va to'lov (qo'lda)
+        // Tizim yechimi (SYSTEM) davomatdan keyin rebuildAllCharges bilan quriladi.
         const chargeDate = fromISODate(dates[0]!);
-        payments.push({ organizationId: orgId, studentId: e.studentId, groupId: group.id, amount: -group.price, date: chargeDate, type: "SYSTEM", description: `${m}-oy uchun yechim` });
-        addBalance(e.studentId, -group.price);
-
         // O'tgan oylarda ko'pchilik to'laydi; joriy oyda ~50%; ba'zilari umuman to'lamaydi (qarzdor).
         const studentIdx = students.findIndex((s) => s.id === e.studentId);
         const chronicDebtor = studentIdx % 6 === 3;
@@ -228,7 +223,6 @@ export async function seedDemoData(prisma: PrismaClient, orgId: string, actor: {
           const partial = studentIdx % 8 === 5;
           const amount = partial ? Math.round(group.price / 2 / 1000) * 1000 : group.price;
           payments.push({ organizationId: orgId, studentId: e.studentId, groupId: group.id, amount, date: chargeDate, type: "MANUAL", description: "Naqd to'lov", receivedById: actor.id });
-          addBalance(e.studentId, amount);
         }
       }
     }
@@ -236,9 +230,10 @@ export async function seedDemoData(prisma: PrismaClient, orgId: string, actor: {
   await prisma.attendance.createMany({ data: attendance });
   await prisma.grade.createMany({ data: grades });
   await prisma.payment.createMany({ data: payments });
-  for (const [studentId, balance] of balances) {
-    await prisma.student.update({ where: { id: studentId }, data: { balance } });
-  }
+  // Davomatga ko'ra dars-dars yechim (SYSTEM) va talabalar balansi.
+  const { rebuildAllCharges, recomputeBalances } = await import("../src/billing");
+  await rebuildAllCharges(prisma, orgId);
+  await recomputeBalances(prisma, orgId);
 
   // ── Chegirmalar, imtihonlar, izohlar, tarix ──
   const discountTargets = activeEnrollments.slice(2, 4);
