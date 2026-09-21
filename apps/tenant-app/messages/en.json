@@ -102,7 +102,9 @@
     "invalidUrl": "The link must start with http:// or https://",
     "passAboveMax": "Pass score cannot exceed the maximum score",
     "discountTooLarge": "The discount must be less than the group price",
-    "futureDate": "A future date cannot be entered"
+    "futureDate": "A future date cannot be entered",
+    "phoneTaken": "This phone number is taken",
+    "passwordShort": "The password must be at least 8 characters"
   },
   "enums": {
     "studentStatus": {
@@ -192,6 +194,17 @@
       "PAYME": "Payme",
       "CLICK": "Click",
       "UZUM": "Uzum"
+    },
+    "roles": {
+      "CEO": "CEO",
+      "ADMINISTRATOR": "Administrator",
+      "LIMITED_ADMINISTRATOR": "Limited administrator",
+      "ADMINISTRATOR2": "Administrator 2",
+      "INTERN_ADMINISTRATOR": "Intern administrator",
+      "CASHIER": "Cashier",
+      "MARKETER": "Marketer",
+      "BRANCH_DIRECTOR": "Branch director",
+      "TEACHER": "Teacher"
     }
   },
   "student": {
@@ -314,7 +327,9 @@
       "sms_sent": "SMS sent",
       "reminder_added": "Reminder added",
       "payment_added": "Payment received",
-      "payment_voided": "Payment voided"
+      "payment_voided": "Payment voided",
+      "activated": "Activated",
+      "deactivated": "Deactivated"
     }
   },
   "attendance": {
@@ -639,6 +654,58 @@
       "lastPayment": "Last payment",
       "never": "Has not paid yet",
       "pay": "Pay"
+    }
+  },
+  "teacher": {
+    "title": "Teachers",
+    "new": "New teacher",
+    "newTitle": "New teacher",
+    "newDescription": "Enter the teacher's details",
+    "editTitle": "Edit teacher",
+    "searchPlaceholder": "Search by name or phone...",
+    "name": "Name",
+    "phone": "Phone",
+    "birthDate": "Date of birth",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "branches": "Branches",
+    "password": "Password (optional)",
+    "newPassword": "New password (optional)",
+    "passwordHint": "If a password is set, the teacher can sign in with their phone number and this password (sees only their own groups).",
+    "passwordHintEdit": "Leave empty to keep the current password.",
+    "salarySection": "Salary",
+    "salaryType": "Salary type",
+    "salaryPercent": "Percent of student payments",
+    "salaryFixed": "Fixed monthly salary",
+    "percent": "Percent (%)",
+    "fixedSalary": "Monthly salary (UZS)",
+    "workDays": "Work days",
+    "workStart": "Work start",
+    "workEnd": "Work end",
+    "workStartDate": "Employment start date",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "groups": "Groups",
+    "salary": "Salary",
+    "percentValue": "{percent}% (of payments)",
+    "open": "Open profile",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "deleteTitle": "Delete \"{name}\"?",
+    "hasRecords": "A teacher with groups or salary payments cannot be deleted — deactivate them instead",
+    "attendanceLink": "Teacher attendance",
+    "noGroups": "No groups",
+    "noStudents": "No students",
+    "studentsCount": "{count} students",
+    "minutesShort": "min",
+    "openGroup": "Open group",
+    "roles": "Roles",
+    "tabs": {
+      "profile": "Profile",
+      "history": "History",
+      "salary": "Salary"
     }
   }
 }

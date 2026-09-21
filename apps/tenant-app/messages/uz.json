@@ -102,7 +102,9 @@
     "invalidUrl": "Havola http:// yoki https:// bilan boshlanishi kerak",
     "passAboveMax": "O'tish balli maksimal balldan oshmasligi kerak",
     "discountTooLarge": "Chegirma guruh narxidan kam bo'lishi kerak",
-    "futureDate": "Kelajak sanasini kiritib bo'lmaydi"
+    "futureDate": "Kelajak sanasini kiritib bo'lmaydi",
+    "phoneTaken": "Bu telefon raqami band",
+    "passwordShort": "Parol kamida 8 ta belgidan iborat bo'lishi kerak"
   },
   "enums": {
     "studentStatus": {
@@ -192,6 +194,17 @@
       "PAYME": "Payme",
       "CLICK": "Click",
       "UZUM": "Uzum"
+    },
+    "roles": {
+      "CEO": "CEO",
+      "ADMINISTRATOR": "Administrator",
+      "LIMITED_ADMINISTRATOR": "Cheklangan administrator",
+      "ADMINISTRATOR2": "Administrator 2",
+      "INTERN_ADMINISTRATOR": "Stajyor administrator",
+      "CASHIER": "Kassir",
+      "MARKETER": "Marketolog",
+      "BRANCH_DIRECTOR": "Filial direktori",
+      "TEACHER": "O'qituvchi"
     }
   },
   "student": {
@@ -314,7 +327,9 @@
       "sms_sent": "SMS yuborildi",
       "reminder_added": "Eslatma qo'shildi",
       "payment_added": "To'lov qabul qilindi",
-      "payment_voided": "To'lov bekor qilindi"
+      "payment_voided": "To'lov bekor qilindi",
+      "activated": "Faollashtirildi",
+      "deactivated": "Nofaol qilindi"
     }
   },
   "attendance": {
@@ -639,6 +654,58 @@
       "lastPayment": "Oxirgi to'lov",
       "never": "Hali to'lamagan",
       "pay": "To'lov"
+    }
+  },
+  "teacher": {
+    "title": "O'qituvchilar",
+    "new": "Yangi o'qituvchi",
+    "newTitle": "Yangi o'qituvchi",
+    "newDescription": "O'qituvchi ma'lumotlarini kiriting",
+    "editTitle": "O'qituvchini tahrirlash",
+    "searchPlaceholder": "Ism yoki telefon bo'yicha qidirish...",
+    "name": "Ism",
+    "phone": "Telefon",
+    "birthDate": "Tug'ilgan sana",
+    "gender": "Jins",
+    "male": "Erkak",
+    "female": "Ayol",
+    "branches": "Filiallar",
+    "password": "Parol (ixtiyoriy)",
+    "newPassword": "Yangi parol (ixtiyoriy)",
+    "passwordHint": "Parol berilsa, o'qituvchi telefon raqami va shu parol bilan tizimga kira oladi (faqat o'z guruhlarini ko'radi).",
+    "passwordHintEdit": "Bo'sh qoldirilsa, parol o'zgarmaydi.",
+    "salarySection": "Ish haqi",
+    "salaryType": "Maosh turi",
+    "salaryPercent": "Talaba to'lovidan foiz",
+    "salaryFixed": "Belgilangan oylik",
+    "percent": "Foiz (%)",
+    "fixedSalary": "Oylik maosh (so'm)",
+    "workDays": "Ish kunlari",
+    "workStart": "Ish boshlanishi",
+    "workEnd": "Ish tugashi",
+    "workStartDate": "Ish faoliyati boshlanish sanasi",
+    "status": "Holat",
+    "active": "Faol",
+    "inactive": "Nofaol",
+    "groups": "Guruhlar",
+    "salary": "Maosh",
+    "percentValue": "{percent}% (to'lovdan)",
+    "open": "Profilni ochish",
+    "deactivate": "Nofaol qilish",
+    "activate": "Faollashtirish",
+    "deleteTitle": "\"{name}\" o'chirilsinmi?",
+    "hasRecords": "Guruhi yoki ish haqi to'lovi bor o'qituvchini o'chirib bo'lmaydi — uni nofaol qiling",
+    "attendanceLink": "Ustozlar davomati",
+    "noGroups": "Guruhlar yo'q",
+    "noStudents": "Talabalar yo'q",
+    "studentsCount": "{count} ta talaba",
+    "minutesShort": "daq.",
+    "openGroup": "Guruhni ochish",
+    "roles": "Rollar",
+    "tabs": {
+      "profile": "Profil",
+      "history": "Tarix",
+      "salary": "Ish haqi"
     }
   }
 }

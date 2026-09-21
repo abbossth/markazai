@@ -102,7 +102,9 @@
     "invalidUrl": "Ссылка должна начинаться с http:// или https://",
     "passAboveMax": "Проходной балл не может превышать максимальный",
     "discountTooLarge": "Скидка должна быть меньше цены группы",
-    "futureDate": "Нельзя указать дату в будущем"
+    "futureDate": "Нельзя указать дату в будущем",
+    "phoneTaken": "Этот номер телефона занят",
+    "passwordShort": "Пароль должен содержать минимум 8 символов"
   },
   "enums": {
     "studentStatus": {
@@ -192,6 +194,17 @@
       "PAYME": "Payme",
       "CLICK": "Click",
       "UZUM": "Uzum"
+    },
+    "roles": {
+      "CEO": "CEO",
+      "ADMINISTRATOR": "Администратор",
+      "LIMITED_ADMINISTRATOR": "Ограниченный администратор",
+      "ADMINISTRATOR2": "Администратор 2",
+      "INTERN_ADMINISTRATOR": "Стажёр-администратор",
+      "CASHIER": "Кассир",
+      "MARKETER": "Маркетолог",
+      "BRANCH_DIRECTOR": "Директор филиала",
+      "TEACHER": "Преподаватель"
     }
   },
   "student": {
@@ -314,7 +327,9 @@
       "sms_sent": "SMS отправлено",
       "reminder_added": "Напоминание добавлено",
       "payment_added": "Платёж принят",
-      "payment_voided": "Платёж отменён"
+      "payment_voided": "Платёж отменён",
+      "activated": "Активирован",
+      "deactivated": "Деактивирован"
     }
   },
   "attendance": {
@@ -639,6 +654,58 @@
       "lastPayment": "Последний платёж",
       "never": "Ещё не платил",
       "pay": "Оплата"
+    }
+  },
+  "teacher": {
+    "title": "Преподаватели",
+    "new": "Новый преподаватель",
+    "newTitle": "Новый преподаватель",
+    "newDescription": "Введите данные преподавателя",
+    "editTitle": "Редактирование преподавателя",
+    "searchPlaceholder": "Поиск по имени или телефону...",
+    "name": "Имя",
+    "phone": "Телефон",
+    "birthDate": "Дата рождения",
+    "gender": "Пол",
+    "male": "Мужской",
+    "female": "Женский",
+    "branches": "Филиалы",
+    "password": "Пароль (необязательно)",
+    "newPassword": "Новый пароль (необязательно)",
+    "passwordHint": "Если указан пароль, преподаватель сможет войти по номеру телефона и этому паролю (видит только свои группы).",
+    "passwordHintEdit": "Если оставить пустым, пароль не изменится.",
+    "salarySection": "Зарплата",
+    "salaryType": "Тип зарплаты",
+    "salaryPercent": "Процент от оплат студентов",
+    "salaryFixed": "Фиксированный оклад",
+    "percent": "Процент (%)",
+    "fixedSalary": "Оклад (сум)",
+    "workDays": "Рабочие дни",
+    "workStart": "Начало работы",
+    "workEnd": "Конец работы",
+    "workStartDate": "Дата начала работы",
+    "status": "Статус",
+    "active": "Активный",
+    "inactive": "Неактивный",
+    "groups": "Группы",
+    "salary": "Зарплата",
+    "percentValue": "{percent}% (от оплат)",
+    "open": "Открыть профиль",
+    "deactivate": "Деактивировать",
+    "activate": "Активировать",
+    "deleteTitle": "Удалить «{name}»?",
+    "hasRecords": "Нельзя удалить преподавателя с группами или выплатами — деактивируйте его",
+    "attendanceLink": "Посещаемость преподавателей",
+    "noGroups": "Групп нет",
+    "noStudents": "Студентов нет",
+    "studentsCount": "Студентов: {count}",
+    "minutesShort": "мин.",
+    "openGroup": "Открыть группу",
+    "roles": "Роли",
+    "tabs": {
+      "profile": "Профиль",
+      "history": "История",
+      "salary": "Зарплата"
     }
   }
 }

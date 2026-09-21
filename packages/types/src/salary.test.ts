@@ -59,11 +59,16 @@ describe("percentSalary", () => {
 
 describe("calculatePayroll", () => {
   it("PERCENT modeli to'lovlardan hisoblanadi", () => {
-    const p = calculatePayroll({ salaryType: "PERCENT", percent: 40, fixedSalary: null, workDays: [], period: "2026-09", paymentsTotal: 2_500_000, came: 0, extra: 0 });
+    const p = calculatePayroll({ salaryType: "PERCENT", percent: 40, fixedSalary: null, workDays: [], period: "2026-09", paymentsByGroup: [1_500_000, 1_000_000], came: 0, extra: 0 });
     expect(p).toMatchObject({ method: "PERCENT", base: 1_000_000, total: 1_000_000 });
   });
+  it("PERCENT: guruhlar bo'yicha yaxlitlash — jami qatorlar yig'indisiga teng", () => {
+    const groups = [333_333, 333_333, 333_334];
+    const p = calculatePayroll({ salaryType: "PERCENT", percent: 35, fixedSalary: null, workDays: [], period: "2026-09", paymentsByGroup: groups, came: 0, extra: 0 });
+    expect(p.total).toBe(groups.reduce((s, g) => s + percentSalary(g, 35), 0));
+  });
   it("FIXED modeli davomatdan hisoblanadi", () => {
-    const p = calculatePayroll({ salaryType: "FIXED", percent: null, fixedSalary: 2_600_000, workDays: [1, 3, 5], period: "2026-09", paymentsTotal: 9_999_999, came: 10, extra: 1 });
+    const p = calculatePayroll({ salaryType: "FIXED", percent: null, fixedSalary: 2_600_000, workDays: [1, 3, 5], period: "2026-09", paymentsByGroup: [9_999_999], came: 10, extra: 1 });
     expect(p.fullWorkDays).toBe(13);
     expect(p.base).toBe(2_000_000);
     expect(p.extraIncome).toBe(200_000);

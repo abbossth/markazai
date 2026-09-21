@@ -53,8 +53,8 @@ export type PayrollInput = {
   fixedSalary: number | null;
   workDays: number[];
   period: string;
-  /** Guruhlariga davrda kelgan to'lovlar yig'indisi (PERCENT uchun). */
-  paymentsTotal: number;
+  /** Har bir guruhiga davrda kelgan to'lovlar yig'indisi (PERCENT uchun). Foiz guruh-guruh yaxlitlanadi. */
+  paymentsByGroup: number[];
   /** Davomat (FIXED uchun). */
   came: number;
   extra: number;
@@ -74,7 +74,8 @@ export type Payroll = {
 /** Bitta o'qituvchining davr uchun ish haqi (ikkala model). */
 export function calculatePayroll(i: PayrollInput): Payroll {
   if (i.salaryType === "PERCENT") {
-    const amount = percentSalary(i.paymentsTotal, i.percent ?? 0);
+    // Guruh qatorlari yig'indisi jami bilan aniq mos chiqishi uchun har bir guruh alohida yaxlitlanadi.
+    const amount = i.paymentsByGroup.reduce((sum, p) => sum + percentSalary(p, i.percent ?? 0), 0);
     return { method: "PERCENT", fullWorkDays: 0, came: 0, extra: 0, base: amount, extraIncome: 0, total: amount };
   }
   const fullWorkDays = scheduledWorkDays(i.workDays, i.period).length;
