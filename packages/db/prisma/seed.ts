@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import path from "node:path";
 import bcrypt from "bcryptjs";
-import { seedDemoData } from "./seed-demo";
+import { seedDemoData, seedLeadsData } from "./seed-demo";
 
 config({ path: path.resolve(process.cwd(), "../../.env") });
 
@@ -59,6 +59,7 @@ async function main() {
   }
 
   await seedDemoData(prisma, ORG_ID, ceo!);
+  await seedLeadsData(prisma, ORG_ID, ceo!);
 
   console.log("Seed tayyor. Kirish: +998 90 123 45 67 / password123 (CEO)");
   await prisma.$disconnect();

@@ -273,3 +273,93 @@ export async function seedDemoData(prisma: PrismaClient, orgId: string, actor: {
     `Demo ma'lumotlar: ${courses.length} kurs, ${teachers.length} o'qituvchi, ${groups.length} guruh, ${students.length} talaba, ${attendance.length} davomat, ${payments.length} to'lov.`,
   );
 }
+
+const LEAD_NAMES = [
+  "Aziza Normatova", "Bobur Sattorov", "Charos Ismailova", "Doston Hamidov", "Elmira Yuldasheva",
+  "Farhod Qosimov", "Gavhar Nabiyeva", "Hasan Ochilov", "Iroda Xolmatova", "Javlon Rustamov",
+  "Kamila Aliyeva", "Lola Ergasheva", "Murod Salimov", "Nargiza Tursunova", "Otabek Sharipov",
+];
+
+/**
+ * Demo lidlar: standart ustunlar, "Lidlar" ustunida 2 ta ro'yxat, 15 lid, eslatmalar,
+ * qo'ng'iroq va SMS jurnali. Lidlar mavjud bo'lsa, hech narsa qilmaydi (idempotent).
+ */
+export async function seedLeadsData(prisma: PrismaClient, orgId: string, actor: { id: string; name: string }) {
+  if ((await prisma.lead.count({ where: { organizationId: orgId } })) > 0) {
+    console.log("Demo lidlar allaqachon mavjud — o'tkazib yuborildi.");
+    return;
+  }
+  const { ensureDefaultLeadColumns } = await import("../src/lead-defaults");
+  const columns = await ensureDefaultLeadColumns(prisma, orgId);
+  const [colLeads, colExpect, colSet] = columns;
+  if (!colLeads || !colExpect || !colSet) throw new Error("Standart ustunlar yaratilmadi");
+
+  const lists = await Promise.all(
+    [
+      { name: "Instagram", position: 0, isLocked: true },
+      { name: "Telegram", position: 1, isLocked: false },
+    ].map((l) => prisma.leadList.create({ data: { organizationId: orgId, columnId: colLeads.id, ...l } })),
+  );
+  const [courses, tags, users] = await Promise.all([
+    prisma.course.findMany({ where: { organizationId: orgId }, orderBy: { name: "asc" } }),
+    prisma.tag.findMany({ where: { organizationId: orgId }, orderBy: { name: "asc" } }),
+    prisma.user.findMany({ where: { organizationId: orgId }, orderBy: { name: "asc" } }),
+  ]);
+  const sources = ["INSTAGRAM", "TELEGRAM", "FACEBOOK", "WEBSITE", "REFERRAL", "WALK_IN", "PHONE"] as const;
+  const patterns = ["ODD", "EVEN", "WEEKEND", null] as const;
+  const now = Date.now();
+
+  // Konteynerlar: [ustun, ro'yxat|null]. Ko'p lid "Lidlar" ustunida, qolganlari keyingi ustunlarda.
+  const slots: [typeof colLeads, (typeof lists)[number] | null][] = [
+    [colLeads, lists[0]!], [colLeads, lists[0]!], [colLeads, lists[0]!],
+    [colLeads, lists[1]!], [colLeads, lists[1]!],
+    [colLeads, null], [colLeads, null], [colLeads, null],
+    [colExpect, null], [colExpect, null], [colExpect, null], [colExpect, null],
+    [colSet, null], [colSet, null], [colSet, null],
+  ];
+  const positions = new Map<string, number>();
+  const leads = [];
+  for (let i = 0; i < LEAD_NAMES.length; i++) {
+    const [column, list] = slots[i]!;
+    const key = `${column.id}:${list?.id ?? "none"}`;
+    const position = positions.get(key) ?? 0;
+    positions.set(key, position + 1);
+    leads.push(
+      await prisma.lead.create({
+        data: {
+          organizationId: orgId,
+          name: LEAD_NAMES[i]!,
+          phone: `998${93 + (i % 5)}${String(3000000 + i * 41213).slice(0, 7)}`,
+          source: sources[i % sources.length],
+          columnId: column.id,
+          listId: list?.id ?? null,
+          position,
+          note: i % 3 === 0 ? "Narxi haqida so'radi" : null,
+          assignedToId: users[i % users.length]?.id,
+          courseId: courses[i % courses.length]?.id,
+          daysPattern: patterns[i % patterns.length],
+          createdAt: new Date(now - i * 26 * 3_600_000),
+          tags: i % 4 === 0 && tags[0] ? { create: [{ organizationId: orgId, tagId: tags[0].id }] } : undefined,
+        },
+      }),
+    );
+  }
+
+  await prisma.reminder.createMany({
+    data: [
+      { organizationId: orgId, title: "Qayta qo'ng'iroq qilish", dueAt: new Date(now - 3 * 3_600_000), responsibleId: actor.id, leadId: leads[0]!.id, createdById: actor.id },
+      { organizationId: orgId, title: "Sinov darsiga taklif", note: "Shanba kuni", dueAt: new Date(now + 20 * 3_600_000), responsibleId: actor.id, leadId: leads[8]!.id, createdById: actor.id },
+      { organizationId: orgId, title: "Guruh to'lovlarini tekshirish", dueAt: new Date(now + 48 * 3_600_000), responsibleId: actor.id, groupId: (await prisma.group.findFirst({ where: { organizationId: orgId } }))?.id, createdById: actor.id },
+    ],
+  });
+  await prisma.callLog.create({
+    data: { organizationId: orgId, leadId: leads[0]!.id, outcome: "NO_ANSWER", direction: "OUTGOING", note: "Javob bermadi", createdById: actor.id },
+  });
+  await prisma.smsLog.create({
+    data: { organizationId: orgId, leadId: leads[1]!.id, phone: leads[1]!.phone, text: "Assalomu alaykum! Kurslarimiz haqida ma'lumot yubordik.", status: "MOCK", provider: "mock", sentById: actor.id },
+  });
+  await prisma.historyLog.createMany({
+    data: leads.map((l) => ({ organizationId: orgId, entityType: "lead", entityId: l.id, action: "created", actorId: actor.id, actorName: actor.name })),
+  });
+  console.log(`Demo lidlar: ${leads.length} lid, ${lists.length} ro'yxat, 3 eslatma.`);
+}

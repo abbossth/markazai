@@ -1,3 +1,5 @@
+import { toCenterParts } from "@markazai/types";
+
 /** 450000 → "450 000" */
 export function formatMoney(amount: number) {
   return new Intl.NumberFormat("ru-RU").format(amount).replace(/ | /g, " ");
@@ -19,11 +21,11 @@ export function formatDate(date: Date | string | null | undefined) {
   return `${dd}.${mm}.${d.getUTCFullYear()}`;
 }
 
-/** Vaqt bilan (mahalliy vaqt zonasida): "21.09.2026 15:30" */
+/** Vaqt bilan, markaz vaqt zonasida (server va brauzerda bir xil): "21.09.2026 15:30" */
 export function formatDateTime(date: Date | string) {
   const d = typeof date === "string" ? new Date(date) : date;
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  const { date: iso, time } = toCenterParts(d);
+  return `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)} ${time}`;
 }
 
 export function initials(name: string) {

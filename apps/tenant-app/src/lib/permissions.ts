@@ -9,20 +9,20 @@ const MODULE_ACCESS: Record<Role, AppModule[]> = {
   CEO: ALL,
   BRANCH_DIRECTOR: ALL,
   ADMINISTRATOR: ALL,
-  ADMINISTRATOR2: ["dashboard", "leads", "teachers", "groups", "students", "finance", "reports"],
-  LIMITED_ADMINISTRATOR: ["dashboard", "leads", "groups", "students"],
-  INTERN_ADMINISTRATOR: ["dashboard", "leads", "groups", "students"],
+  ADMINISTRATOR2: ["dashboard", "leads", "teachers", "groups", "students", "finance", "reports", "leads:write", "leads:delete", "leads:configure"],
+  LIMITED_ADMINISTRATOR: ["dashboard", "leads", "groups", "students", "leads:write"],
+  INTERN_ADMINISTRATOR: ["dashboard", "leads", "groups", "students", "leads:write"],
   CASHIER: ["dashboard", "students", "finance"],
-  MARKETER: ["dashboard", "leads", "reports"],
+  MARKETER: ["dashboard", "leads", "reports", "leads:write"],
   TEACHER: ["dashboard", "groups", "students"],
 };
 
-export type Permission = "students:write" | "students:delete" | "groups:write" | "groups:delete" | "attendance:write";
+export type Permission = "students:write" | "students:delete" | "groups:write" | "groups:delete" | "attendance:write" | "leads:write" | "leads:delete" | "leads:configure";
 
 const PERMISSIONS: Record<Role, Permission[]> = {
-  CEO: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write"],
-  BRANCH_DIRECTOR: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write"],
-  ADMINISTRATOR: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write"],
+  CEO: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write", "leads:write", "leads:delete", "leads:configure"],
+  BRANCH_DIRECTOR: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write", "leads:write", "leads:delete", "leads:configure"],
+  ADMINISTRATOR: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write", "leads:write", "leads:delete", "leads:configure"],
   ADMINISTRATOR2: ["students:write", "students:delete", "groups:write", "groups:delete", "attendance:write"],
   LIMITED_ADMINISTRATOR: ["students:write", "groups:write", "attendance:write"],
   INTERN_ADMINISTRATOR: ["students:write", "attendance:write"],

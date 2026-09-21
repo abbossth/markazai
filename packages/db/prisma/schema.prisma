@@ -156,6 +156,7 @@ model Course {
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   groups Group[]
+  leads  Lead[]
 
   @@index([organizationId])
   @@map("courses")
@@ -180,8 +181,10 @@ model Tag {
   name           String
   color          String?
 
-  students StudentTag[]
-  groups   GroupTag[]
+  students  StudentTag[]
+  groups    GroupTag[]
+  leads     LeadTag[]
+  reminders ReminderTag[]
 
   @@unique([organizationId, name])
   @@map("tags")
@@ -238,6 +241,7 @@ model Group {
   exams         Exam[]
   onlineLessons OnlineLesson[]
   payments      Payment[]
+  reminders     Reminder[]
 
   @@unique([organizationId, name])
   @@index([organizationId, status])
@@ -274,6 +278,10 @@ model Student {
   grades      Grade[]
   discounts   Discount[]
   payments    Payment[]
+  fromLead    Lead?
+  reminders   Reminder[]
+  calls       CallLog[]
+  smsLogs     SmsLog[]
 
   @@index([organizationId, status])
   @@index([organizationId, name])
@@ -435,14 +443,16 @@ model Comment {
   id             String   @id @default(uuid()) @db.Uuid
   organizationId String   @map("organization_id") @db.Uuid
   authorId       String   @map("author_id") @db.Uuid
-  // Bittasi to'ldiriladi: talaba yoki guruh (lid keyingi bosqichda qo'shiladi).
+  // Bittasi to'ldiriladi: talaba, guruh yoki lid.
   studentId      String?  @map("student_id") @db.Uuid
   groupId        String?  @map("group_id") @db.Uuid
+  leadId         String?  @map("lead_id") @db.Uuid
   body           String
   createdAt      DateTime @default(now()) @map("created_at")
 
   @@index([organizationId, studentId])
   @@index([organizationId, groupId])
+  @@index([organizationId, leadId])
   @@map("comments")
 }
 
@@ -460,4 +470,196 @@ model HistoryLog {
 
   @@index([organizationId, entityType, entityId, createdAt])
   @@map("history_logs")
+}
+
+// ─────────────────────────────────────────────────────────────
+// 3-bosqich: Lidlar (CRM), eslatmalar, qo'ng'iroq va SMS jurnallari
+// ─────────────────────────────────────────────────────────────
+
+enum LeadSource {
+  INSTAGRAM
+  TELEGRAM
+  FACEBOOK
+  WEBSITE
+  REFERRAL
+  WALK_IN
+  PHONE
+  OTHER
+}
+
+enum CallOutcome {
+  ANSWERED
+  NO_ANSWER
+  BUSY
+  WRONG_NUMBER
+}
+
+enum CallDirection {
+  OUTGOING
+  INCOMING
+}
+
+// MOCK — haqiqiy SMS provayder ulanmaganda; jurnalga yoziladi, jo'natilmaydi.
+enum SmsStatus {
+  SENT
+  FAILED
+  MOCK
+}
+
+// Kanban ustuni. Ustunlar markaz tomonidan sozlanadi (qo'shish, nomlash, tartiblash).
+model LeadColumn {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  position       Int
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  lists LeadList[]
+  leads Lead[]
+
+  @@index([organizationId, position])
+  @@map("lead_columns")
+}
+
+// Ustun ichidagi foydalanuvchi nomlagan kichik ro'yxat (papka). isLocked — nomini o'zgartirib/o'chirib bo'lmaydi.
+model LeadList {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  columnId       String   @map("column_id") @db.Uuid
+  name           String
+  position       Int
+  isLocked       Boolean  @default(false) @map("is_locked")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  column LeadColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  leads  Lead[]
+
+  @@index([organizationId, columnId, position])
+  @@map("lead_lists")
+}
+
+model Lead {
+  id                 String       @id @default(uuid()) @db.Uuid
+  organizationId     String       @map("organization_id") @db.Uuid
+  name               String
+  phone              String
+  source             LeadSource?
+  columnId           String       @map("column_id") @db.Uuid
+  listId             String?      @map("list_id") @db.Uuid
+  // Ustun/ro'yxat ichidagi tartib (0 dan).
+  position           Int          @default(0)
+  note               String?
+  assignedToId       String?      @map("assigned_to_id") @db.Uuid
+  // Qiziqqan kurs va qulay kunlar (filtrlar uchun).
+  courseId           String?      @map("course_id") @db.Uuid
+  daysPattern        DaysPattern? @map("days_pattern")
+  // Talabaga aylantirilgan lid doskadan yo'qoladi, lekin konversiya hisoboti uchun saqlanadi.
+  convertedStudentId String?      @unique @map("converted_student_id") @db.Uuid
+  convertedAt        DateTime?    @map("converted_at")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  column           LeadColumn @relation(fields: [columnId], references: [id])
+  list             LeadList?  @relation(fields: [listId], references: [id], onDelete: SetNull)
+  course           Course?    @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  convertedStudent Student?   @relation(fields: [convertedStudentId], references: [id], onDelete: SetNull)
+  tags             LeadTag[]
+  reminders        Reminder[]
+  calls            CallLog[]
+  smsLogs          SmsLog[]
+
+  @@index([organizationId, columnId, listId, position])
+  @@index([organizationId, phone])
+  @@map("leads")
+}
+
+model LeadTag {
+  organizationId String @map("organization_id") @db.Uuid
+  leadId         String @map("lead_id") @db.Uuid
+  tagId          String @map("tag_id") @db.Uuid
+  lead           Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  tag            Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([leadId, tagId])
+  @@index([organizationId])
+  @@map("lead_tags")
+}
+
+// Eslatma: bitta bog'liq obyekt (lid, guruh yoki talaba) ko'rsatiladi.
+model Reminder {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  title          String
+  note           String?
+  dueAt          DateTime  @map("due_at")
+  responsibleId  String    @map("responsible_id") @db.Uuid
+  leadId         String?   @map("lead_id") @db.Uuid
+  groupId        String?   @map("group_id") @db.Uuid
+  studentId      String?   @map("student_id") @db.Uuid
+  doneAt         DateTime? @map("done_at")
+  createdById    String    @map("created_by_id") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  lead    Lead?         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  group   Group?        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  student Student?      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  tags    ReminderTag[]
+
+  @@index([organizationId, responsibleId, doneAt, dueAt])
+  @@index([organizationId, leadId])
+  @@index([organizationId, groupId])
+  @@map("reminders")
+}
+
+model ReminderTag {
+  organizationId String   @map("organization_id") @db.Uuid
+  reminderId     String   @map("reminder_id") @db.Uuid
+  tagId          String   @map("tag_id") @db.Uuid
+  reminder       Reminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+  tag            Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([reminderId, tagId])
+  @@index([organizationId])
+  @@map("reminder_tags")
+}
+
+model CallLog {
+  id              String        @id @default(uuid()) @db.Uuid
+  organizationId  String        @map("organization_id") @db.Uuid
+  leadId          String?       @map("lead_id") @db.Uuid
+  studentId       String?       @map("student_id") @db.Uuid
+  direction       CallDirection @default(OUTGOING)
+  outcome         CallOutcome
+  durationSeconds Int?          @map("duration_seconds")
+  note            String?
+  createdById     String        @map("created_by_id") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  lead    Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  student Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, leadId])
+  @@index([organizationId, studentId])
+  @@map("call_logs")
+}
+
+model SmsLog {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  leadId         String?   @map("lead_id") @db.Uuid
+  studentId      String?   @map("student_id") @db.Uuid
+  phone          String
+  text           String
+  status         SmsStatus
+  provider       String
+  error          String?
+  sentById       String    @map("sent_by_id") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  lead    Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  student Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, leadId])
+  @@index([organizationId, studentId])
+  @@map("sms_logs")
 }
