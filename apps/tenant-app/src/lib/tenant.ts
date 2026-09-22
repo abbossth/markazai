@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import { platformPrisma } from "@markazai/db/platform";
 import { setTenantResolver } from "@markazai/db";
@@ -26,10 +27,12 @@ export type TenantInfo = {
   access: AccessDecision;
 };
 
-const cache = new Map<string, { at: number; info: TenantInfo | null }>();
+// So'rovlar orasida (~30s) platform bazasiga qayta murojaat qilmaslik uchun — quyidagi `currentTenant`dagi
+// React `cache()`dan farqli, bu jarayon xotirasida va so'rovlar orasida saqlanadi.
+const slugCache = new Map<string, { at: number; info: TenantInfo | null }>();
 
 async function loadTenantBySlug(slug: string): Promise<TenantInfo | null> {
-  const hit = cache.get(slug);
+  const hit = slugCache.get(slug);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.info;
 
   const org = await platformPrisma.organization.findUnique({
@@ -56,14 +59,14 @@ async function loadTenantBySlug(slug: string): Promise<TenantInfo | null> {
       access: accessDecision({ status: org.status, subscriptionEnd }, toISODate(new Date())),
     };
   }
-  cache.set(slug, { at: Date.now(), info });
+  slugCache.set(slug, { at: Date.now(), info });
   return info;
 }
 
 /** Keshni tozalash (Control Plane o'zgartirgach darhol qo'llash uchun; aks holda TTL ichida yangilanadi). */
 export function invalidateTenantCache(slug?: string) {
-  if (slug) cache.delete(slug);
-  else cache.clear();
+  if (slug) slugCache.delete(slug);
+  else slugCache.clear();
 }
 
 export async function currentHostTarget(): Promise<HostTarget> {
@@ -71,11 +74,21 @@ export async function currentHostTarget(): Promise<HostTarget> {
   return parseHost(h.get("x-forwarded-host") ?? h.get("host"), ROOT_DOMAIN, { defaultSlug: DEFAULT_SLUG });
 }
 
-/** Joriy so'rovning tenant'i; host tenant emas yoki tashkilot topilmasa — null. */
-export async function currentTenant(): Promise<TenantInfo | null> {
+/**
+ * Joriy so'rovning tenant'i; host tenant emas yoki tashkilot topilmasa — null.
+ *
+ * React `cache()` bilan o'ralgan: bir so'rov ichida BIR MARTA hisoblanadi va NATIJA (headers()ga qayta
+ * murojaat qilmay) butun render daraxti bo'ylab qayta ishlatiladi — layout, nested layout va HATTO Next.js
+ * alohida oqim sifatida keyinroq render qiladigan sahifa (page) segmentida ham. Bu — muhim: sahifaning
+ * o'z so'rovlari kechroq, alohida davomida bajariladi, va o'sha nuqtada odatiy AsyncLocalStorage yoki
+ * `headers()`ga qayta murojaat ishonchli emas (Next.js dinamik API cheklovi/PPR oqimi). `cache()` esa
+ * React'ning o'zi tomonidan aynan shu holat uchun kafolatlangan — TenantPool'ning resolver'i shu funksiyani
+ * chaqiradi, shuning uchun BIRINCHI muvaffaqiyatli natija butun so'rov davomida barqaror qoladi.
+ */
+export const currentTenant = cache(async (): Promise<TenantInfo | null> => {
   const target = await currentHostTarget();
   return target.kind === "tenant" ? loadTenantBySlug(target.slug) : null;
-}
+});
 
 /**
  * Joriy so'rov tashkiloti ID'si (RLS kontekstini ham shu beradi). Topilmasa xatolik — sahifa noto'g'ri tenant

@@ -1,0 +1,27 @@
+import { config } from "dotenv";
+import path from "node:path";
+config({ path: path.resolve(process.cwd(), "../../.env") });
+process.env.APP_DATABASE_URL = process.argv[2];
+
+const { prisma, withTenant } = await import("./src/index");
+const ORG = "0df13e29-c750-4ef8-988d-b30e97d2dad7";
+const GID = "2c3b99c3-a157-41d3-a519-81423a0002d9";
+
+for (let i = 0; i < 30; i++) {
+  const res = await withTenant(ORG, async () => {
+    const group = await prisma.group.findFirst({
+      where: { id: GID, organizationId: ORG },
+      include: {
+        course: true,
+        teacher: true,
+        room: true,
+        tags: { include: { tag: true } },
+        enrollments: { include: { student: true } },
+        discounts: true,
+      },
+    });
+    return group?.enrollments.map((e) => e.student === null);
+  });
+  console.log(i, JSON.stringify(res));
+}
+await prisma.$disconnect();
