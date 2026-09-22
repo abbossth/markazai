@@ -6,7 +6,6 @@ import {
   Calendar,
   Check,
   CloudCog,
-  GraduationCap,
   Languages,
   Mail,
   ShieldCheck,
@@ -17,6 +16,7 @@ import {
 } from "lucide-react";
 import { platformPrisma } from "@markazai/db/platform";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { MarkazaiLogo } from "@/components/brand/logo";
 import { DashboardMock } from "./dashboard-mock";
 import { SubdomainForm } from "./subdomain-form";
 
@@ -70,11 +70,8 @@ export default async function MarketingPage() {
       {/* ───────── Header ───────── */}
       <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-slate-950/80">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
-          <Link href="#" className="flex items-center gap-2 font-semibold">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white">
-              <GraduationCap className="size-4.5" />
-            </span>
-            Markazai
+          <Link href="#" className="flex items-center">
+            <MarkazaiLogo size={28} />
           </Link>
           <nav className="ml-4 hidden items-center gap-6 text-sm text-slate-600 md:flex dark:text-slate-300">
             <Link href="#imkoniyatlar" className="hover:text-slate-900 dark:hover:text-white">
@@ -104,13 +101,13 @@ export default async function MarketingPage() {
 
       {/* ───────── Hero ───────── */}
       <section className="relative overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-40 h-[32rem] bg-[radial-gradient(60%_60%_at_50%_0%,theme(colors.indigo.200),transparent)] dark:bg-[radial-gradient(60%_60%_at_50%_0%,theme(colors.indigo.900/40%),transparent)]" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-40 h-[32rem] bg-[radial-gradient(60%_60%_at_50%_0%,#c2ceff,transparent)] dark:bg-[radial-gradient(60%_60%_at_50%_0%,rgba(0,20,102,0.4),transparent)]" />
         <div className="relative mx-auto flex max-w-6xl flex-col items-center px-4 pt-16 pb-20 text-center sm:px-6 sm:pt-24">
           <span className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
             <span className="size-1.5 rounded-full bg-emerald-500" /> O&apos;quv markazlar uchun boshqaruv tizimi
           </span>
           <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-balance sm:text-5xl md:text-6xl">
-            Markazingizni <span className="bg-gradient-to-br from-indigo-500 to-violet-600 bg-clip-text text-transparent">tizimli boshqaring</span>
+            Markazingizni <span className="from-brand-500 to-brand-700 bg-gradient-to-br bg-clip-text text-transparent">tizimli boshqaring</span>
           </h1>
           <p className="mt-5 max-w-xl text-lg text-slate-600 dark:text-slate-300">
             Lidlar, guruhlar, talabalar, moliya va hisobotlar — bitta joyda. Qog&apos;oz jurnal va Excel&apos;lar o&apos;rniga, har bir markaz uchun o&apos;z shaxsiy manzili bilan.
@@ -118,7 +115,7 @@ export default async function MarketingPage() {
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row">
             <Link
               href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Markazai — bepul konsultatsiya")}`}
-              className="rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-transform hover:scale-[1.03]"
+              className="from-brand-500 to-brand-600 shadow-brand-500/25 rounded-full bg-gradient-to-br px-6 py-3 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-[1.03]"
             >
               Bepul konsultatsiya olish
             </Link>
@@ -148,7 +145,7 @@ export default async function MarketingPage() {
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f) => (
               <div key={f.title} className="rounded-2xl border border-slate-200 bg-white p-6 transition-shadow hover:shadow-md dark:border-white/10 dark:bg-white/[0.03]">
-                <div className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white">
+                <div className="from-brand-500 to-brand-600 flex size-11 items-center justify-center rounded-xl bg-gradient-to-br text-white">
                   <f.icon className="size-5" />
                 </div>
                 <h3 className="mt-4 font-semibold">{f.title}</h3>
@@ -174,7 +171,7 @@ export default async function MarketingPage() {
               ["3", "Ishga tushiring", "`markaz-nomi." + ROOT_DOMAIN + "` manzilida kirib, kurslar, guruhlar va xodimlarni qo'shishni boshlaysiz."],
             ].map(([n, title, desc]) => (
               <div key={n} className="relative flex flex-col items-center gap-3 text-center">
-                <span className="relative z-10 flex size-12 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 font-semibold text-white">{n}</span>
+                <span className="from-brand-500 to-brand-600 relative z-10 flex size-12 items-center justify-center rounded-full bg-gradient-to-br font-semibold text-white">{n}</span>
                 <h3 className="font-semibold">{title}</h3>
                 <p className="max-w-xs text-sm text-slate-600 dark:text-slate-300">{desc}</p>
               </div>
@@ -189,7 +186,7 @@ export default async function MarketingPage() {
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {VALUES.map((v) => (
               <div key={v.title} className="flex flex-col gap-2">
-                <v.icon className="size-6 text-indigo-500" />
+                <v.icon className="text-brand-500 size-6" />
                 <h3 className="font-semibold">{v.title}</h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300">{v.desc}</p>
               </div>
@@ -212,9 +209,9 @@ export default async function MarketingPage() {
                 return (
                   <div
                     key={p.id}
-                    className={`flex flex-col gap-5 rounded-2xl border p-6 ${featured ? "border-indigo-500 bg-slate-900 text-white shadow-xl shadow-indigo-500/20" : "border-slate-200 bg-white dark:border-white/10 dark:bg-white/[0.03]"}`}
+                    className={`flex flex-col gap-5 rounded-2xl border p-6 ${featured ? "border-brand-500 bg-ink shadow-brand-500/20 text-white shadow-xl" : "border-slate-200 bg-white dark:border-white/10 dark:bg-white/[0.03]"}`}
                   >
-                    {featured && <span className="w-fit rounded-full bg-indigo-500 px-2.5 py-0.5 text-xs font-medium">Ommabop</span>}
+                    {featured && <span className="bg-brand-500 w-fit rounded-full px-2.5 py-0.5 text-xs font-medium">Ommabop</span>}
                     <div>
                       <h3 className="font-semibold">{p.name}</h3>
                       <div className="mt-2 flex items-baseline gap-1">
@@ -225,13 +222,13 @@ export default async function MarketingPage() {
                     <ul className="flex flex-col gap-2.5 text-sm">
                       {[limit(p.maxStaff, "xodim"), limit(p.maxBranches, "filial"), limit(p.maxStudents, "talaba")].map((line) => (
                         <li key={line} className="flex items-center gap-2">
-                          <Check className={`size-4 shrink-0 ${featured ? "text-indigo-400" : "text-indigo-500"}`} />
+                          <Check className={`size-4 shrink-0 ${featured ? "text-brand-400" : "text-brand-500"}`} />
                           {line}
                         </li>
                       ))}
                       {p.modules.includes("gamification") && (
                         <li className="flex items-center gap-2">
-                          <Check className={`size-4 shrink-0 ${featured ? "text-indigo-400" : "text-indigo-500"}`} />
+                          <Check className={`size-4 shrink-0 ${featured ? "text-brand-400" : "text-brand-500"}`} />
                           Gamifikatsiya
                         </li>
                       )}
@@ -270,9 +267,9 @@ export default async function MarketingPage() {
 
       {/* ───────── CTA ───────── */}
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="flex flex-col items-center gap-5 rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 px-6 py-14 text-center text-white">
+        <div className="from-brand-600 to-brand-800 flex flex-col items-center gap-5 rounded-3xl bg-gradient-to-br px-6 py-14 text-center text-white">
           <h2 className="max-w-lg text-3xl font-bold tracking-tight">Markazingizni bugun raqamlashtiring</h2>
-          <p className="max-w-md text-indigo-100">Bepul konsultatsiya so&apos;rang — jamoamiz markazingiz uchun eng qulay yechimni taklif qiladi.</p>
+          <p className="text-brand-100 max-w-md">Bepul konsultatsiya so&apos;rang — jamoamiz markazingiz uchun eng qulay yechimni taklif qiladi.</p>
           <Link href={`mailto:${CONTACT_EMAIL}`} className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition-transform hover:scale-[1.03]">
             Bog&apos;lanish
           </Link>
@@ -282,9 +279,7 @@ export default async function MarketingPage() {
       {/* ───────── Footer ───────── */}
       <footer className="border-t border-slate-200 py-10 dark:border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 text-sm text-slate-500 sm:flex-row sm:justify-between sm:px-6 dark:text-slate-400">
-          <div className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200">
-            <GraduationCap className="size-4" /> Markazai
-          </div>
+          <MarkazaiLogo size={18} textClassName="text-sm" className="text-slate-700 dark:text-slate-200" />
           <Link href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white">
             <Mail className="size-3.5" /> {CONTACT_EMAIL}
           </Link>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Onest } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { enterTenant } from "@markazai/db";
@@ -8,8 +8,9 @@ import { brandCss, loadCenter, loadCenterConfig } from "@/lib/center";
 import { currentTenant } from "@/lib/tenant";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Onest — brend qo'llanmasidagi yagona shrift (lotin + kirill, interfeys/chek/reklamada bir xil ovoz).
+const onest = Onest({
+  variable: "--font-onest",
   subsets: ["latin", "cyrillic"],
 });
 
@@ -39,7 +40,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${onest.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>{brand && <style dangerouslySetInnerHTML={{ __html: brand }} />}</head>
       <body className="min-h-full flex flex-col">

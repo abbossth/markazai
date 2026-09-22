@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MAIN_NAV, SETTINGS_NAV, type NavItem } from "@/config/nav";
 import { canAccess, type AppModule } from "@/lib/permissions";
+import { MarkazaiLogo } from "@/components/brand/logo";
 
 function NavLink({ item, active }: { item: NavItem; active: boolean }) {
   const t = useTranslations("nav");
@@ -32,11 +32,8 @@ export function Sidebar({ roles }: { roles: string[] }) {
 
   return (
     <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-60 shrink-0 flex-col border-r md:flex print:hidden">
-      <Link href="/dashboard" className="flex h-14 items-center gap-2 px-5 font-semibold">
-        <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
-          <GraduationCap className="size-5" />
-        </span>
-        Markazai
+      <Link href="/dashboard" className="flex h-14 items-center px-5">
+        <MarkazaiLogo size={28} />
       </Link>
 
       <nav className="flex flex-1 flex-col gap-1 px-3 py-2">

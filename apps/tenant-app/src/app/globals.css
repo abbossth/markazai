@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-onest);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -46,75 +46,102 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* Markazai Blue — 9 daraja (brend qo'llanmasi 03-bet). Tenant o'z brend rangini o'rnatsa
+     (Sozlamalar → Umumiy), faqat --primary/--ring/--sidebar-primary ustidan yoziladi — shkala o'zgarmaydi. */
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-gold: var(--gold);
+  --color-ink: var(--ink);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --brand-50: #eef2ff;
+  --brand-100: #e0e7ff;
+  --brand-200: #c2ceff;
+  --brand-300: #99adff;
+  --brand-400: #5c7cff;
+  --brand-500: #1f4bff;
+  --brand-600: #0030f0;
+  --brand-700: #0027c2;
+  --brand-800: #001e94;
+  --brand-900: #001466;
+  --gold: #ffb020;
+  --ink: #0b1026;
+
+  --background: #f6f8ff;
+  --foreground: #0b1026;
+  --card: #ffffff;
+  --card-foreground: #0b1026;
+  --popover: #ffffff;
+  --popover-foreground: #0b1026;
+  --primary: #1f4bff;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2ff;
+  --secondary-foreground: #1f4bff;
+  --muted: #eef1fb;
+  --muted-foreground: #5b6478;
+  --accent: #eef2ff;
+  --accent-foreground: #1f4bff;
+  --destructive: #e11d48;
+  --border: #e3e7f5;
+  --input: #e3e7f5;
+  --ring: #1f4bff;
+  --chart-1: #1f4bff;
+  --chart-2: #ffb020;
+  --chart-3: #5c7cff;
+  --chart-4: #0027c2;
+  --chart-5: #99adff;
+  --radius: 0.75rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0b1026;
+  --sidebar-primary: #1f4bff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef2ff;
+  --sidebar-accent-foreground: #1f4bff;
+  --sidebar-border: #e3e7f5;
+  --sidebar-ring: #1f4bff;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --background: #0b1026;
+  --foreground: #eef2ff;
+  --card: #121833;
+  --card-foreground: #eef2ff;
+  --popover: #121833;
+  --popover-foreground: #eef2ff;
+  --primary: #5c7cff;
+  --primary-foreground: #0b1026;
+  --secondary: #171e3d;
+  --secondary-foreground: #c2ceff;
+  --muted: #171e3d;
+  --muted-foreground: #8b93b8;
+  --accent: #171e3d;
+  --accent-foreground: #c2ceff;
+  --destructive: #fb4b5a;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --ring: #5c7cff;
+  --chart-1: #5c7cff;
+  --chart-2: #ffb020;
+  --chart-3: #99adff;
+  --chart-4: #c2ceff;
+  --chart-5: #0030f0;
+  --sidebar: #121833;
+  --sidebar-foreground: #eef2ff;
+  --sidebar-primary: #5c7cff;
+  --sidebar-primary-foreground: #0b1026;
+  --sidebar-accent: #171e3d;
+  --sidebar-accent-foreground: #c2ceff;
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: #5c7cff;
 }
 
 @layer base {
@@ -128,13 +155,13 @@
     @apply font-sans;
   }
 }
-/* Diagramma ranglari (dataviz: kategorik 1–2-slotlar; validator: CVD ΔE ≥ 24, kontrast ≥ 3:1).
-   Dark rejim — alohida tanlangan qadamlar, oddiy inversiya emas. */
+/* Diagramma ranglari (dataviz: kategorik 1–2-slotlar). Brend ko'k + oltin nuqta — bir-biridan farqi
+   yetarli (ΔE ~30+) va brend palitrasi bilan mos. Dark rejim — alohida tanlangan qadamlar. */
 :root {
-  --viz-1: #2a78d6;
-  --viz-2: #eb6834;
+  --viz-1: #1f4bff;
+  --viz-2: #d97706;
 }
 .dark {
-  --viz-1: #3987e5;
-  --viz-2: #d95926;
+  --viz-1: #5c7cff;
+  --viz-2: #ffb020;
 }

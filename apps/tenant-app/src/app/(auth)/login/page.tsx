@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { GraduationCap } from "lucide-react";
+import { MarkazaiMark } from "@/components/brand/mark";
 import { Card, CardContent } from "@/components/ui/card";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -37,7 +37,15 @@ export default async function LoginPage() {
           // eslint-disable-next-line @next/next/no-img-element -- ichki /api/files manzili, next/image optimizatsiyasi kerak emas
           <img src={center.loginBannerUrl} alt="" className="h-36 w-full object-cover" />
         ) : (
-          <div className="from-primary/90 to-primary/50 h-36 bg-gradient-to-br" aria-hidden />
+          <div className="from-brand-500 to-brand-700 relative h-36 bg-gradient-to-br" aria-hidden>
+            <div
+              className="absolute inset-0 opacity-90"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 15% 35%, rgba(255,176,32,0.35), transparent 45%)",
+              }}
+            />
+          </div>
         )}
         <CardContent className="grid gap-8 p-8 md:grid-cols-2">
           <div className="flex flex-col items-start justify-center gap-3">
@@ -45,9 +53,7 @@ export default async function LoginPage() {
               // eslint-disable-next-line @next/next/no-img-element -- ichki /api/files manzili
               <img src={center.logoUrl} alt="" className="size-14 rounded-2xl object-contain" />
             ) : (
-              <div className="bg-primary text-primary-foreground flex size-14 items-center justify-center rounded-2xl">
-                <GraduationCap className="size-8" />
-              </div>
+              <MarkazaiMark size={56} tone="blue" />
             )}
             <h1 className="text-2xl font-semibold">{name}</h1>
             <p className="text-muted-foreground text-sm">{center?.loginWelcome || t("title")}</p>

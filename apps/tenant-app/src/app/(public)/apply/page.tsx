@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { GraduationCap } from "lucide-react";
 import { prisma } from "@markazai/db";
 import { normalizeLeadFormFields } from "@markazai/types";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
@@ -9,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { loadCenter } from "@/lib/center";
 import { notFound } from "next/navigation";
 import { currentTenant } from "@/lib/tenant";
+import { MarkazaiMark } from "@/components/brand/mark";
 import { LeadFormView } from "./lead-form-view";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -42,9 +42,7 @@ export default async function ApplyPage() {
               // eslint-disable-next-line @next/next/no-img-element -- ichki /api/files manzili
               <img src={center.logoUrl} alt="" className="size-10 rounded-lg object-contain" />
             ) : (
-              <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-lg">
-                <GraduationCap className="size-6" />
-              </div>
+              <MarkazaiMark size={40} tone="blue" />
             )}
             <span className="font-semibold">{center?.name ?? "Markazai"}</span>
           </div>

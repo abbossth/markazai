@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 120" width="920" height="240">
+
+<rect x="10" y="10" width="100" height="100" rx="26" fill="#1F4BFF"/>
+<path d="M40.4 78.4 V56.8 A9.6 9.6 0 0 1 60 56.8 A9.6 9.6 0 0 1 79.6 56.8 V78.4" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="60" cy="74.8" r="5.6" fill="#FFB020"/>
+<text x="130" y="76" font-family="Onest, Arial, sans-serif" font-weight="700" font-size="46" letter-spacing="-1" fill="#0B1026">markazai</text>
+</svg>
