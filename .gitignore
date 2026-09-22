@@ -11,3 +11,4 @@ next-env.d.ts
 
 .uploads
 packages/db/src/generated-platform
+*.tsbuildinfo
