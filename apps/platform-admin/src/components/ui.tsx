@@ -93,3 +93,7 @@ export function Stat({ label, value, sub }: { label: string; value: string; sub?
     </div>
   );
 }
+
+export function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
+  return <div className={cn("bg-muted animate-pulse rounded-md", className)} {...props} />;
+}
