@@ -48,8 +48,12 @@ export async function currentTenantOrg(): Promise<string | undefined> {
   const explicit = store.getStore()?.orgId;
   if (explicit) return explicit;
   try {
-    return await g.__markazaiTenantResolver?.();
-  } catch {
+    const resolved = await g.__markazaiTenantResolver?.();
+    // VAQTINCHALIK TASHXIS: resolver bo'sh qaytarsa (RLS "hech kim yo'q" deydi) — buni ko'rish uchun.
+    if (!resolved) console.error("[diag currentTenantOrg] resolver bo'sh qiymat qaytardi", { hasResolver: !!g.__markazaiTenantResolver });
+    return resolved;
+  } catch (e) {
+    console.error("[diag currentTenantOrg] resolver xatolik berdi", e);
     return undefined;
   }
 }

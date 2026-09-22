@@ -23,9 +23,22 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   const session = await auth();
   if (!session?.user) return null;
   const [account, tenant] = await Promise.all([findAccount(session.user.id), currentTenant()]);
-  if (!account || !account.isActive) return null;
+  if (!account || !account.isActive) {
+    // VAQTINCHALIK TASHXIS: production'da vaqti-vaqti bilan sessiya kutilmaganda tugab qolyapti — sababini aniqlash uchun.
+    console.error("[diag getSessionUser] account check failed", { userId: session.user.id, hasAccount: !!account, isActive: account?.isActive });
+    return null;
+  }
   // Boshqa tashkilot subdomenida olingan token bu yerda ishlamasin; obuna tugagan/to'xtatilgan tashkilot yopiq.
-  if (!tenant || tenant.orgId !== account.organizationId || !tenant.access.allowed) return null;
+  if (!tenant || tenant.orgId !== account.organizationId || !tenant.access.allowed) {
+    console.error("[diag getSessionUser] tenant check failed", {
+      userId: session.user.id,
+      accountOrgId: account.organizationId,
+      hasTenant: !!tenant,
+      tenantOrgId: tenant?.orgId,
+      tenantAccess: tenant?.access,
+    });
+    return null;
+  }
   return { id: session.user.id, name: account.name, orgId: account.organizationId, roles: account.roles };
 }
 

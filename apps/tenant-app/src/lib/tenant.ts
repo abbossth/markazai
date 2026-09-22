@@ -87,7 +87,14 @@ export async function currentHostTarget(): Promise<HostTarget> {
  */
 export const currentTenant = cache(async (): Promise<TenantInfo | null> => {
   const target = await currentHostTarget();
-  return target.kind === "tenant" ? loadTenantBySlug(target.slug) : null;
+  if (target.kind !== "tenant") {
+    // VAQTINCHALIK TASHXIS
+    console.error("[diag currentTenant] host tenant sifatida aniqlanmadi", { target });
+    return null;
+  }
+  const info = await loadTenantBySlug(target.slug);
+  if (!info) console.error("[diag currentTenant] slug uchun tashkilot topilmadi", { slug: target.slug });
+  return info;
 });
 
 /**
