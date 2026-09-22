@@ -30,6 +30,19 @@ export function withTenant<T>(orgId: string, fn: () => PromiseLike<T> | T): Prom
   return store.run({ orgId }, async () => await fn());
 }
 
+/**
+ * `withTenant`dan farqli: callback'ni o'rab bo'lmaydigan joylar uchun (masalan Next.js root layout — undan keyingi
+ * `{children}` renderini funksiya sifatida o'rab bo'lmaydi). Joriy va undan keyingi bajarilishlar uchun kontekstni
+ * o'rnatadi (`AsyncLocalStorage.enterWith`). So'rov boshida BIR MARTA chaqirilsa, keyingi barcha Prisma so'rovlari —
+ * hatto pg pool eskirgan ulanishni yopib, yangisini ochayotganda ham (haqiqiy soket I/O, kechikkan callback) — resolver
+ * orqali `next/headers()`ga qayta murojaat qilmay, shu aniq qiymatdan foydalanadi. Bu — muhim: `headers()` so'rov
+ * davomida kech chaqirilgan callback'lardan har doim ham ishlashiga kafolat yo'q (Next.js dinamik API cheklovlari),
+ * `enterWith` esa sof Node AsyncLocalStorage bo'lgani uchun bunday chegarasi yo'q.
+ */
+export function enterTenant(orgId: string): void {
+  store.enterWith({ orgId });
+}
+
 /** pool.connect chaqirilgan paytdagi tashkilot (aniq kontekst → resolver). Xatolik → undefined (fail-closed). */
 export async function currentTenantOrg(): Promise<string | undefined> {
   const explicit = store.getStore()?.orgId;

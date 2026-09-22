@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
+import { enterTenant } from "@markazai/db";
 import { Providers } from "@/components/providers/providers";
 import { brandCss, loadCenter, loadCenterConfig } from "@/lib/center";
+import { currentTenant } from "@/lib/tenant";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,6 +25,13 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();
+  // Tashkilot shu yerda BIR MARTA aniqlanadi va Node AsyncLocalStorage'ga aniq o'rnatiladi (`enterTenant`),
+  // shunda so'rovning qolgan qismidagi (ichki layout/sahifalar) Prisma so'rovlari — hatto ulanish pool'i
+  // eskirgan soketni yopib, yangisini ochayotganda ham — `next/headers()`ga qayta murojaat qilmaydi. Bu API
+  // so'rov davomida kech chaqirilgan callback'lardan doim ham ishlayvermaydi (Dynamic APIs cheklovi) va
+  // ishlamay qolgan holatda RLS hech narsa ko'rsatmay, foydalanuvchi "sessiya tugadi" bilan chiqib ketardi.
+  const tenant = await currentTenant();
+  if (tenant) enterTenant(tenant.orgId);
   const [config, center] = await Promise.all([loadCenterConfig(), loadCenter()]);
   const brand = brandCss(center?.brandColor);
 
