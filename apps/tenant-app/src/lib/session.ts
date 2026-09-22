@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@markazai/db";
 import { auth } from "@/auth";
 import { canAccess, can, isTeacherOnly, type AppModule, type Permission } from "./permissions";
+import { currentTenant } from "./tenant";
 
 export type SessionUser = {
   id: string;
@@ -21,8 +22,10 @@ const findAccount = cache(async (id: string) => prisma.user.findUnique({ where: 
 export async function getSessionUser(): Promise<SessionUser | null> {
   const session = await auth();
   if (!session?.user) return null;
-  const account = await findAccount(session.user.id);
+  const [account, tenant] = await Promise.all([findAccount(session.user.id), currentTenant()]);
   if (!account || !account.isActive) return null;
+  // Boshqa tashkilot subdomenida olingan token bu yerda ishlamasin; obuna tugagan/to'xtatilgan tashkilot yopiq.
+  if (!tenant || tenant.orgId !== account.organizationId || !tenant.access.allowed) return null;
   return { id: session.user.id, name: account.name, orgId: account.organizationId, roles: account.roles };
 }
 

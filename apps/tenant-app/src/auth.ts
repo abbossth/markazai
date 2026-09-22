@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@markazai/db";
 import { loginSchema } from "@markazai/types";
-import { currentOrganizationId } from "@/lib/tenant";
+import { currentTenant } from "@/lib/tenant";
 import { authConfig } from "./auth.config";
 
 // Foydalanuvchi topilmaganda ham haqiqiy hash solishtiriladi (javob vaqti orqali telefon aniqlanmasligi uchun).
@@ -19,9 +19,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!parsed.success) return null;
         const { phone, password } = parsed.data;
 
-        // 9-bosqichda organizationId subdomen orqali aniqlanadi.
+        // Tashkilot subdomen (host) orqali aniqlanadi; to'xtatilgan/obunasi tugagan tashkilotga kirib bo'lmaydi.
+        const tenant = await currentTenant();
+        if (!tenant?.access.allowed) return null;
         const user = await prisma.user.findUnique({
-          where: { organizationId_phone: { organizationId: await currentOrganizationId(), phone } },
+          where: { organizationId_phone: { organizationId: tenant.orgId, phone } },
         });
         const ok = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
         if (!user || !user.isActive || !ok) return null;

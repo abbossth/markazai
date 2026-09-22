@@ -38,7 +38,8 @@
     "more": "(ko'proq)",
     "less": "(kamroq)",
     "print": "Chop etish",
-    "locked": "Bu ro'yxat qulflangan"
+    "locked": "Bu ro'yxat qulflangan",
+    "planLimit": "Tarif limitiga yetdingiz — tarifni yangilang"
   },
   "nav": {
     "dashboard": "Bosh sahifa",
@@ -60,7 +61,21 @@
     "invalidCredentials": "Telefon yoki parol noto'g'ri",
     "invalidPhone": "Telefon raqami noto'g'ri",
     "required": "Majburiy maydon",
-    "genericError": "Xatolik yuz berdi, qayta urinib ko'ring"
+    "genericError": "Xatolik yuz berdi, qayta urinib ko'ring",
+    "blocked": {
+      "suspended": {
+        "title": "Markaz vaqtincha to'xtatilgan",
+        "hint": "Iltimos, markaz ma'muriyati yoki Markazai qo'llab-quvvatlash xizmati bilan bog'laning. Ma'lumotlar saqlanadi."
+      },
+      "expired": {
+        "title": "Obunangiz tugagan",
+        "hint": "Kirish yopilgan. Obunani yangilash uchun Markazai bilan bog'laning — ma'lumotlaringiz saqlanadi."
+      },
+      "deleted": {
+        "title": "Markaz o'chirilgan",
+        "hint": "Bu markaz endi mavjud emas."
+      }
+    }
   },
   "search": {
     "placeholder": "Qidirish: ism yoki telefon...",
@@ -1013,7 +1028,8 @@
       "gamificationHint": "Yoqilsa, talabalar davomat va baholar uchun coin oladi.",
       "previewButton": "Ko'rinish",
       "coinsPerLesson": "Har bir \"keldi\" dars uchun coin",
-      "coinsPerLessonHint": "Davomat belgilanganda avtomatik beriladi; 0 — faqat qo'lda beriladi."
+      "coinsPerLessonHint": "Davomat belgilanganda avtomatik beriladi; 0 — faqat qo'lda beriladi.",
+      "moduleUnavailable": "Bu modul joriy tarifingizda mavjud emas."
     },
     "staff": {
       "columns": {
@@ -1048,7 +1064,8 @@
         "lastCeo": "Oxirgi faol CEO'ni o'chirib yoki bloklab bo'lmaydi",
         "cannotDeactivateSelf": "O'zingizni bloklab bo'lmaydi",
         "cannotDeleteSelf": "O'zingizni o'chirib bo'lmaydi",
-        "notFound": "Xodim topilmadi"
+        "notFound": "Xodim topilmadi",
+        "planLimit": "Tarifdagi xodimlar limitiga yetdingiz"
       },
       "import": {
         "button": "Import",
@@ -1070,7 +1087,8 @@
           "password": "parol juda qisqa",
           "duplicate": "fayl ichida takrorlangan telefon",
           "phoneTaken": "telefon allaqachon mavjud",
-          "forbidden": "bu rolni berishga ruxsat yo'q"
+          "forbidden": "bu rolni berishga ruxsat yo'q",
+          "planLimit": "tarif limitiga yetildi"
         },
         "errors": {
           "tooLarge": "Fayl 1 MB dan oshmasligi kerak",

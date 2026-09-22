@@ -6,16 +6,20 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./platform": "./src/platform.ts"
   },
   "scripts": {
-    "generate": "prisma generate",
+    "generate": "prisma generate && prisma generate --config prisma.platform.config.ts",
     "migrate:dev": "prisma migrate dev && prisma generate",
     "migrate:deploy": "prisma migrate deploy",
     "seed": "tsx prisma/seed.ts",
     "reset": "prisma migrate reset --force && npm run seed",
     "billing:rebuild": "tsx prisma/rebuild-billing.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "platform:migrate": "prisma migrate deploy --config prisma.platform.config.ts && prisma generate --config prisma.platform.config.ts",
+    "platform:generate": "prisma generate --config prisma.platform.config.ts",
+    "platform:seed": "tsx prisma/platform/seed.ts"
   },
   "devDependencies": {
     "@types/pg": "^8.23.1",

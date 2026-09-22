@@ -1,10 +1,14 @@
 import { cache } from "react";
 import { prisma } from "@markazai/db";
 import { LOCALES, readableForeground } from "@markazai/types";
-import { currentOrganizationId } from "./tenant";
+import { currentTenant } from "./tenant";
 
 /** Markaz sozlamalari (bir so'rov ichida keshlanadi: layout, i18n va sahifalar bitta so'rov qiladi). */
-export const loadCenter = cache(async () => prisma.centerSettings.findUnique({ where: { organizationId: await currentOrganizationId() } }));
+export const loadCenter = cache(async () => {
+  const tenant = await currentTenant();
+  // Noma'lum tenant (host mos kelmadi) — sozlamalar yo'q; sahifalar o'zi 404 ko'rsatadi.
+  return tenant ? prisma.centerSettings.findUnique({ where: { organizationId: tenant.orgId } }) : null;
+});
 
 export type CenterConfig = { name: string; logoUrl: string | null; locales: string[]; defaultTheme: string };
 

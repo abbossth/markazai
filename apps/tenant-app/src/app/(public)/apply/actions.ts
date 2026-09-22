@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { prisma } from "@markazai/db";
 import { buildLeadSubmissionSchema, normalizeLeadFormFields } from "@markazai/types";
 import { rateLimit } from "@/lib/rate-limit";
-import { currentOrganizationId } from "@/lib/tenant";
+import { currentTenant } from "@/lib/tenant";
 
 export type SubmitResult = { ok: true } | { ok: false; error: "unavailable" | "rateLimited" | "validation" | "generic"; fieldErrors?: Record<string, string> };
 
@@ -13,7 +13,9 @@ export type SubmitResult = { ok: true } | { ok: false; error: "unavailable" | "r
  * server tomonida maydonlar qayta tekshiriladi (kurs shu markazniki bo'lishi shart), takroriy telefon yangi lid yaratmaydi.
  */
 export async function submitLead(input: unknown): Promise<SubmitResult> {
-  const orgId = await currentOrganizationId();
+  const tenant = await currentTenant();
+  if (!tenant?.access.allowed) return { ok: false, error: "unavailable" };
+  const orgId = tenant.orgId;
   const form = await prisma.leadForm.findUnique({ where: { organizationId: orgId } });
   if (!form?.enabled) return { ok: false, error: "unavailable" };
 

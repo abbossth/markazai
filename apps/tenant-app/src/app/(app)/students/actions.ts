@@ -1,5 +1,6 @@
 "use server";
 
+import { canAddWithinPlan } from "@/lib/plan";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@markazai/db";
 import {
@@ -38,6 +39,7 @@ export async function createStudent(input: StudentInput): Promise<Result<{ id: s
   const parsed = studentSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "validation", fieldErrors: fieldErrors(parsed.error.issues) };
   const d = parsed.data;
+  if (!(await canAddWithinPlan("students"))) return { ok: false, error: "planLimit" };
 
   // Guruh va teglar shu tashkilotga tegishli ekanini tekshirish.
   let groupId: string | undefined;

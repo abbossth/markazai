@@ -38,7 +38,8 @@
     "more": "(more)",
     "less": "(less)",
     "print": "Print",
-    "locked": "This list is locked"
+    "locked": "This list is locked",
+    "planLimit": "Plan limit reached — please upgrade your plan"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -60,7 +61,21 @@
     "invalidCredentials": "Invalid phone or password",
     "invalidPhone": "Invalid phone number",
     "required": "Required field",
-    "genericError": "Something went wrong, please try again"
+    "genericError": "Something went wrong, please try again",
+    "blocked": {
+      "suspended": {
+        "title": "This center is temporarily suspended",
+        "hint": "Please contact the center's administration or Markazai support. Your data is kept."
+      },
+      "expired": {
+        "title": "Your subscription has ended",
+        "hint": "Sign-in is closed. Contact Markazai to renew the subscription — your data is kept."
+      },
+      "deleted": {
+        "title": "This center has been deleted",
+        "hint": "This center no longer exists."
+      }
+    }
   },
   "search": {
     "placeholder": "Search: name or phone...",
@@ -1013,7 +1028,8 @@
       "gamificationHint": "When on, students earn coins for attendance and grades.",
       "previewButton": "Preview",
       "coinsPerLesson": "Coins per attended lesson",
-      "coinsPerLessonHint": "Awarded automatically when attendance is marked; 0 — manual only."
+      "coinsPerLessonHint": "Awarded automatically when attendance is marked; 0 — manual only.",
+      "moduleUnavailable": "This module is not available on your current plan."
     },
     "staff": {
       "columns": {
@@ -1048,7 +1064,8 @@
         "lastCeo": "The last active CEO cannot be deleted or blocked",
         "cannotDeactivateSelf": "You cannot block yourself",
         "cannotDeleteSelf": "You cannot delete yourself",
-        "notFound": "Staff member not found"
+        "notFound": "Staff member not found",
+        "planLimit": "Staff limit of your plan reached"
       },
       "import": {
         "button": "Import",
@@ -1070,7 +1087,8 @@
           "password": "password too short",
           "duplicate": "duplicate phone in the file",
           "phoneTaken": "phone already exists",
-          "forbidden": "not allowed to grant this role"
+          "forbidden": "not allowed to grant this role",
+          "planLimit": "plan limit reached"
         },
         "errors": {
           "tooLarge": "The file must not exceed 1 MB",

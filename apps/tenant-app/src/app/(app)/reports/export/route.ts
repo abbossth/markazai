@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import { gamificationActive } from "@/lib/plan";
 import { getTranslations } from "next-intl/server";
 import { CONVERSION_GROUPINGS, LOG_KEYS, REPORT_KEYS, type ReportKey } from "@markazai/types";
 import { prisma } from "@markazai/db";
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
   const sp: RawSearchParams = Object.fromEntries(new URL(request.url).searchParams.entries());
   const report = REPORT_KEYS.find((k) => k === sp.report) as ReportKey | undefined;
   if (!report) return new Response("Bad request", { status: 400 });
-  const gamification = (await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } }))?.gamificationEnabled ?? false;
+  const gamification = await gamificationActive((await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } }))?.gamificationEnabled);
   if (!visibleReports(roles, gamification).includes(report)) return new Response("Forbidden", { status: 403 });
 
   const range = resolveRange(sp);

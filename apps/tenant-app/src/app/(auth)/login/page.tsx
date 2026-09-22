@@ -4,7 +4,9 @@ import { GraduationCap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { notFound } from "next/navigation";
 import { loadCenter } from "@/lib/center";
+import { currentTenant } from "@/lib/tenant";
 import { LoginForm } from "./login-form";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,8 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function LoginPage() {
   const t = await getTranslations("login");
   const tc = await getTranslations("common");
+  // Tashkilot topilmasa — 404; to'xtatilgan yoki obunasi tugagan bo'lsa forma o'rniga xabar (ma'lumot o'chirilmaydi).
+  const tenant = await currentTenant();
+  if (!tenant) notFound();
+  const blocked = !tenant.access.allowed ? tenant.access.reason : null;
   const center = await loadCenter();
-  const name = center?.name ?? tc("appName");
+  const name = center?.name ?? tenant.name;
 
   return (
     <main className="bg-muted/40 relative flex min-h-screen items-center justify-center p-4">
@@ -46,7 +52,14 @@ export default async function LoginPage() {
             <h1 className="text-2xl font-semibold">{name}</h1>
             <p className="text-muted-foreground text-sm">{center?.loginWelcome || t("title")}</p>
           </div>
-          <LoginForm />
+          {blocked ? (
+            <div role="alert" className="border-destructive/40 bg-destructive/5 flex flex-col justify-center gap-1 rounded-lg border p-4 text-sm">
+              <p className="font-semibold">{t(`blocked.${blocked}.title`)}</p>
+              <p className="text-muted-foreground">{t(`blocked.${blocked}.hint`)}</p>
+            </div>
+          ) : (
+            <LoginForm />
+          )}
         </CardContent>
       </Card>
     </main>

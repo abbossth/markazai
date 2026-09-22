@@ -7,7 +7,8 @@ import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Card, CardContent } from "@/components/ui/card";
 import { loadCenter } from "@/lib/center";
-import { currentOrganizationId } from "@/lib/tenant";
+import { notFound } from "next/navigation";
+import { currentTenant } from "@/lib/tenant";
 import { LeadFormView } from "./lead-form-view";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,7 +18,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /** Ommaviy ariza formasi: markaz saytiga havola/iframe sifatida joylanadi. Kirish talab qilinmaydi. */
 export default async function ApplyPage() {
-  const orgId = await currentOrganizationId();
+  const tenant = await currentTenant();
+  // Tashkilot topilmasa yoki obunasi yopiq bo'lsa — ommaviy forma ham ishlamaydi.
+  if (!tenant?.access.allowed) notFound();
+  const orgId = tenant.orgId;
   const [t, center, form, courses] = await Promise.all([
     getTranslations("apply"),
     loadCenter(),

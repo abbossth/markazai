@@ -1,5 +1,6 @@
 "use server";
 
+import { canAddWithinPlan } from "@/lib/plan";
 import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 import ExcelJS from "exceljs";
@@ -38,6 +39,7 @@ export async function saveStaff(id: string | null, input: StaffInput): Promise<R
   const existing = id ? await prisma.user.findFirst({ where: { id, organizationId: actor.orgId }, select: { id: true, roles: true, isActive: true } }) : null;
   if (id && !existing) return { ok: false, error: "notFound" };
   if (!id && !d.password) return { ok: false, error: "validation", fieldErrors: { password: "required" } };
+  if (!id && !(await canAddWithinPlan("staff"))) return { ok: false, error: "planLimit" };
 
   // Huquq oshirib yuborishdan himoya: yuqori rollarni faqat CEO/Filial direktori beradi va o'zgartiradi.
   if (!canManageRoles(actor.roles, d.roles) || (existing && !canManageRoles(actor.roles, existing.roles))) return { ok: false, error: "forbidden" };
@@ -127,6 +129,7 @@ export async function importStaff(formData: FormData): Promise<Result<ImportResu
   }
 
   const { valid, errors } = parseStaffImport(rows);
+  // Reja limiti: import ham limitdan oshib ketmasligi kerak (limitga yetgach qolgan qatorlar o'tkazib yuboriladi).
   const existing = new Set((await prisma.user.findMany({ where: { organizationId: actor.orgId, phone: { in: valid.map((v) => v.phone) } }, select: { phone: true } })).map((u) => u.phone));
   const created: ImportResult["created"] = [];
   const outErrors: ImportResult["errors"] = errors.map((e) => ({ row: e.row, field: e.field }));
@@ -138,6 +141,10 @@ export async function importStaff(formData: FormData): Promise<Result<ImportResu
     }
     if (!canManageRoles(actor.roles, v.roles)) {
       outErrors.push({ row: v.row, field: "forbidden" });
+      continue;
+    }
+    if (!(await canAddWithinPlan("staff"))) {
+      outErrors.push({ row: v.row, field: "planLimit" });
       continue;
     }
     const password = v.password && v.password.length >= MIN_PASSWORD ? v.password : generatePassword();

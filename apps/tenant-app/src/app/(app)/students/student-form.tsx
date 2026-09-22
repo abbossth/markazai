@@ -116,7 +116,7 @@ function StudentFormBody({ lookups, student, onDone }: { lookups: Props["lookups
         for (const [field, message] of Object.entries(res.fieldErrors)) setError(field as keyof StudentInput, { message });
         return;
       }
-      toast.error(res.error === "forbidden" ? tc("forbidden") : res.error === "groupInactive" ? t("groupInactive") : tc("error"));
+      toast.error(res.error === "forbidden" ? tc("forbidden") : res.error === "groupInactive" ? t("groupInactive") : res.error === "planLimit" ? tc("planLimit") : tc("error"));
     });
   };
 

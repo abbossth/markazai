@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { gamificationActive } from "@/lib/plan";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { CONVERSION_GROUPINGS, LOG_KEYS, type LogKey, type ReportKey } from "@markazai/types";
@@ -26,7 +27,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const user = await requireModule("reports");
   const sp = await searchParams;
   const t = await getTranslations("reports");
-  const gamification = (await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } }))?.gamificationEnabled ?? false;
+  const gamification = await gamificationActive((await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } }))?.gamificationEnabled);
   const tabs = visibleReports(user.roles, gamification);
   const requested = param(sp, "report");
   const report: ReportKey | undefined = tabs.find((k) => k === requested) ?? tabs[0];

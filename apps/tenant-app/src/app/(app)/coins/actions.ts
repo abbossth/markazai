@@ -1,5 +1,6 @@
 "use server";
 
+import { gamificationActive } from "@/lib/plan";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@markazai/db";
 import { coinAwardSchema, toCenterParts, fromISODate, type ActionResult, type CoinAwardInput } from "@markazai/types";
@@ -29,7 +30,7 @@ export async function awardCoins(studentId: string, input: CoinAwardInput): Prom
   const d = parsed.data;
 
   const settings = await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } });
-  if (!settings?.gamificationEnabled) return { ok: false, error: "disabled" };
+  if (!(await gamificationActive(settings?.gamificationEnabled))) return { ok: false, error: "disabled" };
 
   const student = await prisma.student.findFirst({ where: { id: studentId, organizationId: user.orgId }, select: { id: true, name: true } });
   if (!student) return { ok: false, error: "notFound" };

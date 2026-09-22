@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, Coins, Eye, EyeOff, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ import {
 } from "@markazai/types";
 import { Button } from "@/components/ui/button";
 import { AwardCoinsDialog } from "@/components/shared/coins";
+import { useLocalPref } from "@/hooks/use-local-pref";
 import { EmptyState } from "@/components/shared/empty-state";
 import { cn } from "@/lib/utils";
 import { setAttendance, setGrade } from "./actions";
@@ -45,21 +46,9 @@ export function LessonGrid(props: Props & CommonProps) {
   const tw = useTranslations("enums.weekdaysShort");
   const tm = useTranslations("enums.months");
   const { group, members, today, canEdit, coins } = props;
-  const [showCoins, setShowCoins] = useState(true);
+  const [showCoins, setShowCoins] = useLocalPref(COINS_PREF_KEY, true);
   const [awarding, setAwarding] = useState<Member | null>(null);
-  // "Show/Hide coins" tanlovi brauzerda eslab qolinadi (boshlang'ich qiymat serverdagi bilan bir xil — hydration mos).
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(COINS_PREF_KEY) === "0") setShowCoins(false);
-    } catch {}
-  }, []);
-  const toggleCoins = () =>
-    setShowCoins((v) => {
-      try {
-        localStorage.setItem(COINS_PREF_KEY, v ? "0" : "1");
-      } catch {}
-      return !v;
-    });
+  const toggleCoins = () => setShowCoins(!showCoins);
   const coinsVisible = props.mode === "attendance" && !!coins && showCoins;
   const [, startTransition] = useTransition();
   const [cursor, setCursor] = useState({ y: Number(today.slice(0, 4)), m: Number(today.slice(5, 7)) });

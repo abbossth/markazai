@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@markazai/db";
 import { LOCALES, type GeneralSettingsInput } from "@markazai/types";
+import { gamificationActive } from "@/lib/plan";
 import { requireModule } from "@/lib/session";
 import { GeneralForm } from "./general-form";
 
@@ -34,5 +35,5 @@ export default async function GeneralSettingsPage() {
     gamificationEnabled: s?.gamificationEnabled ?? false,
     coinsPerLesson: s?.coinsPerLesson ?? 1,
   };
-  return <GeneralForm initial={initial} />;
+  return <GeneralForm initial={initial} gamificationAvailable={await gamificationActive(true)} />;
 }

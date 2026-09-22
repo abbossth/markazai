@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { gamificationActive } from "@/lib/plan";
 import { loadHolidayDates, prisma } from "@markazai/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -96,7 +97,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
   const canMark = can(user.roles, "attendance:write");
   // Gamifikatsiya yoqilgan bo'lsa davomat tabida coin ustuni ko'rsatiladi.
   const center = await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } });
-  const coinInfo = center?.gamificationEnabled
+  const coinInfo = (await gamificationActive(center?.gamificationEnabled))
     ? {
         totals: Object.fromEntries((await prisma.coinLog.groupBy({ by: ["studentId"], where: { organizationId: user.orgId, groupId: group.id }, _sum: { amount: true } })).map((r) => [r.studentId, r._sum.amount ?? 0])),
         canAward: canMark,

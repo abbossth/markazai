@@ -10,11 +10,12 @@ import { AsyncLocalStorage } from "node:async_hooks";
  *     so'rovning konteksti aralashib ketmaydi.
  * Hech biri org bermasa — `undefined`: RLS hech qanday qatorni ko'rsatmaydi (fail-closed).
  */
-const store = new AsyncLocalStorage<{ orgId: string }>();
-
 type Resolver = () => Promise<string | undefined>;
-// globalThis: Next.js/Turbopack modulni bir necha marta yuklashi mumkin — resolver hammasiga umumiy bo'lsin.
-const g = globalThis as unknown as { __markazaiTenantResolver?: Resolver };
+// globalThis: Next.js/Turbopack bir modulni bir necha nusxada yuklashi mumkin (masalan route va instrumentation alohida).
+// Store va resolver hammasiga UMUMIY bo'lmasa, bir nusxadagi `withTenant` boshqasidagi pool'ga ko'rinmay qolib,
+// so'rov jimgina boshqa (host bo'yicha) tashkilot kontekstida bajarilardi.
+const g = globalThis as unknown as { __markazaiTenantResolver?: Resolver; __markazaiTenantStore?: AsyncLocalStorage<{ orgId: string }> };
+const store = (g.__markazaiTenantStore ??= new AsyncLocalStorage<{ orgId: string }>());
 
 export function setTenantResolver(fn: Resolver) {
   g.__markazaiTenantResolver = fn;

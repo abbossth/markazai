@@ -1,5 +1,6 @@
 "use server";
 
+import { gamificationActive } from "@/lib/plan";
 import { revalidatePath } from "next/cache";
 import { backfillAttendanceCoins, prisma } from "@markazai/db";
 import { generalSettingsSchema, type GeneralSettingsInput } from "@markazai/types";
@@ -33,6 +34,8 @@ export async function saveGeneralSettings(input: GeneralSettingsInput): Promise<
     coinsPerLesson: d.coinsPerLesson,
   };
   const before = await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true, coinsPerLesson: true } });
+  // Reja/bayroq ruxsat bermagan modulni yoqib bo'lmaydi.
+  if (d.gamificationEnabled && !before?.gamificationEnabled && !(await gamificationActive(true))) return { ok: false, error: "moduleUnavailable" };
   await prisma.centerSettings.upsert({ where: { organizationId: user.orgId }, update: data, create: { organizationId: user.orgId, ...data } });
   // Gamifikatsiya yoqilganda yoki coin qiymati o'zgarganda mavjud davomat coinlari tenglashtiriladi.
   if (d.gamificationEnabled && (!before?.gamificationEnabled || before.coinsPerLesson !== d.coinsPerLesson)) await backfillAttendanceCoins(prisma, user.orgId, d.coinsPerLesson);

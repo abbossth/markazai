@@ -28,7 +28,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export function GeneralForm({ initial }: { initial: GeneralSettingsInput }) {
+export function GeneralForm({ initial, gamificationAvailable }: { initial: GeneralSettingsInput; gamificationAvailable: boolean }) {
   const t = useTranslations("settings.general");
   const tc = useTranslations("common");
   const tv = useTranslations("validation");
@@ -52,7 +52,7 @@ export function GeneralForm({ initial }: { initial: GeneralSettingsInput }) {
         router.refresh();
       } else if (res.fieldErrors) {
         for (const [name, message] of Object.entries(res.fieldErrors)) setError(name as keyof GeneralSettingsInput, { message });
-      } else toast.error(res.error === "forbidden" ? tc("forbidden") : tc("error"));
+      } else toast.error(res.error === "forbidden" ? tc("forbidden") : res.error === "moduleUnavailable" ? t("moduleUnavailable") : tc("error"));
     });
 
   return (
@@ -164,10 +164,10 @@ export function GeneralForm({ initial }: { initial: GeneralSettingsInput }) {
           name="gamificationEnabled"
           render={({ field }) => (
             <label className="flex items-start gap-3 text-sm">
-              <Checkbox className="mt-0.5" checked={field.value} onCheckedChange={(c) => field.onChange(!!c)} />
+              <Checkbox className="mt-0.5" checked={field.value} disabled={!gamificationAvailable && !field.value} onCheckedChange={(c) => field.onChange(!!c)} />
               <span className="flex flex-col">
                 <span className="font-medium">{t("gamification")}</span>
-                <span className="text-muted-foreground text-xs">{t("gamificationHint")}</span>
+                <span className="text-muted-foreground text-xs">{gamificationAvailable || field.value ? t("gamificationHint") : t("moduleUnavailable")}</span>
               </span>
             </label>
           )}

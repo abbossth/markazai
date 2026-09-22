@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { gamificationActive } from "@/lib/plan";
 import { StudentCoins } from "@/components/shared/coins";
 import { loadStudentCoins } from "@/lib/coins";
 import { loadHolidayDates, prisma } from "@markazai/db";
@@ -76,7 +77,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
   const rating = grades._avg.score;
   // Gamifikatsiya: yoqilgan bo'lsa coin jami va tarixi (faqat-o'qituvchi faqat o'z guruhlaridagi yozuvlarni ko'radi).
   const center = await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } });
-  const coins = center?.gamificationEnabled
+  const coins = (await gamificationActive(center?.gamificationEnabled))
     ? await loadStudentCoins(user.orgId, student.id, isTeacherOnly(user.roles) ? enrollments.map((e) => e.groupId) : null)
     : null;
 
