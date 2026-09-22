@@ -2,6 +2,9 @@ import type { NextAuthConfig } from "next-auth";
 
 // Edge/proxy-xavfsiz qism: bu yerda Prisma yoki bcrypt import qilinmaydi.
 export const authConfig = {
+  // Wildcard subdomenlar ({slug}.markazai.uz): host ro'yxati oldindan noma'lum, shuning uchun host'ga ishoniladi. Xavfsiz, chunki
+  // proxy.ts noma'lum/noto'g'ri hostni 404 bilan rad etadi va lib/tenant.ts host'ni Control Plane bazasidagi tashkilotga bog'laydi.
+  trustHost: true,
   pages: { signIn: "/login" },
   session: { strategy: "jwt" },
   providers: [],

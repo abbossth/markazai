@@ -6,6 +6,7 @@ const prefix = "markazai-platform";
 
 export const authConfig = {
   secret: process.env.PLATFORM_AUTH_SECRET,
+  trustHost: true,
   pages: { signIn: "/login" },
   session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
   cookies: {

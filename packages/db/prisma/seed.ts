@@ -8,6 +8,8 @@ config({ path: path.resolve(process.cwd(), "../../.env") });
 const ORG_ID = process.env.DEFAULT_ORGANIZATION_ID ?? "00000000-0000-4000-8000-000000000001";
 
 async function main() {
+  // Demo ma'lumot va ma'lum parollar (password123) production bazaga tushib qolmasligi uchun.
+  if (process.env.NODE_ENV === "production" && process.env.ALLOW_DEMO_SEED !== "1") throw new Error("Demo seed production'da o'chirilgan (ALLOW_DEMO_SEED=1 bilan majburlash mumkin — tavsiya etilmaydi)");
   // Dinamik import: DATABASE_URL yuklangandan keyin klient yaratiladi.
   const { getAdminPrisma } = await import("../src/index");
   const prisma = getAdminPrisma();

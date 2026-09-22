@@ -13,7 +13,8 @@
     "test": "turbo run test",
     "postinstall": "npm run generate -w @markazai/db",
     "db:migrate": "npm run migrate:dev -w @markazai/db",
-    "db:seed": "npm run seed -w @markazai/db"
+    "db:seed": "npm run seed -w @markazai/db",
+    "launch:check": "node scripts/launch-check.mjs"
   },
   "devDependencies": {
     "turbo": "^2"

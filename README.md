@@ -93,7 +93,7 @@ Kanban ustunlari va CEO akkaunti (bir martalik parol) yaratiladi. Agregat ko'rsa
 - [x] 7. Sozlamalar (umumiy + brend/logotip/login banneri, xodimlar + Excel import, kurslar, xonalar, teglar, dam olish kunlari, arxiv, chek shabloni, lid forma konstruktori + ommaviy `/apply`, integratsiyalar)
 - [x] 8. Gamifikatsiya (coin: davomat uchun avtomatik + qo'lda berish/ayirish, tarix, guruh davomatida ko'rsatish/yashirish, coin reytingi hisoboti, Sozlamalarda yoqish)
 - [x] 9. Multi-tenant: RLS (39 jadval), `markazai_app` roli, subdomen bo'yicha tenant, platform-admin (tashkilot/rejalar/obuna/billing/monitoring/audit), provisioning, "obuna tugagan" bloklash, reja limitlari va feature flag'lar
-- [ ] 10. Domen va launch (`markazai-prompt-v3.md` 8-bo'limi)
+- [x] 10. Domen va launch — kod, deploy konfiguratsiyasi, `launch:check` va runbook tayyor (`docs/DEPLOY.md`); DNS/Vercel/prod bazasini sozlash — egasi tomonidan
 
 ## Testlar
 

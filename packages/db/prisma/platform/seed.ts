@@ -11,6 +11,8 @@ const DEMO_ORG_ID = process.env.DEFAULT_ORGANIZATION_ID ?? "00000000-0000-4000-8
  * (tenant bazasidagi DEFAULT_ORGANIZATION_ID bilan bir xil ID, slug `demo`). Idempotent.
  */
 async function main() {
+  // Production'da standart admin paroli (admin12345) bilan owner yaratilmasin: parol muhitdan berilishi shart.
+  if (process.env.NODE_ENV === "production" && !process.env.PLATFORM_OWNER_PASSWORD) throw new Error("Production'da PLATFORM_OWNER_PASSWORD (kamida 12 belgi) berilishi shart");
   const { platformPrisma: prisma } = await import("../../src/platform");
 
   const passwordHash = await bcrypt.hash(process.env.PLATFORM_OWNER_PASSWORD ?? "admin12345", 10);
