@@ -40,7 +40,7 @@ async function main() {
     const end = new Date(Date.UTC(start.getUTCFullYear() + 1, start.getUTCMonth(), start.getUTCDate()));
     await prisma.subscription.create({ data: { organizationId: org.id, planId: premium.id, billingCycle: 12, price: premium.monthlyPrice * 12, startDate: start, endDate: end } });
   }
-  console.log("Platform seed tayyor. Kirish: owner@markazai.uz / admin12345; birinchi tenant: demo.localhost");
+  console.log(`Platform seed tayyor. Kirish: owner@markazai.uz / ${process.env.PLATFORM_OWNER_PASSWORD ? "(berilgan parol)" : "admin12345"}`);
   await prisma.$disconnect();
 }
 
