@@ -53,6 +53,25 @@ NODE_ENV=production PLATFORM_OWNER_PASSWORD='<kamida 12 belgi>' PLATFORM_DATABAS
 
 > `TENANT_APP_URL` apex domenga ko'rsatsa, tenant-app `/api/internal/*` ni **host'ga bog'liq bo'lmagan** holda `withTenant(orgId)` bilan bajaradi — alohida tenant subdomeni kerak emas.
 
+### 3.1 Funksiyalar hududi (Function Region) — bazaga MOS bo'lishi shart
+
+Vercel Serverless Function'lar sukut bo'yicha `iad1` (AQSh, Virjiniya)da ishlaydi. Agar Postgres bazangiz boshqa hududda
+bo'lsa (masalan Neon `ap-southeast-1`, Singapur), har bir so'rov o'sha hududgacha borib-kelib, sahifalar sezilarli sekin
+yuklanadi (3+ soniya — bir nechta so'rov ustma-ust qo'shilib ketadi). Bazangiz qaysi hududda bo'lsa, ikkala Vercel
+loyihasining **Function Region**ini ham o'sha hududga (yoki eng yaqiniga) o'zgartiring:
+
+**Dashboard orqali:** loyiha → Settings → Functions → Function Region → mos hududni tanlang (masalan Singapur uchun `sin1`) → Save → loyihani qayta deploy qiling (sozlama faqat keyingi deploy'larga qo'llanadi).
+
+**API orqali** (ikkala loyihada ham):
+```bash
+curl -X PATCH -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
+  "https://api.vercel.com/v9/projects/<loyiha-nomi>?teamId=<team-id>" \
+  -d '{"serverlessFunctionRegion":"sin1"}'
+# so'ng: vercel redeploy <oxirgi-deploy-id> --scope <team>
+```
+
+Tekshirish: javob sarlavhasidagi `x-vercel-id`da hudud kodi ko'rinadi (`curl -sI https://markazai.uz/api/health | grep x-vercel-id`) — `::sin1::` (yoki tanlangan hudud) bo'lishi kerak, `::iad1::` emas. Markazai uchun O'zbekiston mijozlari va Neon `ap-southeast-1` bazasi bo'lgani sabab **`sin1` (Singapur)** tavsiya etiladi.
+
 ## 4. Deploy tekshiruvi
 
 ```bash
