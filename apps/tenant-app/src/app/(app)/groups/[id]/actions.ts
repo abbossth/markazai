@@ -44,8 +44,9 @@ async function requireGroupWriter(groupId: string) {
 }
 
 /**
- * Davomat/baho qo'yish mumkinmi: sana — guruhning dars kuni, bugundan keyin emas,
- * talaba o'sha kuni guruh a'zosi bo'lgan.
+ * Davomat/baho qo'yish mumkinmi: sana — guruhning dars kuni, talaba o'sha kuni guruh a'zosi bo'lgan.
+ * O'qituvchi (faqat TEACHER roli, o'z guruhida) — faqat BUGUNGI kunga; CEO/administrator/rahbariyat —
+ * guruhning butun o'qish davri (boshlanish–tugash) ichidagi istalgan dars kuniga.
  */
 type CellCheck = { ok: false; error: "forbidden" | "notFound" | "validation" } | { ok: true; date: Date };
 
@@ -53,7 +54,8 @@ async function validateLessonCell(user: SessionUser, groupId: string, studentId:
   if (!can(user.roles, "attendance:write")) return { ok: false, error: "forbidden" };
   const group = await loadGroup(user, groupId);
   if (!group) return { ok: false, error: "notFound" };
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date > toISODate(new Date())) return { ok: false, error: "validation" };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { ok: false, error: "validation" };
+  if (isTeacherOnly(user.roles) && date !== toISODate(new Date())) return { ok: false, error: "validation" };
 
   const [y, m] = [Number(date.slice(0, 4)), Number(date.slice(5, 7))];
   const holidays = await loadMonthHolidays(prisma, user.orgId, y, m);

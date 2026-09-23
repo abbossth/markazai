@@ -72,7 +72,13 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
   const today = toISODate(new Date());
   // Moliya ruxsati yo'q foydalanuvchi (o'qituvchi) balans/to'lovlarni ko'rmaydi va talabaning faqat o'z guruhlarini ko'radi.
   const canFinance = canAccess(user.roles, "finance");
-  const enrollments = isTeacherOnly(user.roles) ? student.enrollments.filter((e) => e.group.teacherId === user.teacherId) : student.enrollments;
+  // Himoya: RLS/tenant konteksti tasodifan yo'qolgan holatda (bo'lmasligi kerak, lekin agar bo'lsa) bitta
+  // buzilgan qatordan butun sahifa qulamasin — shunday enrollment'lar jimgina o'tkazib yuboriladi.
+  const validEnrollments = student.enrollments.filter((e) => {
+    if (!e.group) console.error("[diag students/[id]] enrollment'da group null", { studentId: student.id, groupId: e.groupId });
+    return !!e.group;
+  });
+  const enrollments = isTeacherOnly(user.roles) ? validEnrollments.filter((e) => e.group.teacherId === user.teacherId) : validEnrollments;
   const activeEnrollments = enrollments.filter((e) => !e.leftAt);
   const rating = grades._avg.score;
   // Gamifikatsiya: yoqilgan bo'lsa coin jami va tarixi (faqat-o'qituvchi faqat o'z guruhlaridagi yozuvlarni ko'radi).

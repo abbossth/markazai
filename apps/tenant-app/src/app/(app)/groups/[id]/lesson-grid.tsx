@@ -28,7 +28,11 @@ type Props =
 
 /** Gamifikatsiya (faqat davomat tabida): talabaning shu guruhdagi coin jami va berish huquqi. */
 type CoinsProp = { totals: Record<string, number>; canAward: boolean };
-type CommonProps = { group: GroupSchedule; members: Member[]; today: string; canEdit: boolean; coins?: CoinsProp };
+/**
+ * Qaysi kunlarga belgi qo'yish mumkin: "today" — faqat bugun (o'qituvchi, o'z guruhida),
+ * "period" — guruhning butun o'qish davri (CEO, administrator, boshqa rahbariyat).
+ */
+type CommonProps = { group: GroupSchedule; members: Member[]; today: string; canEdit: boolean; editScope: "today" | "period"; coins?: CoinsProp };
 
 const COINS_PREF_KEY = "markazai.showCoins";
 
@@ -45,7 +49,7 @@ export function LessonGrid(props: Props & CommonProps) {
   const tc = useTranslations("common");
   const tw = useTranslations("enums.weekdaysShort");
   const tm = useTranslations("enums.months");
-  const { group, members, today, canEdit, coins } = props;
+  const { group, members, today, canEdit, editScope, coins } = props;
   const [showCoins, setShowCoins] = useLocalPref(COINS_PREF_KEY, true);
   const [awarding, setAwarding] = useState<Member | null>(null);
   const toggleCoins = () => setShowCoins(!showCoins);
@@ -102,7 +106,10 @@ export function LessonGrid(props: Props & CommonProps) {
     });
   };
 
-  const editable = (member: Member, date: string) => canEdit && date <= today && member.joinedAt <= date && (!member.leftAt || member.leftAt >= date);
+  // "today" — faqat bugungi kunga (o'qituvchi); "period" — guruhning butun davriga (rahbariyat, `dates`
+  // allaqachon guruh boshlanish/tugash sanalari bilan chegaralangan, shuning uchun qo'shimcha tekshiruv kerak emas).
+  const dateAllowed = (date: string) => (editScope === "today" ? date === today : true);
+  const editable = (member: Member, date: string) => canEdit && dateAllowed(date) && member.joinedAt <= date && (!member.leftAt || member.leftAt >= date);
 
   return (
     <div className="flex flex-col gap-3">
@@ -178,7 +185,7 @@ export function LessonGrid(props: Props & CommonProps) {
                               }}
                               className={cn(
                                 "size-8 rounded-md text-xs font-semibold transition-colors",
-                                value ? TONE[value as AttendanceValue] : d <= today && !inactive ? "border-border border border-dashed" : "",
+                                value ? TONE[value as AttendanceValue] : dateAllowed(d) && !inactive ? "border-border border border-dashed" : "",
                                 can && "hover:ring-primary/50 hover:ring-2",
                                 !can && "cursor-default",
                               )}

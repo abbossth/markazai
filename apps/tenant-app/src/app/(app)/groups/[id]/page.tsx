@@ -14,7 +14,7 @@ import { GroupStatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate, formatMoney } from "@/lib/format";
-import { can, canAccess } from "@/lib/permissions";
+import { can, canAccess, isTeacherOnly } from "@/lib/permissions";
 import { param } from "@/lib/search-params";
 import { requireModule } from "@/lib/session";
 import { loadGroupLookups } from "../queries";
@@ -63,7 +63,13 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
   const canWrite = can(user.roles, "groups:write");
   const canFinance = canAccess(user.roles, "finance");
   const today = toISODate(new Date());
-  const active = group.enrollments.filter((e) => !e.leftAt);
+  // Himoya: RLS/tenant konteksti tasodifan yo'qolgan holatda (bo'lmasligi kerak, lekin agar bo'lsa) bitta
+  // buzilgan qatordan butun sahifa qulamasin — shunday enrollment'lar jimgina o'tkazib yuboriladi.
+  const enrollments = group.enrollments.filter((e) => {
+    if (!e.student) console.error("[diag groups/[id]] enrollment'da student null", { groupId: group.id, studentId: e.studentId });
+    return !!e.student;
+  });
+  const active = enrollments.filter((e) => !e.leftAt);
   const daysLabel =
     group.days === "OTHER"
       ? weekdaysOf("OTHER", group.customDays).map((d) => tw(String(d) as "1")).join(", ")
@@ -80,7 +86,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
     ["ID", group.id.slice(0, 8)],
   ];
 
-  const members = group.enrollments.map((e) => ({
+  const members = enrollments.map((e) => ({
     studentId: e.studentId,
     name: e.student.name,
     joinedAt: toISODate(e.joinedAt),
@@ -95,6 +101,8 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
     holidays: await loadHolidayDates(prisma, user.orgId),
   };
   const canMark = can(user.roles, "attendance:write");
+  // O'qituvchi (faqat TEACHER roli) — faqat bugungi kunga; CEO/administrator/rahbariyat — butun o'qish davriga.
+  const markScope: "today" | "period" = isTeacherOnly(user.roles) ? "today" : "period";
   // Gamifikatsiya yoqilgan bo'lsa davomat tabida coin ustuni ko'rsatiladi.
   const center = await prisma.centerSettings.findUnique({ where: { organizationId: user.orgId }, select: { gamificationEnabled: true } });
   const coinInfo = (await gamificationActive(center?.gamificationEnabled))
@@ -167,7 +175,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
           <GroupStudentsPanel
             groupId={group.id}
             canWrite={canWrite}
-            students={group.enrollments.map((e) => ({
+            students={enrollments.map((e) => ({
               id: e.student.id,
               name: e.student.name,
               phone: e.student.phone,
@@ -211,6 +219,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
                 members={members}
                 today={today}
                 canEdit={canMark}
+                editScope={markScope}
                 records={attendance.map((a) => ({ studentId: a.studentId, date: toISODate(a.date), value: a.status }))}
               />
             </TabsContent>
@@ -221,6 +230,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
                 members={members}
                 today={today}
                 canEdit={canMark}
+                editScope={markScope}
                 records={grades.map((g) => ({ studentId: g.studentId, date: toISODate(g.date), value: g.score }))}
               />
             </TabsContent>

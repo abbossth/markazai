@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist_Mono, Onest } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
-import { enterTenant } from "@markazai/db";
 import { Providers } from "@/components/providers/providers";
 import { brandCss, loadCenter, loadCenterConfig } from "@/lib/center";
 import { currentTenant } from "@/lib/tenant";
@@ -26,13 +25,17 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();
-  // Tashkilot shu yerda BIR MARTA aniqlanadi va Node AsyncLocalStorage'ga aniq o'rnatiladi (`enterTenant`),
-  // shunda so'rovning qolgan qismidagi (ichki layout/sahifalar) Prisma so'rovlari — hatto ulanish pool'i
-  // eskirgan soketni yopib, yangisini ochayotganda ham — `next/headers()`ga qayta murojaat qilmaydi. Bu API
-  // so'rov davomida kech chaqirilgan callback'lardan doim ham ishlayvermaydi (Dynamic APIs cheklovi) va
-  // ishlamay qolgan holatda RLS hech narsa ko'rsatmay, foydalanuvchi "sessiya tugadi" bilan chiqib ketardi.
-  const tenant = await currentTenant();
-  if (tenant) enterTenant(tenant.orgId);
+  // MUHIM: bu yerda `enterTenant`/`AsyncLocalStorage.enterWith` ISHLATILMAYDI — u butun so'rov davomida "joriy
+  // kontekst"ni joyida o'zgartiradi, Node esa bir vaqtning o'zida bir nechta so'rovni (turli tashkilotlar!) bitta
+  // process ichida interleaved bajarishi mumkin, shuning uchun bir so'rovning enterWith chaqiruvi boshqa,
+  // parallel bajarilayotgan so'rovning keyingi Prisma ulanishlariga sizib chiqishi mumkin edi (kamdan-kam,
+  // vaqt bo'yicha to'qnashganda) — buni productionda `/groups/[id]`da vaqti-vaqti bilan bitta talaba nolga
+  // o'xshab qolishi (RLS "hech kim yo'q") sifatida kuzatdik. Tenant har bir Prisma ulanish so'ralganda
+  // `TenantPool` orqali resolver (`currentTenant()` → `next/headers()`) yordamida aniqlanadi — bu React `cache()`
+  // bilan keshlangan va Next.js'ning o'zi kafolatlagan so'rov-darajasidagi izolyatsiyaga tayanadi.
+  // Chaqiruv natijasi ishlatilmaydi — faqat React `cache()`ni shu so'rov uchun oldindan "isitib qo'yish": pastdagi
+  // `getSessionUser()`/sahifalar keyinroq `currentTenant()`ni chaqirganda qayta host/DB so'roviga bormaydi.
+  await currentTenant();
   const [config, center] = await Promise.all([loadCenterConfig(), loadCenter()]);
   const brand = brandCss(center?.brandColor);
 
