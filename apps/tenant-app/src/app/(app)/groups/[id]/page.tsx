@@ -70,14 +70,20 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
     return !!e.student;
   });
   const active = enrollments.filter((e) => !e.leftAt);
+  // Xuddi shu himoya: `teacher`/`course` — majburiy (NOT NULL) FK'lar, lekin RLS konteksti tasodifan
+  // yo'qolgan holatda include natijasi baribir `null` bo'lib qolishi mumkin edi (productionda kuzatildi).
+  if (!group.teacher) console.error("[diag groups/[id]] teacher null", { groupId: group.id, teacherId: group.teacherId });
+  if (!group.course) console.error("[diag groups/[id]] course null", { groupId: group.id, courseId: group.courseId });
+  const teacherName = group.teacher?.name ?? "—";
+  const courseName = group.course?.name ?? "—";
   const daysLabel =
     group.days === "OTHER"
       ? weekdaysOf("OTHER", group.customDays).map((d) => tw(String(d) as "1")).join(", ")
       : te(`days.${group.days}`);
 
   const details: [string, React.ReactNode][] = [
-    [t("course"), group.course.name],
-    [t("teacher"), group.teacher.name],
+    [t("course"), courseName],
+    [t("teacher"), teacherName],
     [t("price"), formatMoney(group.price)],
     [t("time"), `${daysLabel} · ${group.startTime}–${endTime(group.startTime, group.durationMinutes)}`],
     [t("room"), group.room?.name ?? "—"],
@@ -125,7 +131,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
         <div className="flex flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-semibold">
-              {group.name} <span className="text-muted-foreground font-normal">• {group.course.name} • {group.teacher.name}</span>
+              {group.name} <span className="text-muted-foreground font-normal">• {courseName} • {teacherName}</span>
             </h1>
             <GroupStatusBadge status={group.status} />
           </div>

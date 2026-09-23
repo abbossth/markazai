@@ -31,15 +31,24 @@ export function withTenant<T>(orgId: string, fn: () => PromiseLike<T> | T): Prom
 }
 
 /**
- * DIQQAT: bu yerda ataylab `AsyncLocalStorage.enterWith` asosidagi "enterTenant" YO'Q (avval bo'lgan, olib
- * tashlandi). `enterWith` joriy async kontekstni JOYIDA o'zgartiradi — Node esa bir process ichida bir nechta
- * so'rovni (turli tashkilotlar!) interleaved bajarishi mumkin, shuning uchun bitta so'rovning `enterWith`
- * chaqiruvi, vaqt jihatdan to'qnashganda, BOSHQA parallel so'rovning keyingi Prisma ulanishlariga sizib chiqishi
- * mumkin edi — productionda buni `/groups/[id]`da vaqti-vaqti bilan bitta yozuv "RLS hech kim yo'q" bilan
- * qaytishi sifatida kuzatdik. Hozir yagona yo'l: `withTenant` (`store.run` — xavfsiz, alohida branch yaratadi)
- * yoki resolver (`setTenantResolver`, Next.js so'rov ichida `next/headers()` orqali, React `cache()` bilan
- * keshlangan — bu Next.js'ning o'zi kafolatlagan so'rov-darajasidagi izolyatsiyaga tayanadi).
+ * `withTenant`dan farqli: callback'ni o'rab bo'lmaydigan joylar uchun (masalan Next.js root layout — undan keyingi
+ * `{children}` renderini funksiya sifatida o'rab bo'lmaydi). Joriy va undan keyingi bajarilishlar uchun kontekstni
+ * o'rnatadi (`AsyncLocalStorage.enterWith`). So'rov boshida BIR MARTA chaqirilsa, keyingi barcha Prisma so'rovlari —
+ * hatto pg pool eskirgan ulanishni yopib, yangisini ochayotganda ham (haqiqiy soket I/O, kechikkan callback) — resolver
+ * orqali `next/headers()`ga qayta murojaat qilmay, shu aniq qiymatdan foydalanadi.
+ *
+ * TARIX: 2026-09-23'da bu funksiya "xavfli" deb olib tashlangan edi (nazariy jihatdan: bitta so'rovning
+ * `enterWith`i boshqa parallel so'rovga sizib chiqishi mumkin), lekin productionda buni olib tashlash HOLATNI
+ * YOMONLASHTIRDI — `getSessionUser`/`/dashboard`/`/groups` xato ko'payib, ko'proq foydalanuvchi "sessiya tugadi"ga
+ * chiqib keta boshladi. Demak asosiy muammo aslida `next/headers()`ning so'rov davomida KECH chaqirilgan
+ * callback'lardan (masalan pg pool navbatda kutib, boshqa so'rovning ulanishi bo'shaganda davom etganda)
+ * ishlamay qolishi ekan — bu holatda ALS-only (faqat resolver) yechim ancha ko'proq muvaffaqiyatsizlikka olib
+ * keladi. Shuning uchun QAYTARILDI: enterWith — asosiy tezkor yo'l, resolver — faqat enterTenant chaqirilmagan
+ * joylar (masalan `/api/*` route handler'lar, ular root layout orqali o'tmaydi) uchun zaxira.
  */
+export function enterTenant(orgId: string): void {
+  store.enterWith({ orgId });
+}
 
 /** pool.connect chaqirilgan paytdagi tashkilot (aniq kontekst → resolver). Xatolik → undefined (fail-closed). */
 export async function currentTenantOrg(): Promise<string | undefined> {
