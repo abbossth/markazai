@@ -127,7 +127,8 @@
   --muted-foreground: #8b93b8;
   --accent: #171e3d;
   --accent-foreground: #c2ceff;
-  --destructive: #fb4b5a;
+  /* tenant-app bilan bir xil tuzatish (Lighthouse color-contrast) — qarang: apps/tenant-app/src/app/globals.css */
+  --destructive: #fd6b77;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: #5c7cff;

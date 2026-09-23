@@ -14,13 +14,18 @@ export function NotificationsBell({ count, items }: { count: number; items: Bell
   const t = useTranslations("reminders");
   const tc = useTranslations("common");
 
+  // Badge ichidagi ko'rinadigan raqam ("9+"/soni) accessible name'ga kiritilishi kerak (WCAG 2.5.3) —
+  // aks holda faqat "Bildirishnomalar" deb o'qiladi-yu, ko'rinadigan matn bilan mos kelmaydi.
+  const badge = count > 9 ? "9+" : count > 0 ? String(count) : "";
+  const label = badge ? `${tc("notifications")} (${badge})` : tc("notifications");
+
   return (
     <Popover>
-      <PopoverTrigger render={<Button variant="ghost" size="icon" className="relative" aria-label={tc("notifications")} title={tc("notifications")} />}>
+      <PopoverTrigger render={<Button variant="ghost" size="icon" className="relative" aria-label={label} title={label} />}>
         <Bell className="size-4" />
         {count > 0 && (
           <span className="absolute top-0.5 right-0.5 flex min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] leading-4 font-medium text-white">
-            {count > 9 ? "9+" : count}
+            {badge}
           </span>
         )}
       </PopoverTrigger>

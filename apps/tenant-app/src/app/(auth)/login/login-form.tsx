@@ -74,7 +74,8 @@ export function LoginForm() {
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? t("hidePassword") : t("showPassword")}
-            className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-2 flex items-center"
+            // w-8 (32px) — teginish nishoni kamida 24×24px bo'lishi kerak (WCAG 2.5.8); faqat ikonka (16px) yetarli emas edi.
+            className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex w-8 items-center justify-center"
           >
             {/* Yozilganda "ko'z" ochiladi, yashirilganda yumiladi */}
             {showPassword ? <Eye className="size-4" /> : <EyeOff className="size-4" />}

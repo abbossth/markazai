@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { GlobalSearch } from "./global-search";
 import type { BellItem } from "@/app/(app)/reminders/queries";
 import { LocaleSwitcher } from "./locale-switcher";
+import { MobileNav } from "./mobile-nav";
 import { NotificationsBell } from "./notifications-bell";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
@@ -44,6 +45,7 @@ export function Header({ user, reminders }: Props) {
 
   return (
     <header className="bg-background flex h-14 shrink-0 items-center gap-3 border-b px-4 print:hidden">
+      <MobileNav roles={user.roles} />
       <GlobalSearch />
       <div className="ml-auto flex items-center gap-0.5">
         <LocaleSwitcher />

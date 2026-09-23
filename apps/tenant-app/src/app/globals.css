@@ -125,7 +125,9 @@
   --muted-foreground: #8b93b8;
   --accent: #171e3d;
   --accent-foreground: #c2ceff;
-  --destructive: #fb4b5a;
+  /* #fb4b5a matnga nisbatan qorong'u fon ustida (destructive/10-20% + card/background) ba'zan 4.5:1 dan past edi
+     (Lighthouse: color-contrast). Bir oz ochiqroq qizil — barcha destructive fon/matn kombinatsiyalarida ≥4.5:1. */
+  --destructive: #fd6b77;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: #5c7cff;

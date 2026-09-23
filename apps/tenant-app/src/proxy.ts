@@ -31,5 +31,7 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|ico|webp)$).*)"],
+  // robots.txt/sitemap.xml — har qanday host/tenantda ham auth/marketing yo'naltirishidan chetlab o'tadi
+  // (Next.js'ning o'z `app/robots.ts`/`app/sitemap.ts`iga to'g'ridan-to'g'ri boradi).
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:png|jpg|jpeg|svg|ico|webp)$).*)"],
 };

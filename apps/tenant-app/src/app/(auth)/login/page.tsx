@@ -11,7 +11,7 @@ import { LoginForm } from "./login-form";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("login");
-  return { title: t("title") };
+  return { title: t("title"), robots: { index: false, follow: false } };
 }
 
 export default async function LoginPage() {
@@ -25,49 +25,54 @@ export default async function LoginPage() {
   const name = center?.name ?? tenant.name;
 
   return (
-    <main className="bg-muted/40 relative flex min-h-screen items-center justify-center p-4">
-      <div className="absolute top-4 right-4 flex items-center gap-1">
+    // `absolute top-4 right-4` ilgari past bo'yli ekranlarda (kichik/gorizontal mobil, torroq oyna) markazlashgan
+    // Card bilan ustma-ust tushib qolardi — endi oddiy oqimda, karta esa qolgan bo'shliqda markazlashadi
+    // (kontent baland bo'lsa ham sahifa erkin skroll bo'ladi, hech narsa kesilib qolmaydi).
+    <main className="bg-muted/40 flex min-h-screen flex-col p-4">
+      <div className="flex items-center justify-end gap-1">
         <LocaleSwitcher />
         <ThemeToggle />
       </div>
 
-      <Card className="w-full max-w-3xl overflow-hidden p-0">
-        {/* Brend banner: Sozlamalar → Umumiy (CenterSettings.loginBannerUrl); yuklanmagan bo'lsa — brend rangidagi gradient */}
-        {center?.loginBannerUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- ichki /api/files manzili, next/image optimizatsiyasi kerak emas
-          <img src={center.loginBannerUrl} alt="" className="h-36 w-full object-cover" />
-        ) : (
-          <div className="from-brand-500 to-brand-700 relative h-36 bg-gradient-to-br" aria-hidden>
-            <div
-              className="absolute inset-0 opacity-90"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle at 15% 35%, rgba(255,176,32,0.35), transparent 45%)",
-              }}
-            />
-          </div>
-        )}
-        <CardContent className="grid gap-8 p-8 md:grid-cols-2">
-          <div className="flex flex-col items-start justify-center gap-3">
-            {center?.logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- ichki /api/files manzili
-              <img src={center.logoUrl} alt="" className="size-14 rounded-2xl object-contain" />
-            ) : (
-              <MarkazaiMark size={56} tone="blue" />
-            )}
-            <h1 className="text-2xl font-semibold">{name}</h1>
-            <p className="text-muted-foreground text-sm">{center?.loginWelcome || t("title")}</p>
-          </div>
-          {blocked ? (
-            <div role="alert" className="border-destructive/40 bg-destructive/5 flex flex-col justify-center gap-1 rounded-lg border p-4 text-sm">
-              <p className="font-semibold">{t(`blocked.${blocked}.title`)}</p>
-              <p className="text-muted-foreground">{t(`blocked.${blocked}.hint`)}</p>
-            </div>
+      <div className="flex flex-1 items-center justify-center py-4">
+        <Card className="w-full max-w-3xl overflow-hidden p-0">
+          {/* Brend banner: Sozlamalar → Umumiy (CenterSettings.loginBannerUrl); yuklanmagan bo'lsa — brend rangidagi gradient */}
+          {center?.loginBannerUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- ichki /api/files manzili, next/image optimizatsiyasi kerak emas
+            <img src={center.loginBannerUrl} alt="" className="h-36 w-full object-cover" />
           ) : (
-            <LoginForm />
+            <div className="from-brand-500 to-brand-700 relative h-36 bg-gradient-to-br" aria-hidden>
+              <div
+                className="absolute inset-0 opacity-90"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle at 15% 35%, rgba(255,176,32,0.35), transparent 45%)",
+                }}
+              />
+            </div>
           )}
-        </CardContent>
-      </Card>
+          <CardContent className="grid gap-8 p-8 md:grid-cols-2">
+            <div className="flex flex-col items-start justify-center gap-3">
+              {center?.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- ichki /api/files manzili
+                <img src={center.logoUrl} alt="" className="size-14 rounded-2xl object-contain" />
+              ) : (
+                <MarkazaiMark size={56} tone="blue" />
+              )}
+              <h1 className="text-2xl font-semibold">{name}</h1>
+              <p className="text-muted-foreground text-sm">{center?.loginWelcome || t("title")}</p>
+            </div>
+            {blocked ? (
+              <div role="alert" className="border-destructive/40 bg-destructive/5 flex flex-col justify-center gap-1 rounded-lg border p-4 text-sm">
+                <p className="font-semibold">{t(`blocked.${blocked}.title`)}</p>
+                <p className="text-muted-foreground">{t(`blocked.${blocked}.hint`)}</p>
+              </div>
+            ) : (
+              <LoginForm />
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </main>
   );
 }

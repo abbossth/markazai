@@ -25,7 +25,9 @@ export function LocaleSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={<Button variant="ghost" size="sm" disabled={pending} aria-label={t("language")} />}
+        // Ko'rinadigan matn (masalan "UZ") accessible name'ga kiritilishi kerak (WCAG 2.5.3) — aks holda ovozli
+        // boshqaruv ("UZ" tugmasini bos) ishlamaydi; shuning uchun faqat "Til" emas, kod ham qo'shiladi.
+        render={<Button variant="ghost" size="sm" disabled={pending} aria-label={`${t("language")}: ${active?.short ?? ""}`} />}
       >
         <Languages className="size-4" />
         {active?.short}

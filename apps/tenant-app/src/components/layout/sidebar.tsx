@@ -26,12 +26,13 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
   );
 }
 
-export function Sidebar({ roles }: { roles: string[] }) {
+/** Nav ro'yxati — desktop `<aside>` va mobil `Sheet` ikkalasida ham ishlatiladi (bitta manba). */
+export function SidebarNavContent({ roles }: { roles: string[] }) {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-60 shrink-0 flex-col border-r md:flex print:hidden">
+    <>
       <Link href="/dashboard" className="flex h-14 items-center px-5">
         <MarkazaiLogo size={28} />
       </Link>
@@ -47,6 +48,15 @@ export function Sidebar({ roles }: { roles: string[] }) {
           <NavLink item={SETTINGS_NAV} active={isActive(SETTINGS_NAV.href)} />
         </div>
       )}
+    </>
+  );
+}
+
+// md dan katta ekranlarda doim ko'rinadi; kichikroqlarda (mobil/planshet) — `MobileNav` (header'dagi) o'rniga ishlaydi.
+export function Sidebar({ roles }: { roles: string[] }) {
+  return (
+    <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-60 shrink-0 flex-col border-r md:flex print:hidden">
+      <SidebarNavContent roles={roles} />
     </aside>
   );
 }

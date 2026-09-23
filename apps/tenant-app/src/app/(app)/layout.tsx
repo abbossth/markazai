@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SubscriptionBanner } from "@/components/layout/subscription-banner";
@@ -6,6 +7,9 @@ import { canAccess } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
 import { currentTenant } from "@/lib/tenant";
 import { loadMyReminders } from "./reminders/queries";
+
+// Har bir tashkilotning ichki paneli — hech qachon qidiruv tizimlarida indekslanmasligi kerak.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   // Proxy — birinchi to'siq, bu — haqiqiy tekshiruv (bazadagi joriy rollar va faollik bilan).

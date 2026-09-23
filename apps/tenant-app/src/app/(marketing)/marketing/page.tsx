@@ -18,6 +18,7 @@ import { platformPrisma } from "@markazai/db/platform";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { MarkazaiLogo } from "@/components/brand/logo";
 import { DashboardMock } from "./dashboard-mock";
+import { MarketingMobileNav } from "./mobile-nav";
 import { SubdomainForm } from "./subdomain-form";
 
 export const metadata: Metadata = {
@@ -70,6 +71,7 @@ export default async function MarketingPage() {
       {/* ───────── Header ───────── */}
       <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-slate-950/80">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
+          <MarketingMobileNav />
           <Link href="#" className="flex items-center">
             <MarkazaiLogo size={28} />
           </Link>

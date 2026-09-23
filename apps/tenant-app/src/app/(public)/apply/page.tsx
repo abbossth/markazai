@@ -30,32 +30,35 @@ export default async function ApplyPage() {
   ]);
 
   return (
-    <main className="bg-muted/40 relative flex min-h-screen items-center justify-center p-4">
-      <div className="absolute top-4 right-4 flex items-center gap-1">
+    // Ikonkalar oddiy oqimda (login sahifasidagi kabi) — past bo'yli ekranlarda kartaga ustma-ust tushmasin.
+    <main className="bg-muted/40 flex min-h-screen flex-col p-4">
+      <div className="flex items-center justify-end gap-1">
         <LocaleSwitcher />
         <ThemeToggle />
       </div>
-      <Card className="w-full max-w-md">
-        <CardContent className="flex flex-col gap-6 p-6">
-          <div className="flex items-center gap-3">
-            {center?.logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- ichki /api/files manzili
-              <img src={center.logoUrl} alt="" className="size-10 rounded-lg object-contain" />
+      <div className="flex flex-1 items-center justify-center py-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col gap-6 p-6">
+            <div className="flex items-center gap-3">
+              {center?.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- ichki /api/files manzili
+                <img src={center.logoUrl} alt="" className="size-10 rounded-lg object-contain" />
+              ) : (
+                <MarkazaiMark size={40} tone="blue" />
+              )}
+              <span className="font-semibold">{center?.name ?? "Markazai"}</span>
+            </div>
+            {form?.enabled ? (
+              <LeadFormView
+                courses={courses}
+                config={{ title: form.title, description: form.description, submitLabel: form.submitLabel, successMessage: form.successMessage, fields: normalizeLeadFormFields(form.fields) }}
+              />
             ) : (
-              <MarkazaiMark size={40} tone="blue" />
+              <p className="text-muted-foreground py-6 text-center text-sm">{t("unavailable")}</p>
             )}
-            <span className="font-semibold">{center?.name ?? "Markazai"}</span>
-          </div>
-          {form?.enabled ? (
-            <LeadFormView
-              courses={courses}
-              config={{ title: form.title, description: form.description, submitLabel: form.submitLabel, successMessage: form.successMessage, fields: normalizeLeadFormFields(form.fields) }}
-            />
-          ) : (
-            <p className="text-muted-foreground py-6 text-center text-sm">{t("unavailable")}</p>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </main>
   );
 }

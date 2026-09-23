@@ -333,7 +333,8 @@ function CardView({ card, overlay, canWrite, canDelete, onEdit, onDelete }: { ca
   return (
     <article className={cn("bg-card flex flex-col gap-1.5 rounded-lg border p-2.5 text-sm shadow-xs", overlay && "shadow-lg ring-2 ring-primary/40")}>
       <div className="flex items-start gap-1">
-        <Link href={`/leads/${card.id}`} className="min-w-0 flex-1 truncate font-medium hover:underline" onPointerDown={(e) => e.stopPropagation()}>
+        {/* py-1 — teginish nishoni kamida 24px balandlikda bo'lishi uchun (WCAG 2.5.8; matn qatori o'zi ~20px edi). */}
+        <Link href={`/leads/${card.id}`} className="min-w-0 flex-1 truncate py-1 font-medium hover:underline" onPointerDown={(e) => e.stopPropagation()}>
           {card.name}
         </Link>
         {!overlay && (

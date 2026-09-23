@@ -42,6 +42,7 @@
     "planLimit": "Plan limit reached — please upgrade your plan"
   },
   "nav": {
+    "menu": "Menu",
     "dashboard": "Dashboard",
     "leads": "Leads",
     "teachers": "Teachers",
