@@ -18,7 +18,11 @@ function createAppClient() {
   if (!url && process.env.NODE_ENV === "production") throw new Error("APP_DATABASE_URL o'rnatilmagan: production'da RLS'siz ishga tushmaydi");
   const connectionString = url ?? process.env.DATABASE_URL;
   if (!connectionString) throw new Error("APP_DATABASE_URL / DATABASE_URL o'rnatilmagan");
-  return new PrismaClient({ adapter: new PrismaPg(new TenantPool({ connectionString }) as unknown as pg.Pool) });
+  // `max` sukut bo'yicha 10 edi: pool to'lib qolsa, `TenantPool.connect()` ichki navbatda kutadi va o'sha
+  // navbatdan bo'shagan payt kontekst (enterWith orqali o'rnatilgan) ba'zan yo'qolib qolgan (productionda
+  // vaqti-vaqti bilan "hasAccount: false" — user o'ziniki RLS ostida "yo'q" bo'lib chiqishi sifatida kuzatilgan).
+  // Neon'ning pooled endpoint'i (`-pooler`) buni bemalol ko'taradi, shuning uchun bu yerda oshirish xavfsiz.
+  return new PrismaClient({ adapter: new PrismaPg(new TenantPool({ connectionString, max: 25, idleTimeoutMillis: 30_000 }) as unknown as pg.Pool) });
 }
 
 /**

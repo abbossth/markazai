@@ -6,7 +6,12 @@ export const authConfig = {
   // proxy.ts noma'lum/noto'g'ri hostni 404 bilan rad etadi va lib/tenant.ts host'ni Control Plane bazasidagi tashkilotga bog'laydi.
   trustHost: true,
   pages: { signIn: "/login" },
-  session: { strategy: "jwt" },
+  // JWT sessiyada alohida "refresh token" tushunchasi yo'q (bu — OAuth provayderlariga xos naqsh; Credentials
+  // provayderida sessiya = imzolangan JWT o'zi). Shuning o'rniga "rolling session": `maxAge` — faollik bo'lmasa
+  // sessiya nechchi vaqtdan keyin tugaydi (2 kun); `updateAge` — foydalanuvchi faol bo'lganda JWT qancha tez-tez
+  // qayta imzolanadi (muddati yangilanadi). Amalda: har soatda kamida bitta so'rov yuborilsa, sessiya cheksiz
+  // davom etadi; 2 kun batamom faolsiz qolsagina chiqib ketadi.
+  session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 2, updateAge: 60 * 60 },
   providers: [],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
