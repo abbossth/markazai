@@ -1,10 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { put } from "@vercel/blob";
 
 /**
- * Fayl saqlash (mahalliy disk). Ishlab chiqarishda S3/R2 bilan almashtiriladi — shu modulning ikki funksiyasi
- * (`saveImage`, `readStored`) yagona interfeys. Fayllar `/api/files/<org>/<nom>` orqali beriladi.
+ * Fayl saqlash: production'da Vercel Blob (doimiy, CDN'dan beriladi — Vercel serverless funksiyalarining
+ * o'zi FAQAT O'QISH UCHUN disk bilan ishlashi, `UPLOAD_DIR` mahalliy papkaga yozib bo'lmasligi sababli
+ * (productionda kuzatilgan `ENOENT: mkdir` xatosi shundan edi); mahalliy `next dev`da esa `BLOB_READ_WRITE_TOKEN`
+ * odatda yo'q, shu sabab mahalliy diskka (`.uploads`, `/api/files/<org>/<nom>` orqali beriladi) tushadi.
  */
 const ROOT = process.env.UPLOAD_DIR ? path.resolve(process.env.UPLOAD_DIR) : path.resolve(process.cwd(), ".uploads");
 
@@ -27,6 +30,12 @@ export async function saveImage(orgId: string, data: Uint8Array): Promise<{ url:
   const ext = sniffImage(data);
   if (!ext) return { error: "invalidType" };
   const name = `${randomUUID()}.${ext}`;
+
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const blob = await put(`${orgId}/${name}`, Buffer.from(data), { access: "public", contentType: TYPES[ext], addRandomSuffix: false });
+    return { url: blob.url };
+  }
+  // Mahalliy fallback (dev): Blob token yo'q bo'lsa diskka yoziladi.
   await mkdir(path.join(ROOT, orgId), { recursive: true });
   await writeFile(path.join(ROOT, orgId, name), data);
   return { url: `/api/files/${orgId}/${name}` };

@@ -15,7 +15,8 @@
         "PROVISIONING_SECRET",
         "TENANT_APP_URL",
         "SECRETS_KEY",
-        "UPLOAD_DIR"
+        "UPLOAD_DIR",
+        "BLOB_READ_WRITE_TOKEN"
       ]
     },
     "dev": { "cache": false, "persistent": true },
