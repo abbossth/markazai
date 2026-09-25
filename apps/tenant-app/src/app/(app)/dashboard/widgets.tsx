@@ -23,12 +23,12 @@ export function MetricWidget({ id, metric, edit }: { id: string; metric: MetricV
   const isLoad = id === "centerLoad";
   const title = t(`widgets.${id}` as "widgets.groups");
   return (
-    <div className="flex h-full flex-col justify-between gap-2">
-      <span className="text-muted-foreground text-sm">{title}</span>
-      <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-semibold tabular-nums">{metric.value === null ? "—" : isLoad ? `${metric.value}%` : formatMoney(metric.value)}</span>
+    <div className="flex h-full flex-col justify-between gap-1">
+      <span className="text-muted-foreground text-xs">{title}</span>
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-xl font-semibold tabular-nums">{metric.value === null ? "—" : isLoad ? `${metric.value}%` : formatMoney(metric.value)}</span>
         {isLoad && metric.of && (
-          <span className="text-muted-foreground text-sm tabular-nums">
+          <span className="text-muted-foreground text-xs tabular-nums">
             {metric.of.students} / {metric.of.capacity}
           </span>
         )}

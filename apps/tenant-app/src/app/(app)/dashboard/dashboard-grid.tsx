@@ -153,7 +153,7 @@ export function DashboardGrid({ layout: initial, allowed, data }: Props) {
 
       <DndContext id="dashboard-grid" sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={layout.map((l) => l.id)} strategy={rectSortingStrategy} disabled={!editing}>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {layout.map((item) => (
               <WidgetFrame key={item.id} item={item} editing={editing} onSize={(size) => setLayout((cur) => cur.map((l) => (l.id === item.id ? { ...l, size } : l)))} onRemove={() => setLayout((cur) => cur.filter((l) => l.id !== item.id))}>
                 {renderWidget(item)}
@@ -202,7 +202,7 @@ function WidgetFrame({ item, editing, onSize, onRemove, children }: { item: Layo
     <section
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn("bg-card relative rounded-lg border p-4", SPAN[item.size], editing && "ring-primary/30 pt-11 ring-1", isDragging && "z-10 opacity-70 shadow-lg")}
+      className={cn("bg-card relative rounded-lg border p-3", SPAN[item.size], editing && "ring-primary/30 pt-11 ring-1", isDragging && "z-10 opacity-70 shadow-lg")}
     >
       {editing && (
         <div className="bg-popover absolute top-2 right-2 z-10 flex items-center gap-1 rounded-md border p-0.5 shadow-sm">
