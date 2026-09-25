@@ -1,6 +1,7 @@
 import { ActionForm } from "@/components/action-form";
 import { Card, Field, Input } from "@/components/ui";
 import { MarkazaiLogo } from "@/components/brand/logo";
+import { PasswordInput } from "@/components/password-input";
 import { login } from "./actions";
 
 export default function LoginPage() {
@@ -15,7 +16,7 @@ export default function LoginPage() {
               <Input name="email" type="email" autoComplete="username" required autoFocus />
             </Field>
             <Field label="Parol">
-              <Input name="password" type="password" autoComplete="current-password" required />
+              <PasswordInput name="password" autoComplete="current-password" required />
             </Field>
           </ActionForm>
         </Card>

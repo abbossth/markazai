@@ -12,6 +12,7 @@ import { DataTable, type AnyColumnDef } from "@/components/data-table/data-table
 import { PhoneInput } from "@/components/layout/phone-input";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Field } from "@/components/shared/form-field";
+import { PasswordInput } from "@/components/shared/password-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -257,7 +258,7 @@ function StaffDialog({ open, onOpenChange, staff, branches, canGrantPrivileged, 
               <Input type="email" {...register("email")} />
             </Field>
             <Field label={staff ? t("newPasswordOptional") : t("columns.password")} error={err(errors.password?.message)}>
-              <Input type="password" autoComplete="new-password" {...register("password")} />
+              <PasswordInput autoComplete="new-password" {...register("password")} />
             </Field>
           </div>
           {branches.length > 0 && (

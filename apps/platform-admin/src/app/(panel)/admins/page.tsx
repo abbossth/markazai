@@ -2,6 +2,7 @@ import { platformPrisma } from "@markazai/db/platform";
 import { ActionForm } from "@/components/action-form";
 import { Card, Field, Input, PageHeader, Select } from "@/components/ui";
 import { fmtDate } from "@/lib/format";
+import { PasswordInput } from "@/components/password-input";
 import { requireAdmin } from "@/lib/session";
 import { saveAdmin } from "./actions";
 
@@ -25,7 +26,7 @@ function AdminForm({ a }: { a?: A }) {
           </Select>
         </Field>
         <Field label={a ? "Yangi parol (bo'sh — o'zgarmaydi)" : "Parol (≥10 belgi)"}>
-          <Input name="password" type="password" autoComplete="new-password" />
+          <PasswordInput name="password" autoComplete="new-password" />
         </Field>
       </div>
       <label className="flex items-center gap-2 text-sm">

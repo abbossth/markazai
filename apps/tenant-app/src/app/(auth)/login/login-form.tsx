@@ -4,11 +4,10 @@ import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { Eye, EyeOff } from "lucide-react";
 import { loginSchema, type LoginInput, type LoginOutput } from "@markazai/types";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/shared/password-input";
 import { PhoneInput } from "@/components/layout/phone-input";
 import { login } from "./actions";
 
@@ -16,7 +15,6 @@ export function LoginForm() {
   const t = useTranslations("login");
   const [pending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
 
   const {
     control,
@@ -61,26 +59,13 @@ export function LoginForm() {
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="password">{t("password")}</Label>
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            autoComplete="current-password"
-            className="pr-9"
-            aria-invalid={!!errors.password}
-            {...register("password")}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? t("hidePassword") : t("showPassword")}
-            // w-8 (32px) — teginish nishoni kamida 24×24px bo'lishi kerak (WCAG 2.5.8); faqat ikonka (16px) yetarli emas edi.
-            className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex w-8 items-center justify-center"
-          >
-            {/* Yozilganda "ko'z" ochiladi, yashirilganda yumiladi */}
-            {showPassword ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
-          </button>
-        </div>
+        <PasswordInput
+          id="password"
+          autoComplete="current-password"
+          aria-invalid={!!errors.password}
+          labels={{ show: t("showPassword"), hide: t("hidePassword") }}
+          {...register("password")}
+        />
         {errors.password && <p className="text-destructive text-xs">{t(errors.password.message as "required")}</p>}
       </div>
 

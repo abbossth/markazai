@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { teacherSchema, type TeacherInput, type TeacherOutput } from "@markazai/types";
 import { PhoneInput } from "@/components/layout/phone-input";
 import { Field } from "@/components/shared/form-field";
+import { PasswordInput } from "@/components/shared/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -164,7 +165,7 @@ function TeacherFormBody({ lookups, canSalary, teacher, onDone }: Props & { onDo
           )}
 
           <Field label={isEdit ? t("newPassword") : t("password")} error={field("password")}>
-            <Input type="password" autoComplete="new-password" {...register("password")} />
+            <PasswordInput autoComplete="new-password" {...register("password")} />
             <p className="text-muted-foreground text-xs">{isEdit && teacher.hasLogin ? t("passwordHintEdit") : t("passwordHint")}</p>
           </Field>
 
