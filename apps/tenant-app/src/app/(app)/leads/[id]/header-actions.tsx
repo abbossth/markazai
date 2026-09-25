@@ -41,13 +41,21 @@ export function LeadHeaderActions({ lead, converted, lookups, groups, canWrite, 
   const [groupId, setGroupId] = useState(NONE);
   const [joinedAt, setJoinedAt] = useState(() => toISODate(new Date()));
 
-  const convert = () =>
+  const convert = (force = false) =>
     startTransition(async () => {
-      const res = await convertLeadToStudent(lead.id, { groupId: groupId === NONE ? undefined : groupId, joinedAt });
+      const res = await convertLeadToStudent(lead.id, { groupId: groupId === NONE ? undefined : groupId, joinedAt }, force);
       if (res.ok) {
         toast.success(t("converted"));
         router.push(`/students/${res.studentId}`);
-      } else toast.error(res.error === "forbidden" ? tc("forbidden") : res.error === "groupInactive" ? ts("groupInactive") : tc("error"));
+        return;
+      }
+      if (res.error === "duplicatePhone" && res.duplicate) {
+        toast.warning(ts("duplicatePhoneConfirm", { name: res.duplicate.name }), {
+          action: { label: ts("duplicatePhoneCreate"), onClick: () => convert(true) },
+        });
+        return;
+      }
+      toast.error(res.error === "forbidden" ? tc("forbidden") : res.error === "groupInactive" ? ts("groupInactive") : tc("error"));
     });
 
   const remove = () =>
@@ -116,7 +124,7 @@ export function LeadHeaderActions({ lead, converted, lookups, groups, canWrite, 
             <Button variant="outline" onClick={() => setConverting(false)}>
               {tc("cancel")}
             </Button>
-            <Button disabled={pending} onClick={convert}>
+            <Button disabled={pending} onClick={() => convert()}>
               {t("convert")}
             </Button>
           </DialogFooter>

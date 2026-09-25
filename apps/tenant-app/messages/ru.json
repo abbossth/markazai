@@ -353,7 +353,9 @@
     "leadSource": "Источник",
     "leadCreated": "Лид создан",
     "leadConverted": "Преобразован в студента",
-    "pay": "Оплата"
+    "pay": "Оплата",
+    "duplicatePhoneConfirm": "Учащийся \"{name}\" с этим номером телефона уже существует. Всё равно создать нового?",
+    "duplicatePhoneCreate": "Всё равно создать"
   },
   "comments": {
     "placeholder": "Напишите комментарий...",

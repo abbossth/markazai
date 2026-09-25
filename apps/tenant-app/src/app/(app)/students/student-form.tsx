@@ -103,9 +103,9 @@ function StudentFormBody({ lookups, student, onDone }: { lookups: Props["lookups
   const errText = (msg?: string) => (msg ? (tv.has(msg as "required") ? tv(msg as "required") : tv("invalid")) : undefined);
 
   // Sxemalar idempotent: transformdan o'tgan qiymatni server qayta tekshirganda ham to'g'ri chiqadi.
-  const send = (values: StudentOutput) => {
+  const send = (values: StudentOutput, force = false) => {
     startTransition(async () => {
-      const res = student ? await updateStudent(student.id, values) : await createStudent(values);
+      const res = student ? await updateStudent(student.id, values) : await createStudent(values, force);
       if (res.ok) {
         toast.success(tc("saved"));
         onDone();
@@ -114,6 +114,16 @@ function StudentFormBody({ lookups, student, onDone }: { lookups: Props["lookups
       }
       if (res.error === "validation" && res.fieldErrors) {
         for (const [field, message] of Object.entries(res.fieldErrors)) setError(field as keyof StudentInput, { message });
+        return;
+      }
+      // Xuddi shu telefon raqamli talaba allaqachon bor — taqiqlanmaydi (oila bitta raqamda bo'lishi mumkin),
+      // faqat "davom ettirasizmi" deb so'raladi (2026-09-25: shu sababsiz ikkita "Xolbek" yaratilib qolgan edi).
+      // (`updateStudent`ning natija turida `duplicate` yo'q — shuning uchun aniq cast, TS ternary orqali union'ni to'liq torayolmaydi.)
+      const dup = (res as { duplicate?: { id: string; name: string } }).duplicate;
+      if (res.error === "duplicatePhone" && dup) {
+        toast.warning(t("duplicatePhoneConfirm", { name: dup.name }), {
+          action: { label: t("duplicatePhoneCreate"), onClick: () => send(values, true) },
+        });
         return;
       }
       toast.error(res.error === "forbidden" ? tc("forbidden") : res.error === "groupInactive" ? t("groupInactive") : res.error === "planLimit" ? tc("planLimit") : tc("error"));
@@ -125,7 +135,7 @@ function StudentFormBody({ lookups, student, onDone }: { lookups: Props["lookups
   return (
     <form
       className="flex min-h-0 flex-1 flex-col"
-      onSubmit={handleSubmit(send, () => setMoreOpen(true))}
+      onSubmit={handleSubmit((values) => send(values), () => setMoreOpen(true))}
       noValidate
     >
       <SheetHeader>

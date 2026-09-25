@@ -353,7 +353,9 @@
     "leadSource": "Source",
     "leadCreated": "Lead created",
     "leadConverted": "Converted to student",
-    "pay": "Payment"
+    "pay": "Payment",
+    "duplicatePhoneConfirm": "A student named \"{name}\" already has this phone number. Create a new one anyway?",
+    "duplicatePhoneCreate": "Create anyway"
   },
   "comments": {
     "placeholder": "Write a comment...",

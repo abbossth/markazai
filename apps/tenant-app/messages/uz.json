@@ -353,7 +353,9 @@
     "leadSource": "Manba",
     "leadCreated": "Lid yaratilgan",
     "leadConverted": "Talabaga aylantirilgan",
-    "pay": "To'lov"
+    "pay": "To'lov",
+    "duplicatePhoneConfirm": "Bu telefon raqami bilan \"{name}\" talaba allaqachon mavjud. Baribir yangi talaba yaratilsinmi?",
+    "duplicatePhoneCreate": "Baribir yaratish"
   },
   "comments": {
     "placeholder": "Izoh yozing...",

@@ -32,7 +32,13 @@ function fieldErrors(issues: { path: PropertyKey[]; message: string }[]) {
   return out;
 }
 
-export async function createStudent(input: StudentInput): Promise<Result<{ id: string }>> {
+/**
+ * `force=true` bo'lmasa: shu telefon raqami bilan tashkilotda allaqachon talaba bo'lsa, yaratilmaydi —
+ * o'rniga uning nomi bilan qaytariladi, forma tasdiqlash so'raydi (masalan bir uyda 2 farzand bitta
+ * ota-ona raqamida bo'lishi mumkin, shuning uchun qat'iy taqiqlanmaydi — faqat ogohlantiriladi).
+ * Xotira: 2026-09-25'da bitta o'quvchi ikki marta (turli joydan) yaratilib, davomat ikkiga bo'linib qolgan edi.
+ */
+export async function createStudent(input: StudentInput, force = false): Promise<Result<{ id: string }> & { duplicate?: { id: string; name: string } }> {
   const user = await guard("students:write");
   if (!user) return { ok: false, error: "forbidden" };
 
@@ -40,6 +46,11 @@ export async function createStudent(input: StudentInput): Promise<Result<{ id: s
   if (!parsed.success) return { ok: false, error: "validation", fieldErrors: fieldErrors(parsed.error.issues) };
   const d = parsed.data;
   if (!(await canAddWithinPlan("students"))) return { ok: false, error: "planLimit" };
+
+  if (!force) {
+    const dup = await prisma.student.findFirst({ where: { organizationId: user.orgId, phone: d.phone }, select: { id: true, name: true } });
+    if (dup) return { ok: false, error: "duplicatePhone", duplicate: dup };
+  }
 
   // Guruh va teglar shu tashkilotga tegishli ekanini tekshirish.
   let groupId: string | undefined;

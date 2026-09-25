@@ -11,13 +11,24 @@ import { requireUser } from "@/lib/session";
  * Lidni talabaga aylantiradi: yangi Student yaratiladi (lidning ismi, telefoni, izohi, teglari),
  * ixtiyoriy ravishda guruhga qo'shiladi. Lid doskadan yo'qoladi, lekin konversiya hisoboti uchun saqlanadi.
  */
-export async function convertLeadToStudent(leadId: string, opts: { groupId?: string; joinedAt?: string }): Promise<ActionResult<{ studentId: string }>> {
+export async function convertLeadToStudent(
+  leadId: string,
+  opts: { groupId?: string; joinedAt?: string },
+  force = false,
+): Promise<ActionResult<{ studentId: string }> & { duplicate?: { id: string; name: string } }> {
   const user = await requireUser();
   if (!can(user.roles, "leads:write") || !can(user.roles, "students:write")) return { ok: false, error: "forbidden" };
 
   const lead = await prisma.lead.findFirst({ where: { id: leadId, organizationId: user.orgId }, include: { tags: true } });
   if (!lead) return { ok: false, error: "notFound" };
   if (lead.convertedStudentId) return { ok: false, error: "alreadyConverted" };
+
+  // Shu telefon raqamli talaba allaqachon bo'lsa (masalan, boshqa xodim uni qo'lda ham qo'shib qo'ygan bo'lsa)
+  // — taqiqlanmaydi, faqat ogohlantiriladi (qarang: students/actions.ts createStudent'dagi bir xil izoh).
+  if (!force) {
+    const dup = await prisma.student.findFirst({ where: { organizationId: user.orgId, phone: lead.phone }, select: { id: true, name: true } });
+    if (dup) return { ok: false, error: "duplicatePhone", duplicate: dup };
+  }
 
   let groupId: string | undefined;
   if (opts.groupId) {
