@@ -3,10 +3,11 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Pencil, Power, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Power, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { deleteTeacher, setTeacherActive } from "../actions";
 import type { TeacherLookups } from "../queries";
 import { TeacherSheet, type EditableTeacher } from "../teacher-form";
@@ -48,14 +49,21 @@ export function TeacherHeaderActions({ teacher, isActive, lookups, canSalary }: 
         <Pencil className="size-4" />
         {tc("edit")}
       </Button>
-      <Button size="sm" variant="outline" disabled={pending} onClick={toggle}>
-        <Power className="size-4" />
-        {isActive ? t("deactivate") : t("activate")}
-      </Button>
-      <Button size="sm" variant="destructive" onClick={() => setDeleting(true)}>
-        <Trash2 className="size-4" />
-        {tc("delete")}
-      </Button>
+      {/* Kamdan-kam va xavfli amallar (nofaol qilish, o'chirish) alohida menyuda — tasodifan bosilmasligi uchun. */}
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button size="icon-sm" variant="outline" aria-label={tc("actions")} title={tc("actions")} disabled={pending} />}>
+          <MoreHorizontal className="size-4" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={toggle}>
+            <Power /> {isActive ? t("deactivate") : t("activate")}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant="destructive" onClick={() => setDeleting(true)}>
+            <Trash2 /> {tc("delete")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <TeacherSheet open={editing} onOpenChange={setEditing} lookups={lookups} canSalary={canSalary} teacher={teacher} />
       <ConfirmDialog open={deleting} onOpenChange={setDeleting} title={t("deleteTitle", { name: teacher.name })} description={tc("confirmDelete")} confirmLabel={tc("delete")} destructive pending={pending} onConfirm={remove} />
     </div>

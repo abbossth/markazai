@@ -920,7 +920,8 @@
       "totalRow": "Jami",
       "legend": "Darslar: o'tgan darslar soni · talabalarning \"keldi\" belgilari (yashil) · sababsiz \"kelmadi\" belgilari (qizil).",
       "payments": "To'lovlar"
-    }
+    },
+    "students": "Talabalar"
   },
   "teacherAttendance": {
     "title": "Ustozlar davomati",
