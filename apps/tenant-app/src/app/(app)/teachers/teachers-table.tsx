@@ -34,11 +34,13 @@ export function TeachersTable({ rows, total, page, pageSize, sort, lookups, canW
   const router = useRouter();
   const [editing, setEditing] = useState<TeacherRow | null>(null);
   const [deleting, setDeleting] = useState<TeacherRow | null>(null);
+  const [deactivating, setDeactivating] = useState<TeacherRow | null>(null);
   const [pending, startTransition] = useTransition();
 
   const toggleActive = useCallback(
     (row: TeacherRow) =>
       startTransition(async () => {
+        setDeactivating(null);
         const res = await setTeacherActive(row.id, !row.isActive);
         if (res.ok) {
           toast.success(tc("saved"));
@@ -124,7 +126,7 @@ export function TeachersTable({ rows, total, page, pageSize, sort, lookups, canW
               {canWrite && (
                 <>
                   <DropdownMenuItem onClick={() => setEditing(row.original)}>{tc("edit")}</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => toggleActive(row.original)}>{row.original.isActive ? t("deactivate") : t("activate")}</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => (row.original.isActive && row.original.activeGroups > 0 ? setDeactivating(row.original) : toggleActive(row.original))}>{row.original.isActive ? t("deactivate") : t("activate")}</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem variant="destructive" onClick={() => setDeleting(row.original)}>
                     {tc("delete")}
@@ -143,6 +145,15 @@ export function TeachersTable({ rows, total, page, pageSize, sort, lookups, canW
     <>
       <DataTable columns={columns} data={rows} total={total} page={page} pageSize={pageSize} sort={sort} getRowId={(r) => r.id} storageKey="teachers" />
       {editing && <TeacherSheet open onOpenChange={(o) => !o && setEditing(null)} lookups={lookups} canSalary={canSalary} teacher={editing.editable} />}
+      <ConfirmDialog
+        open={!!deactivating}
+        onOpenChange={(o) => !o && setDeactivating(null)}
+        title={t("deactivateTitle", { name: deactivating?.name ?? "" })}
+        description={t("deactivateHint", { count: deactivating?.activeGroups ?? 0 })}
+        confirmLabel={t("deactivate")}
+        pending={pending}
+        onConfirm={() => deactivating && toggleActive(deactivating)}
+      />
       <ConfirmDialog
         open={!!deleting}
         onOpenChange={(o) => !o && setDeleting(null)}

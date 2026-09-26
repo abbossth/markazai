@@ -135,7 +135,7 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
                 {t("reminders")}
                 {reminders.filter((r) => !r.doneAt).length > 0 && <span className="rounded-full bg-emerald-600 px-1.5 text-xs text-white tabular-nums">{reminders.filter((r) => !r.doneAt).length}</span>}
               </a>
-              {canWrite && <TeacherHeaderActions teacher={toEditable(teacher, canSalary)} isActive={teacher.isActive} lookups={lookups} canSalary={canSalary} />}
+              {canWrite && <TeacherHeaderActions teacher={toEditable(teacher, canSalary)} isActive={teacher.isActive} lookups={lookups} canSalary={canSalary} activeGroups={activeGroups.length} />}
             </div>
           </div>
         </div>

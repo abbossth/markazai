@@ -929,7 +929,9 @@
     },
     "students": "Students",
     "reminders": "Reminders",
-    "comments": "Comments"
+    "comments": "Comments",
+    "deactivateTitle": "Deactivate \"{name}\"?",
+    "deactivateHint": "This teacher has {count} active group(s). They will not be able to sign in, but the groups stay assigned to them and remain in the schedule. Reassign the groups to another teacher yourself."
   },
   "teacherAttendance": {
     "title": "Teacher attendance",

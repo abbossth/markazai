@@ -12,18 +12,20 @@ import { deleteTeacher, setTeacherActive } from "../actions";
 import type { TeacherLookups } from "../queries";
 import { TeacherSheet, type EditableTeacher } from "../teacher-form";
 
-type Props = { teacher: EditableTeacher; isActive: boolean; lookups: TeacherLookups; canSalary: boolean };
+type Props = { teacher: EditableTeacher; isActive: boolean; lookups: TeacherLookups; canSalary: boolean; activeGroups: number };
 
-export function TeacherHeaderActions({ teacher, isActive, lookups, canSalary }: Props) {
+export function TeacherHeaderActions({ teacher, isActive, lookups, canSalary, activeGroups }: Props) {
   const t = useTranslations("teacher");
   const tc = useTranslations("common");
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const toggle = () =>
     startTransition(async () => {
+      setDeactivating(false);
       const res = await setTeacherActive(teacher.id, !isActive);
       if (res.ok) {
         toast.success(tc("saved"));
@@ -55,7 +57,7 @@ export function TeacherHeaderActions({ teacher, isActive, lookups, canSalary }: 
           <MoreHorizontal className="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={toggle}>
+          <DropdownMenuItem onClick={() => (isActive && activeGroups > 0 ? setDeactivating(true) : toggle())}>
             <Power /> {isActive ? t("deactivate") : t("activate")}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -64,6 +66,15 @@ export function TeacherHeaderActions({ teacher, isActive, lookups, canSalary }: 
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <ConfirmDialog
+        open={deactivating}
+        onOpenChange={setDeactivating}
+        title={t("deactivateTitle", { name: teacher.name })}
+        description={t("deactivateHint", { count: activeGroups })}
+        confirmLabel={t("deactivate")}
+        pending={pending}
+        onConfirm={toggle}
+      />
       <TeacherSheet open={editing} onOpenChange={setEditing} lookups={lookups} canSalary={canSalary} teacher={teacher} />
       <ConfirmDialog open={deleting} onOpenChange={setDeleting} title={t("deleteTitle", { name: teacher.name })} description={tc("confirmDelete")} confirmLabel={tc("delete")} destructive pending={pending} onConfirm={remove} />
     </div>

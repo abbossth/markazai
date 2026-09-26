@@ -929,7 +929,9 @@
     },
     "students": "Talabalar",
     "reminders": "Eslatmalar",
-    "comments": "Izohlar"
+    "comments": "Izohlar",
+    "deactivateTitle": "\"{name}\" nofaol qilinsinmi?",
+    "deactivateHint": "Bu o'qituvchining {count} ta faol guruhi bor. U tizimga kira olmaydi, lekin guruhlari unga biriktirilgan holda qoladi va dars jadvalida ko'rinaveradi. Guruhlarni boshqa o'qituvchiga o'zingiz o'tkazishingiz kerak."
   },
   "teacherAttendance": {
     "title": "Ustozlar davomati",
