@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@markazai/db";
 import { sanitizeLayout, type ActionResult } from "@markazai/types";
 import { can } from "@/lib/permissions";
-import { requireUser } from "@/lib/session";
-import { allowedWidgetIds } from "./queries";
+import { requireModule, requireUser } from "@/lib/session";
+import { allowedWidgetIds, loadScheduleGroups } from "./queries";
 
 /**
  * Dashboard tartibini saqlaydi. Kirish qayta tozalanadi (noma'lum/ruxsatsiz vidjetlar va yaroqsiz o'lchamlar
@@ -47,4 +47,10 @@ export async function saveCenterCapacity(capacity: number | null): Promise<Actio
   });
   revalidatePath("/dashboard");
   return { ok: true };
+}
+
+/** O'ng chetdagi "Dars jadvali" paneli ochilganda yuklanadi (har sahifada oldindan yuklanmaydi). */
+export async function loadScheduleDrawerData() {
+  const user = await requireModule("groups");
+  return loadScheduleGroups(user);
 }

@@ -147,23 +147,7 @@ export async function loadDashboard(user: SessionUser): Promise<DashboardData> {
     today,
     metrics,
     payments: paymentRows && expenseRows ? buildPaymentsTrend(paymentRows, expenseRows, chartFrom, monthStart, today) : null,
-    schedule: scheduleGroups
-      ? scheduleGroups.map((g) => ({
-          id: g.id,
-          name: g.name,
-          courseName: g.course.name,
-          courseColor: g.course.color,
-          teacherName: g.teacher.name,
-          roomName: g.room?.name ?? null,
-          capacity: g.room?.capacity ?? null,
-          students: g._count.enrollments,
-          days: g.days,
-          customDays: g.customDays,
-          startTime: g.startTime,
-          durationMinutes: g.durationMinutes,
-          daysLeft: daysLeft(g.endDate ? toISODate(g.endDate) : null, today),
-        }))
-      : null,
+    schedule: scheduleGroups ? scheduleGroups.map((g) => toScheduleGroup(g, today)) : null,
   };
 }
 
@@ -184,4 +168,41 @@ function buildPaymentsTrend(
     monthly: revMonths.map((m, i) => ({ key: m.key, revenue: m.revenue, expenses: expMonths[i]?.revenue ?? 0 })),
     daily: buildDailyTrend(monthStart, today, rev, exp).map((d) => ({ key: d.date, revenue: d.revenue, expenses: d.expenses })),
   };
+}
+
+const scheduleInclude = {
+  course: { select: { name: true, color: true } },
+  teacher: { select: { name: true } },
+  room: { select: { name: true, capacity: true } },
+  _count: { select: { enrollments: { where: { leftAt: null } } } },
+} satisfies Prisma.GroupInclude;
+
+function toScheduleGroup(g: Prisma.GroupGetPayload<{ include: typeof scheduleInclude }>, today: string): ScheduleGroup {
+  return {
+    id: g.id,
+    name: g.name,
+    courseName: g.course.name,
+    courseColor: g.course.color,
+    teacherName: g.teacher.name,
+    roomName: g.room?.name ?? null,
+    capacity: g.room?.capacity ?? null,
+    students: g._count.enrollments,
+    days: g.days,
+    customDays: g.customDays,
+    startTime: g.startTime,
+    durationMinutes: g.durationMinutes,
+    daysLeft: daysLeft(g.endDate ? toISODate(g.endDate) : null, today),
+  };
+}
+
+/** Faol guruhlar jadvali (yon paneldagi "Dars jadvali" uchun); o'qituvchi roli faqat o'z guruhlarini ko'radi. */
+export async function loadScheduleGroups(user: SessionUser): Promise<{ groups: ScheduleGroup[]; today: string }> {
+  const today = toCenterParts(new Date()).date;
+  const teacherId = isTeacherOnly(user.roles) ? (user.teacherId ?? "none") : undefined;
+  const rows = await prisma.group.findMany({
+    where: { organizationId: user.orgId, status: "ACTIVE", ...(teacherId && { teacherId }) },
+    orderBy: [{ startTime: "asc" }, { name: "asc" }],
+    include: scheduleInclude,
+  });
+  return { groups: rows.map((g) => toScheduleGroup(g, today)), today };
 }
