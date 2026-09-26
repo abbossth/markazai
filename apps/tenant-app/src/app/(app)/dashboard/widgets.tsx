@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { fromISODate, isoWeekday, TIMETABLE_TABS, timeRange, timetableTab, type TimetableTab } from "@markazai/types";
 import { Badge } from "@/components/ui/badge";
+import { HScroll } from "@/components/shared/h-scroll";
 import { Button } from "@/components/ui/button";
 import { ChartSkeleton } from "@/components/shared/skeletons";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -397,7 +398,7 @@ export function ScheduleWidget({ groups, today }: { groups: ScheduleGroup[]; tod
       {shown.length === 0 ? (
         <EmptyState title={t("empty")} />
       ) : horizontal ? (
-        <div className="overflow-x-auto pb-4">
+        <HScroll>
           <table className="w-full rounded-lg border border-separate border-spacing-0 text-sm">
             <thead>
               <tr>
@@ -437,9 +438,9 @@ export function ScheduleWidget({ groups, today }: { groups: ScheduleGroup[]; tod
               ))}
             </tbody>
           </table>
-        </div>
+        </HScroll>
       ) : (
-        <div className="overflow-x-auto pb-4">
+        <HScroll>
           <table className="w-full rounded-lg border border-separate border-spacing-0 text-sm">
             <thead>
               <tr>
@@ -464,7 +465,7 @@ export function ScheduleWidget({ groups, today }: { groups: ScheduleGroup[]; tod
               ))}
             </tbody>
           </table>
-        </div>
+        </HScroll>
       )}
     </div>
   );
