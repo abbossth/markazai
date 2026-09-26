@@ -11,7 +11,7 @@ import { GroupStatusBadge } from "@/components/shared/status-badge";
 import { HistoryList } from "@/components/shared/history-list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Flag, MessageSquare, Phone, Users } from "lucide-react";
+import { BookOpen, Flag, MapPin, MessageSquare, Phone, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate, formatMoney, formatPhone, initials } from "@/lib/format";
 import { can } from "@/lib/permissions";
@@ -90,37 +90,61 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
         / {teacher.name}
       </div>
 
-      <header className="bg-card flex flex-wrap items-center gap-4 rounded-xl border p-4 sm:p-5">
-        <Avatar className="size-16">
-          {teacher.photoUrl && <AvatarImage src={teacher.photoUrl} alt="" />}
-          <AvatarFallback className="text-lg">{initials(teacher.name)}</AvatarFallback>
-        </Avatar>
-        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-semibold">{teacher.name}</h1>
-            <Badge variant={teacher.isActive ? "secondary" : "outline"}>{teacher.isActive ? t("active") : t("inactive")}</Badge>
-            {roleLabels.map((r) => (
-              <Badge key={r} variant="outline" className="font-normal">
-                {r}
+      <header className="bg-card overflow-hidden rounded-2xl border shadow-xs">
+        {/* Dekorativ banner: brend gradienti */}
+        <div className="from-brand-500 to-brand-500/60 h-14 bg-gradient-to-r sm:h-16" aria-hidden />
+        <div className="flex flex-wrap items-end gap-x-6 gap-y-4 px-5 pb-5 sm:px-6">
+          <Avatar className="ring-card -mt-9 size-20 shrink-0 ring-4 sm:-mt-10 sm:size-24">
+            {teacher.photoUrl && <AvatarImage src={teacher.photoUrl} alt="" />}
+            <AvatarFallback className="bg-brand-500/10 text-brand-500 text-xl font-semibold">{initials(teacher.name)}</AvatarFallback>
+          </Avatar>
+
+          <div className="flex min-w-0 flex-1 basis-64 flex-col gap-2 pt-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{teacher.name}</h1>
+              <Badge variant={teacher.isActive ? "secondary" : "outline"} className={teacher.isActive ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : ""}>
+                <span className={`mr-1.5 inline-block size-1.5 rounded-full ${teacher.isActive ? "bg-emerald-500" : "bg-muted-foreground"}`} aria-hidden />
+                {teacher.isActive ? t("active") : t("inactive")}
               </Badge>
-            ))}
+            </div>
+            <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
+              {roleLabels.map((r) => (
+                <Badge key={r} variant="outline" className="font-normal">
+                  {r}
+                </Badge>
+              ))}
+              <a href={`tel:+${teacher.phone}`} className="bg-muted/60 hover:bg-muted text-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1 tabular-nums transition-colors">
+                <Phone className="size-3.5" />
+                {formatPhone(teacher.phone)}
+              </a>
+              {teacher.branches.length > 0 && (
+                <span className="bg-muted/60 inline-flex items-center gap-1.5 rounded-full px-3 py-1">
+                  <MapPin className="size-3.5" />
+                  {teacher.branches.map((b) => b.branch.name).join(", ")}
+                </span>
+              )}
+              <span className="text-xs">ID: {teacher.id.slice(0, 8)}</span>
+            </div>
           </div>
-          <p className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <a href={`tel:+${teacher.phone}`} className="hover:text-foreground inline-flex items-center gap-1.5 tabular-nums">
-              <Phone className="size-3.5" />
-              {formatPhone(teacher.phone)}
-            </a>
-            <span className="text-xs">ID: {teacher.id.slice(0, 8)}</span>
-          </p>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="divide-border bg-muted/40 flex divide-x overflow-hidden rounded-xl border">
+              <StatTile icon={<BookOpen className="size-4" />} label={t("groups")} value={activeGroups.length} />
+              <StatTile icon={<Users className="size-4" />} label={t("students")} value={studentCount} />
+            </div>
+            <div className="flex items-center gap-2 print:hidden">
+              <a
+                href="#teacher-reminders"
+                className="inline-flex h-9 items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-500/20 dark:text-emerald-400"
+              >
+                <Flag className="size-4" />
+                {t("reminders")}
+                {reminders.filter((r) => !r.doneAt).length > 0 && <span className="rounded-full bg-emerald-600 px-1.5 text-xs text-white tabular-nums">{reminders.filter((r) => !r.doneAt).length}</span>}
+              </a>
+              {canWrite && <TeacherHeaderActions teacher={toEditable(teacher, canSalary)} isActive={teacher.isActive} lookups={lookups} canSalary={canSalary} />}
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <StatTile icon={<BookOpen className="size-4" />} label={t("groups")} value={activeGroups.length} />
-          <StatTile icon={<Users className="size-4" />} label={t("students")} value={studentCount} />
-        </div>
-        <a href="#teacher-reminders" className="border-input hover:bg-muted inline-flex size-8 items-center justify-center rounded-lg border text-emerald-600 print:hidden" aria-label={t("reminders")} title={t("reminders")}>
-          <Flag className="size-4" />
-        </a>
-        {canWrite && <TeacherHeaderActions teacher={toEditable(teacher, canSalary)} isActive={teacher.isActive} lookups={lookups} canSalary={canSalary} />}
       </header>
 
       <Tabs key={tab} defaultValue={tab}>
@@ -254,12 +278,12 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
 
 function StatTile({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="bg-muted/50 flex min-w-24 flex-col gap-0.5 rounded-lg border px-3 py-2">
+    <div className="flex min-w-24 flex-col gap-0.5 px-4 py-2">
       <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
         {icon}
         {label}
       </span>
-      <span className="text-xl font-semibold tabular-nums">{value}</span>
+      <span className="text-2xl leading-none font-semibold tabular-nums">{value}</span>
     </div>
   );
 }
