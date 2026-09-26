@@ -2,7 +2,7 @@ import { ensureDefaultLeadColumns, prisma, type Prisma } from "@markazai/db";
 import { DAYS_PATTERNS, LEAD_SOURCES, centerDayRange, toCenterParts, type DaysPattern, type LeadSourceValue } from "@markazai/types";
 import { dateParam, param, type RawSearchParams } from "@/lib/search-params";
 import type { SessionUser } from "@/lib/session";
-import { containerId } from "./container";
+import { SET_COLUMN_INDEX, containerId } from "./container";
 
 export const TASK_FILTERS = ["overdue", "today", "any", "none"] as const;
 const MAX_LEADS = 1000;
@@ -108,10 +108,10 @@ export async function loadBoard(user: SessionUser, sp: RawSearchParams) {
     (containers[containerId(l.columnId, l.listId)] ??= []).push(l.id);
   }
 
-  const boardColumns: BoardColumn[] = columns.map((c) => ({
+  const boardColumns: BoardColumn[] = columns.map((c, index) => ({
     id: c.id,
     name: c.name,
-    isSet: c.isSet,
+    isSet: index === SET_COLUMN_INDEX,
     lists: lists.filter((l) => l.columnId === c.id).map((l) => ({ id: l.id, name: l.name, isLocked: l.isLocked, courseId: l.courseId, teacherId: l.teacherId, daysPattern: l.daysPattern, startTime: l.startTime })),
   }));
 

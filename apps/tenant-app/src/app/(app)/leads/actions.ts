@@ -208,16 +208,6 @@ export async function renameColumn(id: string, name: string): Promise<Result> {
   return { ok: true };
 }
 
-/** "Set" bo'limi belgisi: yoqilsa, ustundagi ro'yxatlar guruh ma'lumotlari (kurs, o'qituvchi, kunlar, vaqt) bilan yaratiladi. */
-export async function setColumnIsSet(id: string, isSet: boolean): Promise<Result> {
-  const user = await guard("leads:configure");
-  if (!user) return { ok: false, error: "forbidden" };
-  const res = await prisma.leadColumn.updateMany({ where: { id, organizationId: user.orgId }, data: { isSet } });
-  if (res.count === 0) return { ok: false, error: "notFound" };
-  refresh();
-  return { ok: true };
-}
-
 /** Ustunda faol lidlar bo'lsa o'chirilmaydi; talabaga aylangan lidlar boshqa ustunga o'tkaziladi. */
 export async function deleteColumn(id: string): Promise<Result> {
   const user = await guard("leads:configure");

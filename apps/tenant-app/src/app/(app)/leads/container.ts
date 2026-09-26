@@ -14,3 +14,6 @@ export const parseContainer = (id: string) => {
  * qo'shiladi, shuning uchun bu ustunlar doim tartib bo'yicha birinchi uchtasi bo'lib qoladi.
  */
 export const PROTECTED_COLUMN_COUNT = 3;
+
+/** "Set" (guruh yig'ish) bo'limi — doim uchinchi ustun. Belgilab yoqib-o'chirilmaydi. */
+export const SET_COLUMN_INDEX = 2;

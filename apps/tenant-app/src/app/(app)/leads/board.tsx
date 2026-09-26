@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Bell, Check, Eye, EyeOff, FolderPlus, Lock, LockOpen, MoreHorizontal, Plus, UserPlus } from "lucide-react";
+import { Bell, Eye, EyeOff, FolderPlus, Lock, LockOpen, MoreHorizontal, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { LEAD_SOURCES } from "@markazai/types";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatPhone, initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { createColumn, deleteColumn, deleteLead, deleteList, moveLead, renameColumn, setColumnIsSet, setListLocked } from "./actions";
+import { createColumn, deleteColumn, deleteLead, deleteList, moveLead, renameColumn, setListLocked } from "./actions";
 import { LeadSheet, type EditableLead } from "./lead-form";
 import { ListDialog, type ListDialogState } from "./list-dialog";
 import { NameDialog } from "./name-dialog";
@@ -225,9 +225,6 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setNameDialog({ kind: "renameColumn", id: column.id, name: column.name })}>{t("renameColumn")}</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => run(() => setColumnIsSet(column.id, !column.isSet))}>
-                          <Check className={column.isSet ? "" : "opacity-0"} /> {t("setSection")}
-                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setListDialog({ columnId: column.id })}>
                           <FolderPlus /> {t("newList")}
                         </DropdownMenuItem>
