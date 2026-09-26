@@ -601,7 +601,78 @@
     "hideList": "Ro'yxatni yashirish",
     "showList": "Ro'yxatni ko'rsatish",
     "newSet": "Yangi guruh to'plami",
-    "editSet": "Guruh to'plamini tahrirlash"
+    "editSet": "Guruh to'plamini tahrirlash",
+    "arch": {
+      "menu": {
+        "archive": "Lidlar arxivi",
+        "import": "Excel import",
+        "export": "Excel export",
+        "tags": "Teglar",
+        "forms": "Shakllar",
+        "reasons": "Arxivlash sabablari",
+        "more": "Yana"
+      },
+      "dialog": {
+        "title": "Lidni arxivlash",
+        "reason": "Sabab",
+        "choose": "Sababni tanlang",
+        "note": "Izoh",
+        "submit": "Arxivlash",
+        "done": "Lid arxivlandi",
+        "noReasons": "Faol sabab yo'q. Avval «Arxivlash sabablari» bo'limiga qo'shing."
+      },
+      "page": {
+        "title": "Lidlar arxivi",
+        "count": "Soni: {count}",
+        "back": "Lidlarga qaytish",
+        "empty": "Arxiv bo'sh",
+        "no": "№",
+        "name": "Ism",
+        "section": "Bo'lim",
+        "phone": "Telefon",
+        "reason": "Sabab",
+        "note": "Izoh",
+        "archived": "Arxivlandi",
+        "restore": "Qayta tiklash",
+        "purge": "Butunlay o'chirish",
+        "purgeConfirm": "{count} ta lid butunlay o'chiriladi. Bu amalni qaytarib bo'lmaydi.",
+        "selected": "Tanlangan: {count}",
+        "restored": "{count} ta lid qaytarildi",
+        "purged": "{count} ta lid o'chirildi",
+        "filterReason": "Sabab",
+        "filterEmployee": "Xodim",
+        "from": "Arxivlangan sana: dan",
+        "to": "Arxivlangan sana: gacha",
+        "search": "Ism yoki telefon"
+      },
+      "reasons": {
+        "title": "Arxivlash sabablari",
+        "hint": "Lid arxivlanganda shulardan biri tanlanadi. Sabab o'chirilmaydi, faqat arxivlanadi (eski yozuvlar saqlanadi).",
+        "active": "Faol",
+        "inactive": "Arxivlangan",
+        "add": "Qo'shish",
+        "addTitle": "Yangi sabab",
+        "editTitle": "Sababni tahrirlash",
+        "name": "Nomi",
+        "actions": "Amallar",
+        "edit": "Tahrirlash",
+        "deactivate": "Arxivlash",
+        "activate": "Faollashtirish",
+        "duplicate": "Bunday sabab allaqachon bor",
+        "empty": "Sabab yo'q"
+      },
+      "import": {
+        "title": "Excel'dan import qilish",
+        "pick": "Faylni tanlang (.xlsx)",
+        "hint": "Ustunlar: name, phone, source, section. Bir martada 1000 tagacha lid. Bo'lim topilmasa, birinchi ustunda shu nomli ro'yxat yaratiladi. Telefoni bor lidlar o'tkazib yuboriladi.",
+        "sample": "Namuna Excel faylni yuklash",
+        "upload": "Yuklash",
+        "result": "Qo'shildi: {created}. O'tkazib yuborildi (takroriy): {skipped}. Xato: {failed}.",
+        "errors": "Xato qatorlar",
+        "tooBig": "Fayl juda katta yoki 1000 tadan ko'p qator bor",
+        "badFile": "Fayl o'qilmadi (.xlsx bo'lishi kerak)"
+      }
+    }
   },
   "calls": {
     "log": "Qo'ng'iroqni qayd etish",

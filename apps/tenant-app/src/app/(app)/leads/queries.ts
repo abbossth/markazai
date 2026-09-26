@@ -1,4 +1,4 @@
-import { ensureDefaultLeadColumns, prisma, type Prisma } from "@markazai/db";
+import { ensureDefaultArchiveReasons, ensureDefaultLeadColumns, prisma, type Prisma } from "@markazai/db";
 import { DAYS_PATTERNS, LEAD_SOURCES, centerDayRange, toCenterParts, type DaysPattern, type LeadSourceValue } from "@markazai/types";
 import { dateParam, param, type RawSearchParams } from "@/lib/search-params";
 import type { SessionUser } from "@/lib/session";
@@ -34,6 +34,7 @@ export type BoardColumn = {
 export async function loadBoard(user: SessionUser, sp: RawSearchParams) {
   // Yangi tashkilotda birinchi kirishda standart ustunlar yaratiladi.
   const columns = await ensureDefaultLeadColumns(prisma, user.orgId);
+  await ensureDefaultArchiveReasons(prisma, user.orgId);
   const lists = await prisma.leadList.findMany({ where: { organizationId: user.orgId }, orderBy: { position: "asc" } });
 
   const q = param(sp, "q");
@@ -70,7 +71,7 @@ export async function loadBoard(user: SessionUser, sp: RawSearchParams) {
   if (task === "any") and.push({ reminders: { some: pending } });
   if (task === "none") and.push({ reminders: { none: pending } });
 
-  const where: Prisma.LeadWhereInput = { organizationId: user.orgId, convertedStudentId: null, AND: and };
+  const where: Prisma.LeadWhereInput = { organizationId: user.orgId, convertedStudentId: null, archivedAt: null, AND: and };
 
   const [leads, assignees] = await Promise.all([
     prisma.lead.findMany({
@@ -115,13 +116,14 @@ export async function loadBoard(user: SessionUser, sp: RawSearchParams) {
     lists: lists.filter((l) => l.columnId === c.id).map((l) => ({ id: l.id, name: l.name, isLocked: l.isLocked, courseId: l.courseId, teacherId: l.teacherId, daysPattern: l.daysPattern, startTime: l.startTime })),
   }));
 
-  const [courses, tags, teachers] = await Promise.all([
+  const [courses, tags, teachers, archiveReasons] = await Promise.all([
     prisma.course.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.tag.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.teacher.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.leadArchiveReason.findMany({ where: { organizationId: user.orgId, isActive: true }, orderBy: { createdAt: "asc" }, select: { id: true, name: true } }),
   ]);
 
-  return { columns: boardColumns, cards, containers, lookups: { courses, tags, teachers, assignees, columns: boardColumns } };
+  return { columns: boardColumns, cards, containers, lookups: { courses, tags, teachers, archiveReasons, assignees, columns: boardColumns } };
 }
 
 export type BoardLookups = Awaited<ReturnType<typeof loadBoard>>["lookups"];

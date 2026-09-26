@@ -5,6 +5,7 @@ import { FilterBar, type FilterField } from "@/components/data-table/filter-bar"
 import { can } from "@/lib/permissions";
 import { requireModule } from "@/lib/session";
 import { Board } from "./board";
+import { LeadsMenu } from "./leads-menu";
 import { TASK_FILTERS, loadBoard } from "./queries";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -41,7 +42,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
   return (
     <div className="flex min-w-0 flex-col gap-4">
       <h1 className="text-2xl font-semibold">{t("title")}</h1>
-      <FilterBar searchPlaceholder={t("searchPlaceholder")} fields={fields} />
+      <FilterBar searchPlaceholder={t("searchPlaceholder")} fields={fields} actions={<LeadsMenu canImport={canWrite} canConfigure={can(user.roles, "leads:configure")} canSettings={can(user.roles, "settings:manage")} />} />
       <Board
         columns={columns}
         cards={cards}

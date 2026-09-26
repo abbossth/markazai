@@ -43,13 +43,13 @@ async function checkRefs(user: SessionUser, d: { columnId: string; listId?: stri
 }
 
 async function nextPosition(orgId: string, columnId: string, listId: string | null) {
-  const last = await prisma.lead.aggregate({ where: { organizationId: orgId, columnId, listId, convertedStudentId: null }, _max: { position: true } });
+  const last = await prisma.lead.aggregate({ where: { organizationId: orgId, columnId, listId, convertedStudentId: null, archivedAt: null }, _max: { position: true } });
   return (last._max.position ?? -1) + 1;
 }
 
 /** Telefon bo'yicha mavjud lid/talabani topadi (takroriy kiritishdan ogohlantirish uchun). */
 async function findDuplicate(user: SessionUser, phone: string, excludeLeadId?: string) {
-  const lead = await prisma.lead.findFirst({ where: { organizationId: user.orgId, phone, convertedStudentId: null, id: excludeLeadId ? { not: excludeLeadId } : undefined }, select: { name: true } });
+  const lead = await prisma.lead.findFirst({ where: { organizationId: user.orgId, phone, convertedStudentId: null, archivedAt: null, id: excludeLeadId ? { not: excludeLeadId } : undefined }, select: { name: true } });
   if (lead) return { name: lead.name, kind: "lead" as const };
   const student = await prisma.student.findFirst({ where: { organizationId: user.orgId, phone }, select: { name: true } });
   return student ? { name: student.name, kind: "student" as const } : null;
@@ -217,7 +217,7 @@ export async function deleteColumn(id: string): Promise<Result> {
   if (index === -1) return { ok: false, error: "notFound" };
   if (index < PROTECTED_COLUMN_COUNT) return { ok: false, error: "protected" };
   if (columns.length === 1) return { ok: false, error: "lastColumn" };
-  if ((await prisma.lead.count({ where: { organizationId: user.orgId, columnId: id, convertedStudentId: null } })) > 0) return { ok: false, error: "columnNotEmpty" };
+  if ((await prisma.lead.count({ where: { organizationId: user.orgId, columnId: id, convertedStudentId: null, archivedAt: null } })) > 0) return { ok: false, error: "columnNotEmpty" };
 
   const fallback = columns.find((c) => c.id !== id)!.id;
   await prisma.$transaction([

@@ -17,6 +17,7 @@ export async function loadLeadLookups(user: SessionUser): Promise<BoardLookups> 
     courses,
     tags,
     teachers,
+    archiveReasons: [],
     assignees,
     columns: columns.map((c, index) => ({ id: c.id, name: c.name, isSet: index === SET_COLUMN_INDEX, lists: lists.filter((l) => l.columnId === c.id).map((l) => ({ id: l.id, name: l.name, isLocked: l.isLocked, courseId: l.courseId, teacherId: l.teacherId, daysPattern: l.daysPattern, startTime: l.startTime })) })),
   };

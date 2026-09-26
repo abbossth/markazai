@@ -93,7 +93,7 @@ export async function loadDashboard(user: SessionUser): Promise<DashboardData> {
     has("activeStudents") ? prisma.student.count({ where: { organizationId: org, status: "ACTIVE", ...studentScope } }) : null,
     has("groups") ? prisma.group.count({ where: { organizationId: org, status: "ACTIVE", ...groupScope } }) : null,
     has("debtors") ? prisma.student.count({ where: { organizationId: org, balance: { lt: 0 } } }) : null,
-    has("activeLeads") ? prisma.lead.count({ where: { organizationId: org, convertedStudentId: null } }) : null,
+    has("activeLeads") ? prisma.lead.count({ where: { organizationId: org, convertedStudentId: null, archivedAt: null } }) : null,
     has("trial") ? prisma.student.count({ where: { organizationId: org, status: "TRIAL", ...studentScope } }) : null,
     has("paidThisMonth")
       ? prisma.payment.findMany({ where: { organizationId: org, type: "MANUAL", amount: { gt: 0 }, date: range }, distinct: ["studentId"], select: { studentId: true } })

@@ -28,7 +28,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatPhone, initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { createColumn, deleteColumn, deleteLead, deleteList, moveLead, renameColumn } from "./actions";
+import { createColumn, deleteColumn, deleteList, moveLead, renameColumn } from "./actions";
+import { ArchiveDialog } from "./archive-dialog";
 import { LeadSheet, type EditableLead } from "./lead-form";
 import { ListDialog, type ListDialogState } from "./list-dialog";
 import { NameDialog } from "./name-dialog";
@@ -51,7 +52,7 @@ type Props = {
 
 type NameDialogState = { kind: "newColumn" } | { kind: "renameColumn"; id: string; name: string };
 
-type ConfirmState = { kind: "deleteColumn"; id: string; name: string } | { kind: "deleteList"; id: string; name: string } | { kind: "deleteLead"; id: string; name: string };
+type ConfirmState = { kind: "deleteColumn"; id: string; name: string } | { kind: "deleteList"; id: string; name: string };
 
 export function Board({ columns, cards, containers: initialContainers, lookups, canWrite, canDelete, canConfigure }: Props) {
   const t = useTranslations("lead");
@@ -76,6 +77,7 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
   // Ochiq (ko'rinadigan) ro'yxatlar brauzerda saqlanadi; sukut bo'yicha hammasi yopiq.
   const [openLists, toggleList] = useLocalSet("markazai.leadListsOpen");
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
+  const [archiveTarget, setArchiveTarget] = useState<{ id: string; name: string } | null>(null);
 
   const sensors = useSensors(
     // 5px dan keyin sudrash boshlanadi — oddiy bosish (havola/menyu) buzilmaydi.
@@ -163,7 +165,7 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
     const c = confirm;
     setConfirm(null);
     run(
-      () => (c.kind === "deleteColumn" ? deleteColumn(c.id) : c.kind === "deleteList" ? deleteList(c.id) : deleteLead(c.id)),
+      () => (c.kind === "deleteColumn" ? deleteColumn(c.id) : deleteList(c.id)),
       () => toast.success(tc("deleted")),
     );
   };
@@ -305,14 +307,14 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                           </DropdownMenu>
                         )}
                         </div>
-                        <Container id={cid} ids={ids} cards={cards} collapsed={!open} canWrite={canWrite} canDelete={canDelete} onEdit={(c) => setSheet({ lead: toEditable(c) })} onDelete={(c) => setConfirm({ kind: "deleteLead", id: c.id, name: c.name })} />
+                        <Container id={cid} ids={ids} cards={cards} collapsed={!open} canWrite={canWrite} canDelete={canDelete} onEdit={(c) => setSheet({ lead: toEditable(c) })} onDelete={(c) => setArchiveTarget({ id: c.id, name: c.name })} />
                         <p className="bg-background/70 text-muted-foreground rounded-md py-1 text-center text-xs font-medium tabular-nums">
                           {open ? ids.length : 0} / {ids.length}
                         </p>
                       </div>
                     );
                   })}
-                  <Container id={containerId(column.id, null)} ids={containers[containerId(column.id, null)] ?? []} cards={cards} canWrite={canWrite} canDelete={canDelete} onEdit={(c) => setSheet({ lead: toEditable(c) })} onDelete={(c) => setConfirm({ kind: "deleteLead", id: c.id, name: c.name })} />
+                  <Container id={containerId(column.id, null)} ids={containers[containerId(column.id, null)] ?? []} cards={cards} canWrite={canWrite} canDelete={canDelete} onEdit={(c) => setSheet({ lead: toEditable(c) })} onDelete={(c) => setArchiveTarget({ id: c.id, name: c.name })} />
                 </div>
               </section>
             );
@@ -323,6 +325,8 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
       </DndContext>
 
       {sheet && <LeadSheet open onOpenChange={(o) => !o && setSheet(null)} lookups={lookups} lead={sheet.lead} defaultColumnId={sheet.columnId} defaultListId={sheet.listId} />}
+
+      {archiveTarget && <ArchiveDialog lead={archiveTarget} reasons={lookups.archiveReasons} onClose={() => setArchiveTarget(null)} />}
 
       {listDialog && <ListDialog state={listDialog} onClose={() => setListDialog(null)} lookups={lookups} withGroup={!!columns.find((c) => c.id === listDialog.columnId)?.isSet} />}
 
@@ -380,6 +384,7 @@ function CardView({ card, overlay, canWrite, canDelete, onEdit, onDelete }: { ca
   const t = useTranslations("lead");
   const tc = useTranslations("common");
   const te = useTranslations("enums.leadSource");
+  const ta = useTranslations("lead.arch");
   const source = LEAD_SOURCES.find((s) => s.value === card.source);
   const d = new Date(card.createdAt);
   const date = `${String(d.getUTCDate()).padStart(2, "0")}.${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
@@ -409,7 +414,7 @@ function CardView({ card, overlay, canWrite, canDelete, onEdit, onDelete }: { ca
                 {canDelete && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive" onClick={onDelete}>{tc("delete")}</DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onClick={onDelete}>{ta("dialog.submit")}</DropdownMenuItem>
                   </>
                 )}
               </DropdownMenuContent>

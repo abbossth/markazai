@@ -601,7 +601,78 @@
     "hideList": "Hide list",
     "showList": "Show list",
     "newSet": "New group roster",
-    "editSet": "Edit group roster"
+    "editSet": "Edit group roster",
+    "arch": {
+      "menu": {
+        "archive": "Leads archive",
+        "import": "Excel import",
+        "export": "Excel export",
+        "tags": "Tags",
+        "forms": "Forms",
+        "reasons": "Archive reasons",
+        "more": "More"
+      },
+      "dialog": {
+        "title": "Archive lead",
+        "reason": "Reason",
+        "choose": "Choose a reason",
+        "note": "Note",
+        "submit": "Archive",
+        "done": "Lead archived",
+        "noReasons": "No active reasons. Add some under “Archive reasons” first."
+      },
+      "page": {
+        "title": "Leads archive",
+        "count": "Total: {count}",
+        "back": "Back to leads",
+        "empty": "The archive is empty",
+        "no": "#",
+        "name": "Name",
+        "section": "Section",
+        "phone": "Phone",
+        "reason": "Reason",
+        "note": "Note",
+        "archived": "Archived",
+        "restore": "Restore",
+        "purge": "Delete permanently",
+        "purgeConfirm": "{count} lead(s) will be deleted permanently. This cannot be undone.",
+        "selected": "Selected: {count}",
+        "restored": "{count} lead(s) restored",
+        "purged": "{count} lead(s) deleted",
+        "filterReason": "Reason",
+        "filterEmployee": "Employee",
+        "from": "Archived: from",
+        "to": "Archived: to",
+        "search": "Name or phone"
+      },
+      "reasons": {
+        "title": "Archive reasons",
+        "hint": "One of these is chosen when a lead is archived. Reasons are archived, never deleted (old records keep their reason).",
+        "active": "Active",
+        "inactive": "Archived",
+        "add": "Add",
+        "addTitle": "New reason",
+        "editTitle": "Edit reason",
+        "name": "Name",
+        "actions": "Actions",
+        "edit": "Edit",
+        "deactivate": "Archive",
+        "activate": "Activate",
+        "duplicate": "This reason already exists",
+        "empty": "No reasons"
+      },
+      "import": {
+        "title": "Import from Excel",
+        "pick": "Choose a file (.xlsx)",
+        "hint": "Columns: name, phone, source, section. Up to 1000 leads at once. If a section is not found, a list with that name is created in the first column. Leads whose phone already exists are skipped.",
+        "sample": "Download sample Excel",
+        "upload": "Upload",
+        "result": "Added: {created}. Skipped (duplicates): {skipped}. Failed: {failed}.",
+        "errors": "Rows with errors",
+        "tooBig": "The file is too large or has more than 1000 rows",
+        "badFile": "Could not read the file (.xlsx required)"
+      }
+    }
   },
   "calls": {
     "log": "Log a call",

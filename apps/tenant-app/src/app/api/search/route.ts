@@ -54,7 +54,7 @@ export async function GET(request: Request) {
       : [],
     canAccess(user.roles, "leads") && !teacherOnly
       ? prisma.lead.findMany({
-          where: { organizationId: user.orgId, OR: [{ name: { contains: q, mode: "insensitive" } }, ...phoneOr] },
+          where: { organizationId: user.orgId, archivedAt: null, OR: [{ name: { contains: q, mode: "insensitive" } }, ...phoneOr] },
           select: { id: true, name: true, phone: true },
           orderBy: { name: "asc" },
           take: 6,

@@ -622,9 +622,15 @@ model Lead {
   // Talabaga aylantirilgan lid doskadan yo'qoladi, lekin konversiya hisoboti uchun saqlanadi.
   convertedStudentId String?      @unique @map("converted_student_id") @db.Uuid
   convertedAt        DateTime?    @map("converted_at")
+  // Arxivlangan lid doskadan yo'qoladi (sabab bilan), arxiv sahifasidan qayta tiklanadi yoki butunlay o'chiriladi.
+  archivedAt         DateTime?    @map("archived_at")
+  archivedById       String?      @map("archived_by_id") @db.Uuid
+  archiveReasonId    String?      @map("archive_reason_id") @db.Uuid
+  archiveNote        String?      @map("archive_note")
   createdAt          DateTime     @default(now()) @map("created_at")
   updatedAt          DateTime     @updatedAt @map("updated_at")
 
+  archiveReason    LeadArchiveReason? @relation(fields: [archiveReasonId], references: [id], onDelete: SetNull)
   column           LeadColumn @relation(fields: [columnId], references: [id])
   list             LeadList?  @relation(fields: [listId], references: [id], onDelete: SetNull)
   course           Course?    @relation(fields: [courseId], references: [id], onDelete: SetNull)
@@ -636,7 +642,23 @@ model Lead {
 
   @@index([organizationId, columnId, listId, position])
   @@index([organizationId, phone])
+  @@index([organizationId, archivedAt])
   @@map("leads")
+}
+
+// Lidni arxivlash sabablari (tashkilot o'zi boshqaradi). O'chirilmaydi — faolsizlantiriladi, eski arxivlar saqlanadi.
+model LeadArchiveReason {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  isActive       Boolean  @default(true) @map("is_active")
+  createdById    String?  @map("created_by_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  leads Lead[]
+
+  @@unique([organizationId, name])
+  @@map("lead_archive_reasons")
 }
 
 model LeadTag {

@@ -36,7 +36,7 @@ export async function submitLead(input: unknown): Promise<SubmitResult> {
   if (d.course && !(await prisma.course.findFirst({ where: { id: d.course, organizationId: orgId }, select: { id: true } }))) return { ok: false, error: "validation", fieldErrors: { course: "invalid" } };
 
   // Takroriy so'rov: shu telefonli faol lid bor — foydalanuvchiga muvaffaqiyat, yangi lid yaratilmaydi.
-  if (await prisma.lead.findFirst({ where: { organizationId: orgId, phone: d.phone, convertedStudentId: null }, select: { id: true } })) return { ok: true };
+  if (await prisma.lead.findFirst({ where: { organizationId: orgId, phone: d.phone, convertedStudentId: null, archivedAt: null }, select: { id: true } })) return { ok: true };
 
   const column =
     (form.columnId ? await prisma.leadColumn.findFirst({ where: { id: form.columnId, organizationId: orgId } }) : null) ?? (await prisma.leadColumn.findFirst({ where: { organizationId: orgId }, orderBy: { position: "asc" } }));
