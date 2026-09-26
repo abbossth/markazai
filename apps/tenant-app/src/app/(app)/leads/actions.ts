@@ -259,7 +259,7 @@ export async function createList(columnId: string, name: string, details: ListDe
   return { ok: true };
 }
 
-/** Ro'yxat nomi va "set" ma'lumotlarini yangilaydi (qulflangan ro'yxat o'zgarmaydi). */
+/** Ro'yxat nomi va "set" ma'lumotlarini yangilaydi. */
 export async function updateList(id: string, name: string, details: ListDetails = {}): Promise<Result> {
   const user = await guard("leads:configure");
   if (!user) return { ok: false, error: "forbidden" };
@@ -268,41 +268,17 @@ export async function updateList(id: string, name: string, details: ListDetails 
   if (!parsed.success || !d.success) return { ok: false, error: "validation" };
   const list = await prisma.leadList.findFirst({ where: { id, organizationId: user.orgId } });
   if (!list) return { ok: false, error: "notFound" };
-  if (list.isLocked) return { ok: false, error: "locked" };
   await prisma.leadList.update({ where: { id }, data: { name: parsed.data.name, ...listDetailData(d.data) } });
   refresh();
   return { ok: true };
 }
 
-export async function renameList(id: string, name: string): Promise<Result> {
-  const user = await guard("leads:configure");
-  if (!user) return { ok: false, error: "forbidden" };
-  const parsed = listSchema.safeParse({ name });
-  if (!parsed.success) return { ok: false, error: "validation" };
-  const list = await prisma.leadList.findFirst({ where: { id, organizationId: user.orgId } });
-  if (!list) return { ok: false, error: "notFound" };
-  if (list.isLocked) return { ok: false, error: "locked" };
-  await prisma.leadList.update({ where: { id }, data: { name: parsed.data.name } });
-  refresh();
-  return { ok: true };
-}
-
-export async function setListLocked(id: string, isLocked: boolean): Promise<Result> {
-  const user = await guard("leads:configure");
-  if (!user) return { ok: false, error: "forbidden" };
-  const res = await prisma.leadList.updateMany({ where: { id, organizationId: user.orgId }, data: { isLocked } });
-  if (res.count === 0) return { ok: false, error: "notFound" };
-  refresh();
-  return { ok: true };
-}
-
-/** Qulflangan ro'yxat o'chirilmaydi. O'chirilganda lidlar ustunning umumiy qismiga (ro'yxatsiz) o'tadi. */
+/** O'chirilganda lidlar ustunning umumiy qismiga (ro'yxatsiz) o'tadi. */
 export async function deleteList(id: string): Promise<Result> {
   const user = await guard("leads:configure");
   if (!user) return { ok: false, error: "forbidden" };
   const list = await prisma.leadList.findFirst({ where: { id, organizationId: user.orgId } });
   if (!list) return { ok: false, error: "notFound" };
-  if (list.isLocked) return { ok: false, error: "locked" };
 
   await prisma.$transaction(async (tx) => {
     const moving = await tx.lead.findMany({ where: { listId: id }, orderBy: { position: "asc" }, select: { id: true } });

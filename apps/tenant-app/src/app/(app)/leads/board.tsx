@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Bell, Eye, EyeOff, FolderPlus, Lock, LockOpen, MoreHorizontal, Plus, UserPlus } from "lucide-react";
+import { Bell, Eye, EyeOff, FolderPlus, MoreHorizontal, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { LEAD_SOURCES } from "@markazai/types";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatPhone, initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { createColumn, deleteColumn, deleteLead, deleteList, moveLead, renameColumn, setListLocked } from "./actions";
+import { createColumn, deleteColumn, deleteLead, deleteList, moveLead, renameColumn } from "./actions";
 import { LeadSheet, type EditableLead } from "./lead-form";
 import { ListDialog, type ListDialogState } from "./list-dialog";
 import { NameDialog } from "./name-dialog";
@@ -156,7 +156,7 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
     });
 
   const errorMessage = (error?: string) =>
-    error === "forbidden" ? tc("forbidden") : error === "columnNotEmpty" ? t("columnNotEmpty") : error === "lastColumn" ? t("lastColumn") : error === "locked" ? t("listLocked") : tc("error");
+    error === "forbidden" ? tc("forbidden") : error === "columnNotEmpty" ? t("columnNotEmpty") : error === "lastColumn" ? t("lastColumn") : tc("error");
 
   const confirmAction = () => {
     if (!confirm) return;
@@ -258,7 +258,6 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                         <div className="flex items-start gap-1 px-1">
                           <div className="min-w-0 flex-1">
                             <p className="flex items-center gap-1 text-sm font-medium">
-                              {list.isLocked && <Lock className="text-muted-foreground size-3 shrink-0" aria-label={t("listLocked")} />}
                               <span className="truncate">{list.name}</span>
                             </p>
                       {column.isSet && (list.courseId || list.teacherId || list.daysPattern || list.startTime) && (
@@ -284,7 +283,7 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                               <MoreHorizontal />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem disabled={list.isLocked} onClick={() => setListDialog({ columnId: column.id, list })}>{tc("edit")}</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setListDialog({ columnId: column.id, list })}>{tc("edit")}</DropdownMenuItem>
                               {column.isSet && (
                               <DropdownMenuItem
                                 onClick={() => {
@@ -299,11 +298,8 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                                 {t("createGroup")}
                               </DropdownMenuItem>
                               )}
-                              <DropdownMenuItem onClick={() => run(() => setListLocked(list.id, !list.isLocked))}>
-                                {list.isLocked ? <LockOpen /> : <Lock />} {list.isLocked ? t("unlockList") : t("lockList")}
-                              </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem variant="destructive" disabled={list.isLocked} onClick={() => setConfirm({ kind: "deleteList", id: list.id, name: list.name })}>{tc("delete")}</DropdownMenuItem>
+                              <DropdownMenuItem variant="destructive" onClick={() => setConfirm({ kind: "deleteList", id: list.id, name: list.name })}>{tc("delete")}</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         )}
