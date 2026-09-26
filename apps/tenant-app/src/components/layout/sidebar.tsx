@@ -45,13 +45,10 @@ export function SidebarNavContent({ roles }: { roles: string[] }) {
         {MAIN_NAV.filter((item) => canAccess(roles, item.key as AppModule)).map((item) => (
           <NavLink key={item.key} item={item} active={isActive(item.href)} />
         ))}
+        {/* Sozlamalar — boshqa bo'limlar qatorida, ro'yxat oxirida. */}
+        {canAccess(roles, "settings") && <NavLink item={SETTINGS_NAV} active={isActive(SETTINGS_NAV.href)} />}
       </nav>
 
-      {canAccess(roles, "settings") && (
-        <div className="border-sidebar-border border-t p-3">
-          <NavLink item={SETTINGS_NAV} active={isActive(SETTINGS_NAV.href)} />
-        </div>
-      )}
     </>
   );
 }
