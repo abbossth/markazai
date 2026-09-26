@@ -18,7 +18,7 @@ import {
   UserX,
   type LucideIcon,
 } from "lucide-react";
-import { TIMETABLE_TABS, timeRange, timetableTab, type TimetableTab } from "@markazai/types";
+import { fromISODate, isoWeekday, TIMETABLE_TABS, timeRange, timetableTab, type TimetableTab } from "@markazai/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChartSkeleton } from "@/components/shared/skeletons";
@@ -127,17 +127,24 @@ export function PaymentsWidget({ points }: { points: { key: string; revenue: num
   );
 }
 
+/** Bugungi kunga mos tab: ISO hafta kuni [1,3,5]=Du/Chor/Ju → "Toq", [2,4,6]=Se/Pay/Sha → "Juft"; Yakshanba → "Toq". */
+function defaultTabFor(today: string): TimetableTab {
+  const weekday = isoWeekday(fromISODate(today));
+  if (weekday === 2 || weekday === 4 || weekday === 6) return "EVEN";
+  return "ODD";
+}
+
 /**
- * Dars jadvali: Toq / Juft / Boshqa tablari; ustunlar — xonalar, qatorlar — dars boshlanish vaqti.
- * Katakda: guruh kodi, kurs, o'qituvchi, talabalar/sig'im va tugashigacha "N kun qoldi".
+ * Dars jadvali: Toq / Juft / Boshqa tablari (sukut — bugungi kunga mos keladigani); ustunlar — xonalar,
+ * qatorlar — dars boshlanish vaqti. Katakda: guruh kodi, kurs, o'qituvchi, talabalar/sig'im va "N kun qoldi".
  */
-export function ScheduleWidget({ groups }: { groups: ScheduleGroup[] }) {
+export function ScheduleWidget({ groups, today }: { groups: ScheduleGroup[]; today: string }) {
   const t = useTranslations("dashboard.schedule");
   const daysLabel = useDaysLabel();
-  const [tab, setTab] = useState<TimetableTab>("ODD");
-  // Jadval ko'rinishi: "vertikal" (vaqt qatorda, xona ustunda — sukut) yoki "gorizontal" (xona qatorda,
-  // vaqt ustunda). Foydalanuvchi tanlovi sifatida saqlanadi (bir marta tanlasa, keyingi safar ham shunday).
-  const [horizontal, setHorizontal] = useLocalPref("markazai.scheduleHorizontal", false);
+  const [tab, setTab] = useState<TimetableTab>(() => defaultTabFor(today));
+  // Jadval ko'rinishi: sukut — "gorizontal" (xona qatorda, vaqt ustunda) — barcha markazlar uchun; foydalanuvchi
+  // "vertikal"ga o'zgartirsa, faqat shu brauzerda (localStorage) saqlanadi, boshqa markaz/xodimga ta'sir qilmaydi.
+  const [horizontal, setHorizontal] = useLocalPref("markazai.scheduleHorizontal", true);
 
   const counts = useMemo(() => Object.fromEntries(TIMETABLE_TABS.map((k) => [k, groups.filter((g) => timetableTab(g.days) === k).length])) as Record<TimetableTab, number>, [groups]);
   const shown = groups.filter((g) => timetableTab(g.days) === tab);
