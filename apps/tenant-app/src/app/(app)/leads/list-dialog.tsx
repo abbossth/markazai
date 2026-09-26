@@ -56,7 +56,7 @@ export function ListDialog({ state, onClose, lookups, withGroup }: { state: List
           }}
         >
           <DialogHeader>
-            <DialogTitle>{l ? t("editList") : t("newList")}</DialogTitle>
+            <DialogTitle>{withGroup ? (l ? t("editSet") : t("newSet")) : l ? t("editList") : t("newList")}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="list-name">{t("listName")}</Label>

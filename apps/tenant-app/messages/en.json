@@ -600,7 +600,8 @@
     "setSection": "Set section",
     "hideList": "Hide list",
     "showList": "Show list",
-    "newSet": "New set (for a group)"
+    "newSet": "New group roster",
+    "editSet": "Edit group roster"
   },
   "calls": {
     "log": "Log a call",

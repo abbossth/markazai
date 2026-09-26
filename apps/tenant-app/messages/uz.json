@@ -600,7 +600,8 @@
     "setSection": "Set bo'limi",
     "hideList": "Ro'yxatni yashirish",
     "showList": "Ro'yxatni ko'rsatish",
-    "newSet": "Yangi set (guruh uchun)"
+    "newSet": "Yangi guruh to'plami",
+    "editSet": "Guruh to'plamini tahrirlash"
   },
   "calls": {
     "log": "Qo'ng'iroqni qayd etish",

@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Bell, CalendarPlus, Eye, EyeOff, FolderPlus, MoreHorizontal, Plus, UserPlus } from "lucide-react";
+import { Bell, CalendarPlus, Eye, EyeOff, FolderPlus, MoreHorizontal, Plus, UserPlus, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { LEAD_SOURCES } from "@markazai/types";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -254,10 +254,11 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                     const ids = containers[cid] ?? [];
                     const open = openLists.has(list.id);
                     return (
-                      <div key={list.id} className="bg-muted/40 flex flex-col gap-2 rounded-xl border p-2">
+                      <div key={list.id} className={cn("bg-muted/40 flex flex-col gap-2 rounded-xl border p-2", column.isSet && "border-l-4 border-l-emerald-500")}>
                         <div className="flex items-start gap-1 px-1">
                           <div className="min-w-0 flex-1">
                             <p className="flex items-center gap-1 text-sm font-medium">
+                              {column.isSet && <UsersRound className="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />}
                               <span className="truncate">{list.name}</span>
                             </p>
                       {column.isSet && (list.courseId || list.teacherId || list.daysPattern || list.startTime) && (
