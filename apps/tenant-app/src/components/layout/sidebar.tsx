@@ -14,6 +14,10 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
   return (
     <Link
       href={item.href}
+      // Sidebar HAR sahifada butunlay ko'rinadi — sukut prefetch barcha modullarni bir vaqtda oldindan
+      // yuklardi (productionda bir necha o'nlab bir zumdagi so'rov, ulanish pool'ini zo'riqtirib, tasodifiy
+      // sessiya uzilishlariga hissa qo'shgani kuzatildi). Havola bosilganda oddiy navigatsiya yetarli.
+      prefetch={false}
       aria-current={active ? "page" : undefined}
       className={cn(
         "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
