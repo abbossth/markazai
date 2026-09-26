@@ -927,7 +927,9 @@
       "legend": "Lessons: lessons held · students' \"present\" marks (green) · unexcused \"absent\" marks (red).",
       "payments": "Payments"
     },
-    "students": "Students"
+    "students": "Students",
+    "reminders": "Reminders",
+    "comments": "Comments"
   },
   "teacherAttendance": {
     "title": "Teacher attendance",

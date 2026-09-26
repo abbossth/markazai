@@ -66,7 +66,7 @@ export async function loadMyReminders(user: SessionUser): Promise<{ count: numbe
       where,
       orderBy: { dueAt: "asc" },
       take: 8,
-      include: { lead: { select: { id: true, name: true } }, group: { select: { id: true, name: true } }, student: { select: { id: true, name: true } } },
+      include: { lead: { select: { id: true, name: true } }, group: { select: { id: true, name: true } }, student: { select: { id: true, name: true } }, teacher: { select: { id: true, name: true } } },
     }),
   ]);
   const now = Date.now();
@@ -78,8 +78,8 @@ export async function loadMyReminders(user: SessionUser): Promise<{ count: numbe
       title: r.title,
       dueAt: r.dueAt.toISOString(),
       overdue: r.dueAt.getTime() < now,
-      href: r.lead ? `/leads/${r.lead.id}?tab=reminders` : r.group ? `/groups/${r.group.id}` : r.student ? `/students/${r.student.id}` : "/dashboard",
-      context: r.lead?.name ?? r.group?.name ?? r.student?.name ?? "",
+      href: r.lead ? `/leads/${r.lead.id}?tab=reminders` : r.group ? `/groups/${r.group.id}` : r.student ? `/students/${r.student.id}` : r.teacher ? `/teachers/${r.teacher.id}` : "/dashboard",
+      context: r.lead?.name ?? r.group?.name ?? r.student?.name ?? r.teacher?.name ?? "",
     })),
   };
 }

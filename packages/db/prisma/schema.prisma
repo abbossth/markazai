@@ -258,6 +258,7 @@ model Teacher {
   branches       TeacherBranch[]
   attendance     TeacherAttendance[]
   salaryPayments SalaryPayment[]
+  reminders      Reminder[]
 
   @@unique([organizationId, phone])
   @@index([organizationId])
@@ -502,13 +503,15 @@ model Comment {
   id             String   @id @default(uuid()) @db.Uuid
   organizationId String   @map("organization_id") @db.Uuid
   authorId       String   @map("author_id") @db.Uuid
-  // Bittasi to'ldiriladi: talaba, guruh yoki lid.
+  // Bittasi to'ldiriladi: talaba, guruh, lid yoki o'qituvchi.
   studentId      String?  @map("student_id") @db.Uuid
   groupId        String?  @map("group_id") @db.Uuid
   leadId         String?  @map("lead_id") @db.Uuid
+  teacherId      String?  @map("teacher_id") @db.Uuid
   body           String
   createdAt      DateTime @default(now()) @map("created_at")
 
+  @@index([organizationId, teacherId])
   @@index([organizationId, studentId])
   @@index([organizationId, groupId])
   @@index([organizationId, leadId])
@@ -684,16 +687,19 @@ model Reminder {
   leadId         String?   @map("lead_id") @db.Uuid
   groupId        String?   @map("group_id") @db.Uuid
   studentId      String?   @map("student_id") @db.Uuid
+  teacherId      String?   @map("teacher_id") @db.Uuid
   doneAt         DateTime? @map("done_at")
   createdById    String    @map("created_by_id") @db.Uuid
   createdAt      DateTime  @default(now()) @map("created_at")
 
+  teacher Teacher?      @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   lead    Lead?         @relation(fields: [leadId], references: [id], onDelete: Cascade)
   group   Group?        @relation(fields: [groupId], references: [id], onDelete: Cascade)
   student Student?      @relation(fields: [studentId], references: [id], onDelete: Cascade)
   tags    ReminderTag[]
 
   @@index([organizationId, responsibleId, doneAt, dueAt])
+  @@index([organizationId, teacherId])
   @@index([organizationId, leadId])
   @@index([organizationId, groupId])
   @@map("reminders")

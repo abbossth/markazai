@@ -13,7 +13,7 @@ import { formatDateTime } from "@/lib/format";
 export type CommentItem = { id: string; authorId: string; authorName: string; body: string; createdAt: string };
 
 type Props = {
-  target: { studentId: string } | { groupId: string } | { leadId: string };
+  target: { studentId: string } | { groupId: string } | { leadId: string } | { teacherId: string };
   comments: CommentItem[];
   currentUserId: string;
   canDeleteAny: boolean;

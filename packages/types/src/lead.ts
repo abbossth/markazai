@@ -60,7 +60,7 @@ export const smsSchema = z.object({ text: z.string().trim().min(1, "required").m
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-/** Eslatma: aynan bitta bog'liq obyekt (lid, guruh yoki talaba). */
+/** Eslatma: aynan bitta bog'liq obyekt (lid, guruh, talaba yoki o'qituvchi). */
 export const reminderSchema = z
   .object({
     title: z.string().trim().min(1, "required").max(120),
@@ -72,6 +72,7 @@ export const reminderSchema = z
     leadId: optUuid,
     groupId: optUuid,
     studentId: optUuid,
+    teacherId: optUuid,
   })
-  .refine((v) => [v.leadId, v.groupId, v.studentId].filter(Boolean).length === 1, { path: ["title"], message: "invalid" });
+  .refine((v) => [v.leadId, v.groupId, v.studentId, v.teacherId].filter(Boolean).length === 1, { path: ["title"], message: "invalid" });
 export type ReminderInput = z.input<typeof reminderSchema>;

@@ -3,18 +3,22 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
+import { prisma } from "@markazai/db";
+import { CommentsPanel } from "@/components/shared/comments-panel";
 import { EmptyState } from "@/components/shared/empty-state";
+import { RemindersPanel } from "@/components/shared/reminders-panel";
 import { GroupStatusBadge } from "@/components/shared/status-badge";
 import { HistoryList } from "@/components/shared/history-list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Phone, Users } from "lucide-react";
+import { BookOpen, Flag, Phone, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate, formatMoney, formatPhone, initials } from "@/lib/format";
 import { can } from "@/lib/permissions";
 import { param } from "@/lib/search-params";
 import { requireModule } from "@/lib/session";
 import { isPeriod, toCenterParts, weekdaysOf } from "@markazai/types";
+import { loadReminderItems, loadReminderLookups } from "../../reminders/queries";
 import { loadTeacherLookups, loadTeacherProfile, toEditable } from "../queries";
 import { TeacherHeaderActions } from "./header-actions";
 import { TeacherSalaryTab } from "./salary-tab";
@@ -33,9 +37,12 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
 
-  const [profile, lookups, t, tt, te, tw] = await Promise.all([
+  const [profile, lookups, reminders, reminderLookups, comments, t, tt, te, tw] = await Promise.all([
     loadTeacherProfile(user, id),
     loadTeacherLookups(user),
+    loadReminderItems(user, { teacherId: id }),
+    loadReminderLookups(user),
+    prisma.comment.findMany({ where: { organizationId: user.orgId, teacherId: id }, orderBy: { createdAt: "desc" }, take: 100 }),
     getTranslations("teacher"),
     getTranslations("teacher.tabs"),
     getTranslations("enums"),
@@ -44,6 +51,8 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
   if (!profile) notFound();
 
   const { teacher, history, roles } = profile;
+  const authors = comments.length ? await prisma.user.findMany({ where: { organizationId: user.orgId, id: { in: [...new Set(comments.map((c) => c.authorId))] } }, select: { id: true, name: true } }) : [];
+  const authorName = new Map(authors.map((a) => [a.id, a.name]));
   const sp = await searchParams;
   const canWrite = can(user.roles, "teachers:write");
   const canSalary = can(user.roles, "salary:read");
@@ -108,6 +117,9 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
           <StatTile icon={<BookOpen className="size-4" />} label={t("groups")} value={activeGroups.length} />
           <StatTile icon={<Users className="size-4" />} label={t("students")} value={studentCount} />
         </div>
+        <a href="#teacher-reminders" className="border-input hover:bg-muted inline-flex size-8 items-center justify-center rounded-lg border text-emerald-600 print:hidden" aria-label={t("reminders")} title={t("reminders")}>
+          <Flag className="size-4" />
+        </a>
         {canWrite && <TeacherHeaderActions teacher={toEditable(teacher, canSalary)} isActive={teacher.isActive} lookups={lookups} canSalary={canSalary} />}
       </header>
 
@@ -129,8 +141,32 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
               </div>
             ))}
           </dl>
+          <div className="flex flex-col gap-6 lg:col-start-1">
+            <section id="teacher-reminders" className="flex scroll-mt-20 flex-col gap-2">
+              <h2 className="text-lg font-medium">{t("reminders")}</h2>
+              <RemindersPanel
+                link={{ teacherId: teacher.id }}
+                items={reminders}
+                lookups={reminderLookups}
+                currentUserId={user.id}
+                canWrite={canWrite}
+                canDeleteAny={user.roles.includes("CEO")}
+                today={toCenterParts(new Date()).date}
+                compact
+              />
+            </section>
+            <section className="flex flex-col gap-2">
+              <h2 className="text-lg font-medium">{t("comments")}</h2>
+              <CommentsPanel
+                target={{ teacherId: teacher.id }}
+                currentUserId={user.id}
+                canDeleteAny={user.roles.includes("CEO")}
+                comments={comments.map((c) => ({ id: c.id, authorId: c.authorId, authorName: authorName.get(c.authorId) ?? "—", body: c.body, createdAt: c.createdAt.toISOString() }))}
+              />
+            </section>
+          </div>
 
-          <section className="flex flex-col gap-3">
+          <section className="flex flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <h2 className="text-lg font-medium">
               {t("groups")} <span className="text-muted-foreground text-sm font-normal">({teacher.groups.length})</span>
             </h2>

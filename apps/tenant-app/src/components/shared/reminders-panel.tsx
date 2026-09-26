@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-type Link = { leadId: string } | { groupId: string } | { studentId: string };
+type Link = { leadId: string } | { groupId: string } | { studentId: string } | { teacherId: string };
 
 type Props = {
   link: Link;

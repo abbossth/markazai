@@ -9,7 +9,7 @@ import { requireUser } from "@/lib/session";
 
 const bodySchema = z.string().trim().min(1, "required").max(2000);
 
-type Target = { studentId: string } | { groupId: string } | { leadId: string };
+type Target = { studentId: string } | { groupId: string } | { leadId: string } | { teacherId: string };
 
 export async function addComment(target: Target, body: string): Promise<ActionResult> {
   const user = await requireUser();
@@ -28,6 +28,12 @@ export async function addComment(target: Target, body: string): Promise<ActionRe
     if (!exists) return { ok: false, error: "notFound" };
     await prisma.comment.create({ data: { organizationId: user.orgId, authorId: user.id, leadId: target.leadId, body: parsed.data } });
     revalidatePath(`/leads/${target.leadId}`);
+  } else if ("teacherId" in target) {
+    if (!canAccess(user.roles, "teachers")) return { ok: false, error: "forbidden" };
+    const exists = await prisma.teacher.findFirst({ where: { id: target.teacherId, organizationId: user.orgId }, select: { id: true } });
+    if (!exists) return { ok: false, error: "notFound" };
+    await prisma.comment.create({ data: { organizationId: user.orgId, authorId: user.id, teacherId: target.teacherId, body: parsed.data } });
+    revalidatePath(`/teachers/${target.teacherId}`);
   } else {
     if (!canAccess(user.roles, "groups")) return { ok: false, error: "forbidden" };
     const exists = await prisma.group.findFirst({ where: { id: target.groupId, organizationId: user.orgId }, select: { id: true } });
@@ -49,5 +55,6 @@ export async function deleteComment(id: string): Promise<ActionResult> {
   if (comment.studentId) revalidatePath(`/students/${comment.studentId}`);
   if (comment.groupId) revalidatePath(`/groups/${comment.groupId}`);
   if (comment.leadId) revalidatePath(`/leads/${comment.leadId}`);
+  if (comment.teacherId) revalidatePath(`/teachers/${comment.teacherId}`);
   return { ok: true };
 }

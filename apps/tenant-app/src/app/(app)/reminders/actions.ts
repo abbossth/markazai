@@ -9,15 +9,16 @@ import { requireUser, type SessionUser } from "@/lib/session";
 
 type Result = ActionResult & { fieldErrors?: Record<string, string> };
 
-function revalidateFor(r: { leadId: string | null; groupId: string | null; studentId: string | null }) {
+function revalidateFor(r: { leadId: string | null; groupId: string | null; studentId: string | null; teacherId: string | null }) {
   if (r.leadId) revalidatePath(`/leads/${r.leadId}`);
   if (r.groupId) revalidatePath(`/groups/${r.groupId}`);
   if (r.studentId) revalidatePath(`/students/${r.studentId}`);
+  if (r.teacherId) revalidatePath(`/teachers/${r.teacherId}`);
   revalidatePath("/leads");
 }
 
 /** Bog'liq obyekt shu tashkilotga tegishli va foydalanuvchi uni ko'ra oladimi. */
-async function linkAllowed(user: SessionUser, d: { leadId?: string; groupId?: string; studentId?: string }) {
+async function linkAllowed(user: SessionUser, d: { leadId?: string; groupId?: string; studentId?: string; teacherId?: string }) {
   if (d.leadId) {
     if (!can(user.roles, "leads:write")) return false;
     return !!(await prisma.lead.findFirst({ where: { id: d.leadId, organizationId: user.orgId }, select: { id: true } }));
@@ -29,6 +30,10 @@ async function linkAllowed(user: SessionUser, d: { leadId?: string; groupId?: st
   if (d.studentId) {
     if (!can(user.roles, "students:write")) return false;
     return !!(await prisma.student.findFirst({ where: { id: d.studentId, organizationId: user.orgId }, select: { id: true } }));
+  }
+  if (d.teacherId) {
+    if (!can(user.roles, "teachers:write")) return false;
+    return !!(await prisma.teacher.findFirst({ where: { id: d.teacherId, organizationId: user.orgId }, select: { id: true } }));
   }
   return false;
 }
@@ -60,12 +65,14 @@ export async function createReminder(input: ReminderInput): Promise<Result> {
       leadId: d.leadId,
       groupId: d.groupId,
       studentId: d.studentId,
+      teacherId: d.teacherId,
       createdById: user.id,
       tags: { create: tags.map((t) => ({ organizationId: user.orgId, tagId: t.id })) },
     },
   });
   if (d.leadId) await logHistory(user, "lead", d.leadId, "reminder_added", { summary: d.title });
   if (d.groupId) await logHistory(user, "group", d.groupId, "reminder_added", { summary: d.title });
+  if (d.teacherId) await logHistory(user, "teacher", d.teacherId, "reminder_added", { summary: d.title });
   revalidateFor(reminder);
   return { ok: true };
 }
