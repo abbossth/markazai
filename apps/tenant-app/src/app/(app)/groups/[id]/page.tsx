@@ -62,7 +62,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
 
   const canWrite = can(user.roles, "groups:write");
   const canFinance = canAccess(user.roles, "finance");
-  const today = toISODate(new Date());
+  const today = toCenterParts(new Date()).date;
   // Himoya: RLS/tenant konteksti tasodifan yo'qolgan holatda (bo'lmasligi kerak, lekin agar bo'lsa) bitta
   // buzilgan qatordan butun sahifa qulamasin — shunday enrollment'lar jimgina o'tkazib yuboriladi.
   const enrollments = group.enrollments.filter((e) => {

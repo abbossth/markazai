@@ -9,6 +9,7 @@ import {
   gradeScoreSchema,
   lessonDatesInMonth,
   onlineLessonSchema,
+  toCenterParts,
   toISODate,
   type ActionResult,
   type DiscountInput,
@@ -55,7 +56,10 @@ async function validateLessonCell(user: SessionUser, groupId: string, studentId:
   const group = await loadGroup(user, groupId);
   if (!group) return { ok: false, error: "notFound" };
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { ok: false, error: "validation" };
-  if (isTeacherOnly(user.roles) && date !== toISODate(new Date())) return { ok: false, error: "validation" };
+  // Kelajakdagi (hali kelmagan) darsga hech kim belgi qo'ya olmaydi; o'qituvchi esa faqat BUGUNGI kunga.
+  const today = toCenterParts(new Date()).date;
+  if (date > today) return { ok: false, error: "validation" };
+  if (isTeacherOnly(user.roles) && date !== today) return { ok: false, error: "validation" };
 
   const [y, m] = [Number(date.slice(0, 4)), Number(date.slice(5, 7))];
   const holidays = await loadMonthHolidays(prisma, user.orgId, y, m);

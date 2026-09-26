@@ -108,7 +108,8 @@ export function LessonGrid(props: Props & CommonProps) {
 
   // "today" — faqat bugungi kunga (o'qituvchi); "period" — guruhning butun davriga (rahbariyat, `dates`
   // allaqachon guruh boshlanish/tugash sanalari bilan chegaralangan, shuning uchun qo'shimcha tekshiruv kerak emas).
-  const dateAllowed = (date: string) => (editScope === "today" ? date === today : true);
+  // Kelajakdagi kunlarga hech kim belgi qo'ya olmaydi (rahbariyat ham).
+  const dateAllowed = (date: string) => (editScope === "today" ? date === today : date <= today);
   const editable = (member: Member, date: string) => canEdit && dateAllowed(date) && member.joinedAt <= date && (!member.leftAt || member.leftAt >= date);
 
   return (

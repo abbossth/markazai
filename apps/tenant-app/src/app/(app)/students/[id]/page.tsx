@@ -70,7 +70,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
   const tab: Tab = (TABS as readonly string[]).includes(requestedTab ?? "") ? (requestedTab as Tab) : "groups";
 
   const canWrite = can(user.roles, "students:write");
-  const today = toISODate(new Date());
+  const today = toCenterParts(new Date()).date;
   // Moliya ruxsati yo'q foydalanuvchi (o'qituvchi) balans/to'lovlarni ko'rmaydi va talabaning faqat o'z guruhlarini ko'radi.
   const canFinance = canAccess(user.roles, "finance");
   // Himoya: RLS/tenant konteksti tasodifan yo'qolgan holatda (bo'lmasligi kerak, lekin agar bo'lsa) bitta
