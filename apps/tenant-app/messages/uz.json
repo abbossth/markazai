@@ -105,7 +105,7 @@
       "leftActiveGroup": "Faol guruhni tark etganlar",
       "trialOverdue": "Sinov muddatidan kechganlar",
       "centerLoad": "Markaz yuklamasi",
-      "paymentsChart": "Oy davomidagi to'lovlar",
+      "paymentsChart": "So'nggi 6 oy to'lovlari",
       "schedule": "Dars jadvali"
     },
     "schedule": {
@@ -260,6 +260,20 @@
       "MARKETER": "Marketolog",
       "BRANCH_DIRECTOR": "Filial direktori",
       "TEACHER": "O'qituvchi"
+    },
+    "monthsShort": {
+      "1": "Yan",
+      "2": "Fev",
+      "3": "Mar",
+      "4": "Apr",
+      "5": "May",
+      "6": "Iyun",
+      "7": "Iyul",
+      "8": "Avg",
+      "9": "Sen",
+      "10": "Okt",
+      "11": "Noy",
+      "12": "Dek"
     }
   },
   "student": {

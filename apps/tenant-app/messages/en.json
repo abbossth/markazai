@@ -105,7 +105,7 @@
       "leftActiveGroup": "Left an active group",
       "trialOverdue": "Trial period overdue",
       "centerLoad": "Center load",
-      "paymentsChart": "Payments this month",
+      "paymentsChart": "Payments over the last 6 months",
       "schedule": "Class schedule"
     },
     "schedule": {
@@ -260,6 +260,20 @@
       "MARKETER": "Marketer",
       "BRANCH_DIRECTOR": "Branch director",
       "TEACHER": "Teacher"
+    },
+    "monthsShort": {
+      "1": "Jan",
+      "2": "Feb",
+      "3": "Mar",
+      "4": "Apr",
+      "5": "May",
+      "6": "Jun",
+      "7": "Jul",
+      "8": "Aug",
+      "9": "Sep",
+      "10": "Oct",
+      "11": "Nov",
+      "12": "Dec"
     }
   },
   "student": {

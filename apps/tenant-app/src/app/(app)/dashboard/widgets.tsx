@@ -4,6 +4,18 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import {
+  AlertTriangle,
+  Banknote,
+  Funnel,
+  Gauge,
+  MonitorPlay,
+  UserMinus,
+  Users,
+  UsersRound,
+  UserX,
+  type LucideIcon,
+} from "lucide-react";
 import { TIMETABLE_TABS, timeRange, timetableTab, type TimetableTab } from "@markazai/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,14 +29,37 @@ import type { MetricValue, ScheduleGroup } from "./queries";
 // recharts — alohida chunk (payments-chart.tsx), dashboard ochilganda darhol yuklanmaydi.
 const PaymentsChart = dynamic(() => import("./payments-chart"), { loading: () => <ChartSkeleton />, ssr: false });
 
-/** Metrika kartochkasi: qiymat, yorliq va (tahrirlash rejimida bo'lmasa) tegishli ro'yxatga havola. */
-export function MetricWidget({ id, metric, edit }: { id: string; metric: MetricValue; edit: boolean }) {
+// Har bir metrika uchun ikonka — skanerlashni osonlashtiradi (modme-uslubidagi dashboard'dan ilhomlanib).
+// Rang — semantik: neytral ko'k (odatiy), qizil (qarzdorlar/muddati o'tganlar).
+const METRIC_ICON: Record<string, { icon: LucideIcon; tone: "brand" | "destructive" }> = {
+  activeStudents: { icon: Users, tone: "brand" },
+  groups: { icon: UsersRound, tone: "brand" },
+  debtors: { icon: AlertTriangle, tone: "destructive" },
+  activeLeads: { icon: Funnel, tone: "brand" },
+  trial: { icon: MonitorPlay, tone: "brand" },
+  paidThisMonth: { icon: Banknote, tone: "brand" },
+  leftActiveGroup: { icon: UserMinus, tone: "destructive" },
+  trialOverdue: { icon: UserX, tone: "destructive" },
+  centerLoad: { icon: Gauge, tone: "brand" },
+};
+
+/** Metrika kartochkasi: ikonka, qiymat, yorliq va (tahrirlash rejimida bo'lmasa) tegishli ro'yxatga havola. */
+export function MetricWidget({ id, metric, edit, primary }: { id: string; metric: MetricValue; edit: boolean; primary?: boolean }) {
   const t = useTranslations("dashboard");
   const isLoad = id === "centerLoad";
   const title = t(`widgets.${id}` as "widgets.groups");
+  const iconInfo = METRIC_ICON[id];
+  const Icon = iconInfo?.icon;
   return (
-    <div className="flex h-full flex-col justify-between gap-1">
-      <span className="text-muted-foreground text-xs">{title}</span>
+    <div className={cn("flex h-full flex-col justify-between gap-2", primary && "-m-3 rounded-lg bg-brand-500/[0.06] p-3")}>
+      <div className="flex items-center gap-2">
+        {Icon && (
+          <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-md", iconInfo.tone === "destructive" ? "bg-destructive/10 text-destructive" : "bg-brand-500/10 text-brand-500")}>
+            <Icon className="size-4" />
+          </span>
+        )}
+        <span className="text-muted-foreground text-xs">{title}</span>
+      </div>
       <div className="flex items-baseline gap-1.5">
         <span className="text-xl font-semibold tabular-nums">{metric.value === null ? "—" : isLoad ? `${metric.value}%` : formatMoney(metric.value)}</span>
         {isLoad && metric.of && (
@@ -46,8 +81,10 @@ export function MetricWidget({ id, metric, edit }: { id: string; metric: MetricV
 export function PaymentsWidget({ points }: { points: { key: string; revenue: number }[] }) {
   const t = useTranslations("dashboard");
   const tf = useTranslations("finance");
+  const tm = useTranslations("enums.monthsShort");
   const [view, setView] = useState<"chart" | "table">("chart");
-  const data = points.map((p) => ({ ...p, label: `${p.key.slice(8, 10)}.${p.key.slice(5, 7)}` }));
+  // `key` — "YYYY-MM" (oylik trend). Yorliq: "Sen 26" uslubida.
+  const data = points.map((p) => ({ ...p, label: `${tm(String(Number(p.key.slice(5, 7))) as "1")} ${p.key.slice(2, 4)}` }));
   const total = points.reduce((s, p) => s + p.revenue, 0);
   const units = { million: tf("unitMillion"), thousand: tf("unitThousand") };
 

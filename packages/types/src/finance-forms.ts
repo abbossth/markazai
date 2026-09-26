@@ -48,3 +48,32 @@ export function buildDailyTrend(from: string, to: string, revenue: Map<string, n
   }
   return out;
 }
+
+type Month = { key: string; revenue: number };
+
+/**
+ * `from`–`to` (har biri "YYYY-MM-DD") oralig'idagi har bir OY uchun tushum yig'indisi (ma'lumot yo'q oylar 0
+ * bilan to'ldiriladi). `revenueByDate` — kunlik summalar xaritasi ("YYYY-MM-DD" → summa); shu yerda oyga
+ * yig'iladi. Kalit — "YYYY-MM" (dashboard'dagi bir yillik to'lovlar trendi uchun).
+ */
+export function buildMonthlyTrend(from: string, to: string, revenueByDate: Map<string, number>): Month[] {
+  const byMonth = new Map<string, number>();
+  for (const [date, amount] of revenueByDate) {
+    const key = date.slice(0, 7);
+    byMonth.set(key, (byMonth.get(key) ?? 0) + amount);
+  }
+
+  const out: Month[] = [];
+  let [y, m] = from.slice(0, 7).split("-").map(Number);
+  const [toY, toM] = to.slice(0, 7).split("-").map(Number);
+  while (y < toY || (y === toY && m <= toM)) {
+    const key = `${y}-${String(m).padStart(2, "0")}`;
+    out.push({ key, revenue: byMonth.get(key) ?? 0 });
+    m++;
+    if (m > 12) {
+      m = 1;
+      y++;
+    }
+  }
+  return out;
+}

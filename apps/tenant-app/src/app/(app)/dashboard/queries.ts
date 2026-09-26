@@ -2,7 +2,7 @@ import { prisma, type Prisma } from "@markazai/db";
 import {
   TRIAL_DAYS,
   WIDGETS,
-  buildDailyTrend,
+  buildMonthlyTrend,
   daysLeft,
   defaultLayout,
   fromISODate,
@@ -75,6 +75,15 @@ export async function loadDashboard(user: SessionUser): Promise<DashboardData> {
   const groupScope: Prisma.GroupWhereInput = teacherId ? { teacherId } : {};
   const has = (id: string) => allowed.has(id);
   const range = { gte: fromISODate(monthStart), lte: fromISODate(today) };
+  // To'lovlar grafigi — joriy oy emas, oxirgi 6 oy (joriy oy bilan birga): bitta oylik "qator" o'rniga
+  // trend ko'rinadi (modme-uslubidagi dashboard'dan ilhomlanib — 2026-09-26).
+  const [chartFromY, chartFromM] = (() => {
+    const [y, m] = today.slice(0, 7).split("-").map(Number);
+    const idx = y * 12 + (m - 1) - 5;
+    return [Math.floor(idx / 12), (idx % 12) + 1];
+  })();
+  const chartFrom = `${chartFromY}-${String(chartFromM).padStart(2, "0")}-01`;
+  const chartRange = { gte: fromISODate(chartFrom), lte: fromISODate(today) };
 
   const [activeStudents, groups, debtors, activeLeads, trial, paidThisMonth, leftActiveGroup, trialStudents, loadGroups, paymentRows, scheduleGroups] = await Promise.all([
     has("activeStudents") ? prisma.student.count({ where: { organizationId: org, status: "ACTIVE", ...studentScope } }) : null,
@@ -95,7 +104,7 @@ export async function loadDashboard(user: SessionUser): Promise<DashboardData> {
     has("centerLoad")
       ? prisma.group.findMany({ where: { organizationId: org, status: "ACTIVE", roomId: { not: null }, ...groupScope }, select: { room: { select: { capacity: true } }, _count: { select: { enrollments: { where: { leftAt: null } } } } } })
       : null,
-    has("paymentsChart") ? prisma.payment.groupBy({ by: ["date"], where: { organizationId: org, type: "MANUAL", date: range }, _sum: { amount: true } }) : null,
+    has("paymentsChart") ? prisma.payment.groupBy({ by: ["date"], where: { organizationId: org, type: "MANUAL", date: chartRange }, _sum: { amount: true } }) : null,
     has("schedule")
       ? prisma.group.findMany({
           where: { organizationId: org, status: "ACTIVE", ...groupScope },
@@ -132,9 +141,7 @@ export async function loadDashboard(user: SessionUser): Promise<DashboardData> {
     generatedAt: new Date().toISOString(),
     today,
     metrics,
-    payments: paymentRows
-      ? buildDailyTrend(monthStart, today, new Map(paymentRows.map((p) => [toISODate(p.date), p._sum.amount ?? 0])), new Map()).map((d) => ({ key: d.date, revenue: d.revenue }))
-      : null,
+    payments: paymentRows ? buildMonthlyTrend(chartFrom, today, new Map(paymentRows.map((p) => [toISODate(p.date), p._sum.amount ?? 0]))) : null,
     schedule: scheduleGroups
       ? scheduleGroups.map((g) => ({
           id: g.id,

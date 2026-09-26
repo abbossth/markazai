@@ -30,7 +30,15 @@ export default function PaymentsChart({ data, units, label }: { data: { key: str
               ) : null
             }
           />
-          <Line type="linear" dataKey="revenue" stroke="var(--viz-1)" strokeWidth={2} dot={false} activeDot={{ r: 4, stroke: "var(--card)", strokeWidth: 2, fill: "var(--viz-1)" }} isAnimationActive={false} />
+          <Line
+            type="monotone"
+            dataKey="revenue"
+            stroke="var(--viz-1)"
+            strokeWidth={2}
+            dot={{ r: 4, stroke: "var(--card)", strokeWidth: 2, fill: "var(--viz-1)" }}
+            activeDot={{ r: 5, stroke: "var(--card)", strokeWidth: 2, fill: "var(--viz-1)" }}
+            isAnimationActive={false}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

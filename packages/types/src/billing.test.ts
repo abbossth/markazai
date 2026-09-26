@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDailyTrend, expenseSchema, paymentSchema, withdrawalSchema } from "./finance-forms";
+import { buildDailyTrend, buildMonthlyTrend, expenseSchema, paymentSchema, withdrawalSchema } from "./finance-forms";
 import { activeDiscountTotal, balanceOf, effectivePrice, expectedLessonCharge, financeTotals, isChargeable, lessonAmount } from "./billing";
 
 const d = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
@@ -106,6 +106,24 @@ describe("buildDailyTrend", () => {
   });
   it("oy almashishini to'g'ri hal qiladi", () => {
     expect(buildDailyTrend("2026-09-29", "2026-10-02", new Map(), new Map()).map((r) => r.date)).toEqual(["2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02"]);
+  });
+});
+
+describe("buildMonthlyTrend", () => {
+  it("har bir oy uchun kunlik summalarni yig'adi, ma'lumot yo'q oylarni 0 bilan to'ldiradi", () => {
+    const revenue = new Map([
+      ["2026-07-05", 100],
+      ["2026-07-20", 50],
+      ["2026-09-01", 200],
+    ]);
+    expect(buildMonthlyTrend("2026-07-01", "2026-09-26", revenue)).toEqual([
+      { key: "2026-07", revenue: 150 },
+      { key: "2026-08", revenue: 0 },
+      { key: "2026-09", revenue: 200 },
+    ]);
+  });
+  it("yil almashishini to'g'ri hal qiladi", () => {
+    expect(buildMonthlyTrend("2025-11-15", "2026-01-05", new Map()).map((r) => r.key)).toEqual(["2025-11", "2025-12", "2026-01"]);
   });
 });
 

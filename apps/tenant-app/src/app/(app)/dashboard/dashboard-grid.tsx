@@ -29,7 +29,8 @@ const SPAN: Record<WidgetSize, string> = {
   S: "col-span-1",
   M: "sm:col-span-2 xl:col-span-2",
   L: "sm:col-span-2 xl:col-span-3",
-  XL: "sm:col-span-2 xl:col-span-4",
+  // 5 ustun (pastdagi to'r): 9 ta standart metrika kartochkasi 2 qatorga (5+4) sig'adi, 3 emas.
+  XL: "sm:col-span-2 xl:col-span-5",
 };
 
 type Props = { layout: LayoutItem[]; allowed: string[]; data: DashboardData };
@@ -94,7 +95,7 @@ export function DashboardGrid({ layout: initial, allowed, data }: Props) {
     const def = widgetDef(item.id);
     if (def?.kind === "metric") {
       const metric = data.metrics[item.id];
-      return metric ? <MetricWidget id={item.id} metric={metric} edit={editing} /> : null;
+      return metric ? <MetricWidget id={item.id} metric={metric} edit={editing} primary={item.id === "activeStudents"} /> : null;
     }
     if (item.id === "paymentsChart") return data.payments ? <PaymentsWidget points={data.payments} /> : null;
     if (item.id === "schedule") return data.schedule ? <ScheduleWidget groups={data.schedule} /> : null;
@@ -153,7 +154,7 @@ export function DashboardGrid({ layout: initial, allowed, data }: Props) {
 
       <DndContext id="dashboard-grid" sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={layout.map((l) => l.id)} strategy={rectSortingStrategy} disabled={!editing}>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
             {layout.map((item) => (
               <WidgetFrame key={item.id} item={item} editing={editing} onSize={(size) => setLayout((cur) => cur.map((l) => (l.id === item.id ? { ...l, size } : l)))} onRemove={() => setLayout((cur) => cur.filter((l) => l.id !== item.id))}>
                 {renderWidget(item)}
