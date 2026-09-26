@@ -27,6 +27,7 @@ export type LeadCardData = {
 export type BoardColumn = {
   id: string;
   name: string;
+  isSet: boolean;
   lists: { id: string; name: string; isLocked: boolean; courseId: string | null; teacherId: string | null; daysPattern: DaysPattern | null; startTime: string | null }[];
 };
 
@@ -110,6 +111,7 @@ export async function loadBoard(user: SessionUser, sp: RawSearchParams) {
   const boardColumns: BoardColumn[] = columns.map((c) => ({
     id: c.id,
     name: c.name,
+    isSet: c.isSet,
     lists: lists.filter((l) => l.columnId === c.id).map((l) => ({ id: l.id, name: l.name, isLocked: l.isLocked, courseId: l.courseId, teacherId: l.teacherId, daysPattern: l.daysPattern, startTime: l.startTime })),
   }));
 

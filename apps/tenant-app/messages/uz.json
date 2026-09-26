@@ -596,7 +596,8 @@
     "teacher": "O'qituvchi",
     "startTime": "Darsning boshlanish vaqti",
     "createList": "Yaratish",
-    "createGroup": "Guruh yaratish"
+    "createGroup": "Guruh yaratish",
+    "setSection": "Set bo'limi"
   },
   "calls": {
     "log": "Qo'ng'iroqni qayd etish",

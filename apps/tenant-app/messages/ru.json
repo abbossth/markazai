@@ -596,7 +596,8 @@
     "teacher": "Преподаватель",
     "startTime": "Время начала урока",
     "createList": "Создать",
-    "createGroup": "Создать группу"
+    "createGroup": "Создать группу",
+    "setSection": "Раздел «Set»"
   },
   "calls": {
     "log": "Зафиксировать звонок",

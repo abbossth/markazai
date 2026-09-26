@@ -208,6 +208,16 @@ export async function renameColumn(id: string, name: string): Promise<Result> {
 }
 
 /** direction: -1 — chapga, +1 — o'ngga. */
+/** "Set" bo'limi belgisi: yoqilsa, ustundagi ro'yxatlar guruh ma'lumotlari (kurs, o'qituvchi, kunlar, vaqt) bilan yaratiladi. */
+export async function setColumnIsSet(id: string, isSet: boolean): Promise<Result> {
+  const user = await guard("leads:configure");
+  if (!user) return { ok: false, error: "forbidden" };
+  const res = await prisma.leadColumn.updateMany({ where: { id, organizationId: user.orgId }, data: { isSet } });
+  if (res.count === 0) return { ok: false, error: "notFound" };
+  refresh();
+  return { ok: true };
+}
+
 export async function moveColumn(id: string, direction: -1 | 1): Promise<Result> {
   const user = await guard("leads:configure");
   if (!user) return { ok: false, error: "forbidden" };

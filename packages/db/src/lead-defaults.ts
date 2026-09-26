@@ -7,7 +7,7 @@ export async function ensureDefaultLeadColumns(prisma: PrismaClient, organizatio
   const existing = await prisma.leadColumn.findMany({ where: { organizationId }, orderBy: { position: "asc" } });
   if (existing.length > 0) return existing;
   await prisma.leadColumn.createMany({
-    data: DEFAULT_LEAD_COLUMNS.map((name, position) => ({ organizationId, name, position })),
+    data: DEFAULT_LEAD_COLUMNS.map((name, position) => ({ organizationId, name, position, isSet: name === "Set" })),
   });
   return prisma.leadColumn.findMany({ where: { organizationId }, orderBy: { position: "asc" } });
 }

@@ -14,14 +14,14 @@ import type { BoardLookups } from "./queries";
 
 export type ListDialogState = {
   /** Yangi ro'yxat uchun ustun; tahrirlash uchun ro'yxat ID'si. */
-  columnId?: string;
+  columnId: string;
   list?: { id: string; name: string; courseId: string | null; teacherId: string | null; daysPattern: DaysPattern | null; startTime: string | null };
 };
 
 const selectClass = "border-input bg-background h-9 w-full rounded-md border px-2 text-sm";
 
 /** "Yaratishni o'rnating" formasi: ro'yxat nomi + ixtiyoriy set ma'lumotlari (kurs, o'qituvchi, kunlar, boshlanish vaqti). */
-export function ListDialog({ state, onClose, lookups }: { state: ListDialogState; onClose: () => void; lookups: BoardLookups }) {
+export function ListDialog({ state, onClose, lookups, withGroup }: { state: ListDialogState; onClose: () => void; lookups: BoardLookups; /** Faqat "Set" bo'limida: kurs, o'qituvchi, kunlar va vaqt so'raladi. */ withGroup: boolean }) {
   const t = useTranslations("lead");
   const te = useTranslations("enums");
   const tc = useTranslations("common");
@@ -37,7 +37,7 @@ export function ListDialog({ state, onClose, lookups }: { state: ListDialogState
   const submit = () =>
     startTransition(async () => {
       const details = { courseId, teacherId, daysPattern, startTime } as Parameters<typeof createList>[2];
-      const res = l ? await updateList(l.id, name.trim(), details) : await createList(state.columnId!, name.trim(), details);
+      const res = l ? await updateList(l.id, name.trim(), details) : await createList(state.columnId, name.trim(), details);
       if (res.ok) {
         toast.success(tc("saved"));
         onClose();
@@ -62,6 +62,8 @@ export function ListDialog({ state, onClose, lookups }: { state: ListDialogState
             <Label htmlFor="list-name">{t("listName")}</Label>
             <Input id="list-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} autoFocus />
           </div>
+          {withGroup && (
+            <>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="list-course">{t("course")}</Label>
             <select id="list-course" className={selectClass} value={courseId} onChange={(e) => setCourseId(e.target.value)}>
@@ -101,6 +103,8 @@ export function ListDialog({ state, onClose, lookups }: { state: ListDialogState
               <Input id="list-time" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
             </div>
           </div>
+            </>
+          )}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               {tc("cancel")}

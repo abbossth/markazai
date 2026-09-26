@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Bell, FolderPlus, Lock, LockOpen, MoreHorizontal, Plus } from "lucide-react";
+import { Bell, Check, FolderPlus, Lock, LockOpen, MoreHorizontal, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { LEAD_SOURCES } from "@markazai/types";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatPhone, initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { createColumn, deleteColumn, deleteLead, deleteList, moveColumn, moveLead, renameColumn, setListLocked } from "./actions";
+import { createColumn, deleteColumn, deleteLead, deleteList, moveColumn, moveLead, renameColumn, setColumnIsSet, setListLocked } from "./actions";
 import { LeadSheet, type EditableLead } from "./lead-form";
 import { ListDialog, type ListDialogState } from "./list-dialog";
 import { NameDialog } from "./name-dialog";
@@ -204,11 +204,6 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                   <h2 className="min-w-0 flex-1 truncate text-sm font-semibold">
                     {column.name} <span className="text-muted-foreground font-normal">({count})</span>
                   </h2>
-                  {canWrite && (
-                    <Button variant="ghost" size="icon-sm" aria-label={t("newLead")} onClick={() => setSheet({ columnId: column.id })}>
-                      <Plus className="size-4" />
-                    </Button>
-                  )}
                   {canConfigure && (
                     <Button variant="ghost" size="icon-sm" aria-label={t("newList")} title={t("newList")} onClick={() => setListDialog({ columnId: column.id })}>
                       <FolderPlus className="size-4" />
@@ -221,6 +216,9 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setNameDialog({ kind: "renameColumn", id: column.id, name: column.name })}>{t("renameColumn")}</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => run(() => setColumnIsSet(column.id, !column.isSet))}>
+                          <Check className={column.isSet ? "" : "opacity-0"} /> {t("setSection")}
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setListDialog({ columnId: column.id })}>
                           <FolderPlus /> {t("newList")}
                         </DropdownMenuItem>
@@ -233,6 +231,15 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                   )}
                 </header>
 
+                {index === 0 && canWrite && (
+                  <div className="px-2 pb-2">
+                    <Button className="w-full" onClick={() => setSheet({ columnId: column.id })}>
+                      <UserPlus className="size-4" />
+                      {t("newLead")}
+                    </Button>
+                  </div>
+                )}
+
                 <div className="flex max-h-[calc(100vh-15rem)] flex-col gap-3 overflow-y-auto px-2 pb-2">
                   {column.lists.map((list) => (
                     <div key={list.id} className="flex flex-col gap-1.5">
@@ -240,18 +247,14 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                         {list.isLocked ? <Lock className="text-muted-foreground size-3" aria-label={t("listLocked")} /> : <span className="size-3" />}
                         <span className="min-w-0 flex-1 truncate">{list.name}</span>
                         <span className="text-muted-foreground">{containers[containerId(column.id, list.id)]?.length ?? 0}</span>
-                        {canWrite && (
-                          <Button variant="ghost" size="icon-xs" aria-label={t("newLead")} onClick={() => setSheet({ columnId: column.id, listId: list.id })}>
-                            <Plus />
-                          </Button>
-                        )}
                         {canConfigure && (
                           <DropdownMenu>
                             <DropdownMenuTrigger render={<Button variant="ghost" size="icon-xs" aria-label={tc("actions")} />}>
                               <MoreHorizontal />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem disabled={list.isLocked} onClick={() => setListDialog({ list })}>{tc("edit")}</DropdownMenuItem>
+                              <DropdownMenuItem disabled={list.isLocked} onClick={() => setListDialog({ columnId: column.id, list })}>{tc("edit")}</DropdownMenuItem>
+                              {column.isSet && (
                               <DropdownMenuItem
                                 onClick={() => {
                                   const q = new URLSearchParams({ new: "1", name: list.name });
@@ -264,6 +267,7 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                               >
                                 {t("createGroup")}
                               </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem onClick={() => run(() => setListLocked(list.id, !list.isLocked))}>
                                 {list.isLocked ? <LockOpen /> : <Lock />} {list.isLocked ? t("unlockList") : t("lockList")}
                               </DropdownMenuItem>
@@ -273,7 +277,7 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                           </DropdownMenu>
                         )}
                       </div>
-                      {(list.courseId || list.teacherId || list.daysPattern || list.startTime) && (
+                      {column.isSet && (list.courseId || list.teacherId || list.daysPattern || list.startTime) && (
                         <p className="text-muted-foreground truncate px-1 text-xs">
                           {[
                             lookups.courses.find((c) => c.id === list.courseId)?.name,
@@ -300,7 +304,7 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
 
       {sheet && <LeadSheet open onOpenChange={(o) => !o && setSheet(null)} lookups={lookups} lead={sheet.lead} defaultColumnId={sheet.columnId} defaultListId={sheet.listId} />}
 
-      {listDialog && <ListDialog state={listDialog} onClose={() => setListDialog(null)} lookups={lookups} />}
+      {listDialog && <ListDialog state={listDialog} onClose={() => setListDialog(null)} lookups={lookups} withGroup={!!columns.find((c) => c.id === listDialog.columnId)?.isSet} />}
 
       {nameDialog && (
         <NameDialog
