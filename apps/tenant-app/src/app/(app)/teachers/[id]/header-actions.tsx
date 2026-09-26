@@ -45,13 +45,13 @@ export function TeacherHeaderActions({ teacher, isActive, lookups, canSalary }: 
 
   return (
     <div className="flex flex-wrap items-center gap-2 print:hidden">
-      <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
+      <Button variant="outline" className="h-9 px-3.5" onClick={() => setEditing(true)}>
         <Pencil className="size-4" />
         {tc("edit")}
       </Button>
       {/* Kamdan-kam va xavfli amallar (nofaol qilish, o'chirish) alohida menyuda — tasodifan bosilmasligi uchun. */}
       <DropdownMenu>
-        <DropdownMenuTrigger render={<Button size="icon-sm" variant="outline" aria-label={tc("actions")} title={tc("actions")} disabled={pending} />}>
+        <DropdownMenuTrigger render={<Button size="icon" variant="outline" className="size-9" aria-label={tc("actions")} title={tc("actions")} disabled={pending} />}>
           <MoreHorizontal className="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

@@ -90,16 +90,14 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
         / {teacher.name}
       </div>
 
-      <header className="bg-card overflow-hidden rounded-2xl border shadow-xs">
-        {/* Dekorativ banner: brend gradienti */}
-        <div className="from-brand-500 to-brand-500/60 h-14 bg-gradient-to-r sm:h-16" aria-hidden />
-        <div className="flex flex-wrap items-end gap-x-6 gap-y-4 px-5 pb-5 sm:px-6">
-          <Avatar className="ring-card -mt-9 size-20 shrink-0 ring-4 sm:-mt-10 sm:size-24">
+      <header className="bg-card rounded-2xl border shadow-xs">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-4 p-5 sm:p-6">
+          <Avatar className="size-20 shrink-0 sm:size-24">
             {teacher.photoUrl && <AvatarImage src={teacher.photoUrl} alt="" />}
             <AvatarFallback className="bg-brand-500/10 text-brand-500 text-xl font-semibold">{initials(teacher.name)}</AvatarFallback>
           </Avatar>
 
-          <div className="flex min-w-0 flex-1 basis-64 flex-col gap-2 pt-2">
+          <div className="flex min-w-0 flex-1 basis-64 flex-col gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{teacher.name}</h1>
               <Badge variant={teacher.isActive ? "secondary" : "outline"} className={teacher.isActive ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : ""}>
@@ -132,12 +130,12 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
               <StatTile icon={<BookOpen className="size-4" />} label={t("groups")} value={activeGroups.length} />
               <StatTile icon={<Users className="size-4" />} label={t("students")} value={studentCount} />
             </div>
-            <div className="flex items-center gap-2 print:hidden">
+            <div className="flex items-center gap-2 print:hidden [&_button]:h-9 [&_a]:h-9">
               <a
                 href="#teacher-reminders"
-                className="inline-flex h-9 items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-500/20 dark:text-emerald-400"
+                className="border-input bg-background hover:bg-muted inline-flex h-9 items-center gap-2 rounded-lg border px-3.5 text-sm font-medium transition-colors"
               >
-                <Flag className="size-4" />
+                <Flag className="size-4 text-emerald-600" />
                 {t("reminders")}
                 {reminders.filter((r) => !r.doneAt).length > 0 && <span className="rounded-full bg-emerald-600 px-1.5 text-xs text-white tabular-nums">{reminders.filter((r) => !r.doneAt).length}</span>}
               </a>
