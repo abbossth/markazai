@@ -122,7 +122,12 @@
       "vertical": "Vertikal",
       "horizontal": "Gorizontal",
       "room": "Xona"
-    }
+    },
+    "capacityHint": "Yuklamani ko'rish uchun sig'imni kiriting",
+    "enterCapacity": "Sig'imni kiritish",
+    "capacityDialogTitle": "Sig'im",
+    "capacityFieldLabel": "Sig'im (o'rinlar)",
+    "capacityFieldHint": "Markaz bir vaqtda nechta o'quvchini o'qita oladi (ikki guruhdagi o'quvchi 2 o'rin egallaydi). Bo'sh — yuklama ko'rsatilmaydi."
   },
   "table": {
     "columns": "Ustunlar",
@@ -372,7 +377,8 @@
     "leadConverted": "Talabaga aylantirilgan",
     "pay": "To'lov",
     "duplicatePhoneConfirm": "Bu telefon raqami bilan \"{name}\" talaba allaqachon mavjud. Baribir yangi talaba yaratilsinmi?",
-    "duplicatePhoneCreate": "Baribir yaratish"
+    "duplicatePhoneCreate": "Baribir yaratish",
+    "editJoinDate": "Qo'shilgan sanani o'zgartirish"
   },
   "comments": {
     "placeholder": "Izoh yozing...",

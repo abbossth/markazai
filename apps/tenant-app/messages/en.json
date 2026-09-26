@@ -122,7 +122,12 @@
       "vertical": "Vertical",
       "horizontal": "Horizontal",
       "room": "Room"
-    }
+    },
+    "capacityHint": "Enter capacity to see the load",
+    "enterCapacity": "Enter capacity",
+    "capacityDialogTitle": "Capacity",
+    "capacityFieldLabel": "Capacity (seats)",
+    "capacityFieldHint": "How many students the center can teach at once (a student in two groups takes 2 seats). Empty — load is not shown."
   },
   "table": {
     "columns": "Columns",
@@ -372,7 +377,8 @@
     "leadConverted": "Converted to student",
     "pay": "Payment",
     "duplicatePhoneConfirm": "A student named \"{name}\" already has this phone number. Create a new one anyway?",
-    "duplicatePhoneCreate": "Create anyway"
+    "duplicatePhoneCreate": "Create anyway",
+    "editJoinDate": "Change join date"
   },
   "comments": {
     "placeholder": "Write a comment...",

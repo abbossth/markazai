@@ -13,9 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
+import { JoinDateDialog } from "@/components/shared/join-date-dialog";
 import { addStudentsToGroup, removeStudentFromGroup } from "../../students/actions";
 
-export type PanelStudent = QuickCardStudent & { archived: boolean };
+export type PanelStudent = QuickCardStudent & { archived: boolean; joinedAt: string };
 
 export function GroupStudentsPanel({ groupId, students, canWrite }: { groupId: string; students: PanelStudent[]; canWrite: boolean }) {
   const t = useTranslations("group");
@@ -23,6 +24,7 @@ export function GroupStudentsPanel({ groupId, students, canWrite }: { groupId: s
   const tc = useTranslations("common");
   const router = useRouter();
   const [showArchived, setShowArchived] = useState(false);
+  const [editing, setEditing] = useState<PanelStudent | null>(null);
   const [pending, startTransition] = useTransition();
 
   const visible = students.filter((s) => s.archived === showArchived);
@@ -74,6 +76,7 @@ export function GroupStudentsPanel({ groupId, students, canWrite }: { groupId: s
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem render={<Link href={`/students/${s.id}`} />}>{ts("goToProfile")}</DropdownMenuItem>
+                  {canWrite && <DropdownMenuItem onClick={() => setEditing(s)}>{ts("editJoinDate")}</DropdownMenuItem>}
                   {canWrite &&
                     (s.archived ? (
                       <DropdownMenuItem onClick={() => run(() => addStudentsToGroup([s.id], groupId))}>{t("restoreStudent")}</DropdownMenuItem>
@@ -88,6 +91,7 @@ export function GroupStudentsPanel({ groupId, students, canWrite }: { groupId: s
           ))}
         </ul>
       )}
+      {editing && <JoinDateDialog key={editing.id} studentId={editing.id} groupId={groupId} joinedAt={editing.joinedAt} open onOpenChange={(o) => !o && setEditing(null)} />}
     </div>
   );
 }

@@ -28,6 +28,7 @@ import { requireModule } from "@/lib/session";
 import { cn } from "@/lib/utils";
 import { loadStudentLookups } from "../queries";
 import { AttendanceTab } from "./attendance-tab";
+import { JoinDateButton } from "@/components/shared/join-date-button";
 import { StudentHeaderActions } from "./header-actions";
 import { loadStudentProfile } from "./queries";
 
@@ -224,8 +225,9 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
                   <p className="text-muted-foreground text-xs">
                     {e.group.course.name} · {e.group.teacher.name}
                   </p>
-                  <p className="text-muted-foreground mb-3 text-xs">
+                  <p className="text-muted-foreground mb-3 flex items-center gap-1 text-xs">
                     {e.group.startTime} · {formatDate(e.joinedAt)}
+                    {canWrite && <JoinDateButton studentId={student.id} groupId={e.group.id} joinedAt={toISODate(e.joinedAt)} />}
                   </p>
                   {canFinance && (
                   <div className="flex flex-wrap gap-1.5">

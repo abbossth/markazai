@@ -190,6 +190,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
               freezeReason: e.student.freezeReason,
               createdAt: e.student.createdAt.toISOString(),
               archived: !!e.leftAt,
+              joinedAt: toISODate(e.joinedAt),
             }))}
           />
           <section className="flex flex-col gap-2">

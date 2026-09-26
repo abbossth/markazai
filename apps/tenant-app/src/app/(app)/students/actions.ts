@@ -219,6 +219,25 @@ export async function addStudentsToGroup(
   return { ok: true, added, skipped, overCapacity };
 }
 
+/** Talabaning guruhga qo'shilgan sanasini o'zgartiradi (chiqqan sanasidan keyin bo'lishi mumkin emas). */
+export async function updateEnrollmentJoinedAt(studentId: string, groupId: string, joinedAt: string): Promise<Result> {
+  const user = await guard("students:write");
+  if (!user) return { ok: false, error: "forbidden" };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(joinedAt)) return { ok: false, error: "validation" };
+
+  const enrollment = await prisma.groupStudent.findFirst({ where: { studentId, groupId, organizationId: user.orgId } });
+  if (!enrollment) return { ok: false, error: "notFound" };
+  const date = fromISODate(joinedAt);
+  if (enrollment.leftAt && date > enrollment.leftAt) return { ok: false, error: "validation" };
+
+  await prisma.groupStudent.update({ where: { id: enrollment.id }, data: { joinedAt: date } });
+  await logHistory(user, "student", studentId, "join_date_changed", { groupId, from: toISODate(enrollment.joinedAt), to: joinedAt });
+  revalidatePath("/students");
+  revalidatePath(`/students/${studentId}`);
+  revalidatePath(`/groups/${groupId}`);
+  return { ok: true };
+}
+
 /** Talabani guruhdan chiqaradi (arxivga o'tkazadi); qolgan faol guruhi bo'lmasa, status yangilanadi. */
 export async function removeStudentFromGroup(studentId: string, groupId: string): Promise<Result> {
   const user = await guard("students:write");
