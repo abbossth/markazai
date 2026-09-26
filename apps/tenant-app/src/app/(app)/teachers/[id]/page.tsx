@@ -126,10 +126,6 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="divide-border bg-muted/40 flex divide-x overflow-hidden rounded-xl border">
-              <StatTile icon={<BookOpen className="size-4" />} label={t("groups")} value={activeGroups.length} />
-              <StatTile icon={<Users className="size-4" />} label={t("students")} value={studentCount} />
-            </div>
             <div className="flex items-center gap-2 print:hidden [&_button]:h-9 [&_a]:h-9">
               <a
                 href="#teacher-reminders"
@@ -142,6 +138,11 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
               {canWrite && <TeacherHeaderActions teacher={toEditable(teacher, canSalary)} isActive={teacher.isActive} lookups={lookups} canSalary={canSalary} />}
             </div>
           </div>
+        </div>
+        <div className="divide-border grid grid-cols-3 divide-x border-t">
+          <StatTile icon={<BookOpen className="size-4" />} label={t("groups")} value={activeGroups.length} />
+          <StatTile icon={<Users className="size-4" />} label={t("students")} value={studentCount} />
+          <StatTile icon={<Flag className="size-4" />} label={t("reminders")} value={reminders.filter((r) => !r.doneAt).length} />
         </div>
       </header>
 
@@ -278,12 +279,12 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
 
 function StatTile({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="flex min-w-24 flex-col gap-0.5 px-4 py-2">
-      <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
-        {icon}
-        {label}
-      </span>
-      <span className="text-2xl leading-none font-semibold tabular-nums">{value}</span>
+    <div className="flex items-center justify-center gap-3 px-3 py-3 sm:px-5">
+      <span className="bg-muted text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-lg">{icon}</span>
+      <div className="flex flex-col">
+        <span className="text-xl leading-none font-semibold tabular-nums">{value}</span>
+        <span className="text-muted-foreground mt-1 text-xs">{label}</span>
+      </div>
     </div>
   );
 }
