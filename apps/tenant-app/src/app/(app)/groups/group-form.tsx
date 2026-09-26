@@ -41,6 +41,8 @@ type Props = {
   group?: EditableGroup;
   /** Yangi guruh formasini oldindan to'ldirish (masalan lidlar ro'yxatidan "Guruh yaratish"). */
   prefill?: Partial<Pick<GroupInput, "name" | "courseId" | "teacherId" | "days" | "startTime">>;
+  /** Lidlar ro'yxati (Set): guruh yaratilganda undagi lidlar sinovdagi talaba sifatida qo'shiladi. */
+  fromListId?: string;
 };
 
 const NONE = "__none";
@@ -62,17 +64,17 @@ function defaults(group?: EditableGroup, prefill?: Props["prefill"]): GroupInput
   };
 }
 
-export function GroupSheet({ open, onOpenChange, lookups, group, prefill }: Props) {
+export function GroupSheet({ open, onOpenChange, lookups, group, prefill, fromListId }: Props) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 sm:max-w-xl">
-        {open && <GroupFormBody lookups={lookups} group={group} prefill={prefill} onDone={() => onOpenChange(false)} />}
+        {open && <GroupFormBody lookups={lookups} group={group} prefill={prefill} fromListId={fromListId} onDone={() => onOpenChange(false)} />}
       </SheetContent>
     </Sheet>
   );
 }
 
-function GroupFormBody({ lookups, group, prefill, onDone }: { lookups: GroupLookups; group?: EditableGroup; prefill?: Props["prefill"]; onDone: () => void }) {
+function GroupFormBody({ lookups, group, prefill, fromListId, onDone }: { lookups: GroupLookups; group?: EditableGroup; prefill?: Props["prefill"]; fromListId?: string; onDone: () => void }) {
   const t = useTranslations("group");
   const tc = useTranslations("common");
   const tv = useTranslations("validation");
@@ -97,9 +99,11 @@ function GroupFormBody({ lookups, group, prefill, onDone }: { lookups: GroupLook
 
   const send = (values: GroupOutput) => {
     startTransition(async () => {
-      const res = group ? await updateGroup(group.id, values) : await createGroup(values);
+      const res = group ? await updateGroup(group.id, values) : await createGroup(values, fromListId);
       if (res.ok) {
         toast.success(tc("saved"));
+        const enrolled = (res as { enrolled?: number }).enrolled;
+        if (enrolled) toast.success(t("enrolledFromList", { count: enrolled }));
         onDone();
         router.refresh();
         return;

@@ -529,7 +529,8 @@
     "pin": "Закрепить",
     "unpin": "Открепить",
     "pinned": "Закреплена",
-    "countLabel": "Всего: {count}"
+    "countLabel": "Всего: {count}",
+    "enrolledFromList": "Лидов добавлено в группу как пробных студентов: {count}"
   },
   "lead": {
     "title": "Лиды",

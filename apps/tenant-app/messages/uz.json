@@ -529,7 +529,8 @@
     "pin": "Mahkamlash",
     "unpin": "Mahkamlashni bekor qilish",
     "pinned": "Mahkamlangan",
-    "countLabel": "Soni: {count}"
+    "countLabel": "Soni: {count}",
+    "enrolledFromList": "{count} ta lid sinovdagi talaba sifatida guruhga qo'shildi"
   },
   "lead": {
     "title": "Lidlar",

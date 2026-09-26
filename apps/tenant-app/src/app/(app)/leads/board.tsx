@@ -290,7 +290,7 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                               {column.isSet && (
                               <DropdownMenuItem
                                 onClick={() => {
-                                  const q = new URLSearchParams({ new: "1", name: list.name });
+                                  const q = new URLSearchParams({ new: "1", name: list.name, fromList: list.id });
                                   if (list.courseId) q.set("courseId", list.courseId);
                                   if (list.teacherId) q.set("teacherId", list.teacherId);
                                   if (list.daysPattern) q.set("days", list.daysPattern);

@@ -529,7 +529,8 @@
     "pin": "Pin",
     "unpin": "Unpin",
     "pinned": "Pinned",
-    "countLabel": "Total: {count}"
+    "countLabel": "Total: {count}",
+    "enrolledFromList": "{count} lead(s) added to the group as trial students"
   },
   "lead": {
     "title": "Leads",

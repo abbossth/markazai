@@ -50,7 +50,7 @@ export default async function GroupsPage({ searchParams }: PageProps<"/groups">)
         <h1 className="text-2xl font-semibold">{t("title")}</h1>
         <span className="text-muted-foreground text-sm">{t("countLabel", { count: total })}</span>
       </div>
-      <FilterBar searchPlaceholder={t("searchPlaceholder")} fields={fields} actions={canWrite ? <NewGroupButton lookups={lookups} prefill={prefill} defaultOpen={!!prefill} /> : null} />
+      <FilterBar searchPlaceholder={t("searchPlaceholder")} fields={fields} actions={canWrite ? <NewGroupButton lookups={lookups} prefill={prefill} defaultOpen={!!prefill} fromListId={one("fromList")} /> : null} />
       <GroupsTable
         rows={rows}
         total={total}

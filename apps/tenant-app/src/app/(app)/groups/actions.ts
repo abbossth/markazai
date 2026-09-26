@@ -5,12 +5,14 @@ import { prisma, recalculateStudentGroup } from "@markazai/db";
 import {
   GROUP_STATUSES,
   fromISODate,
+  toISODate,
   groupSchema,
   schedulesOverlap,
   type ActionResult,
   type GroupInput,
 } from "@markazai/types";
 import { logHistory } from "@/lib/history";
+import { can } from "@/lib/permissions";
 import { requirePermission, type SessionUser } from "@/lib/session";
 
 type Result<T = object> = ActionResult<T> & { fieldErrors?: Record<string, string> };
@@ -68,7 +70,52 @@ async function validateRefs(user: SessionUser, d: ValidGroup, excludeGroupId?: s
   return { tagIds: (tags as { id: string }[]).map((t) => t.id) };
 }
 
-export async function createGroup(input: GroupInput): Promise<Result<{ id: string }>> {
+/**
+ * Lidlar doskasidagi "Set" ro'yxatidan guruh ochilganda: ro'yxatdagi lidlar SINOV holatidagi talaba sifatida
+ * guruhga qo'shiladi va doskadan chiqadi. Shu telefonli talaba bor bo'lsa, yangisi yaratilmaydi (mavjudi qo'shiladi).
+ * Talaba faollashtirilgach (holat ACTIVE) to'lov hisobi boshlanadi.
+ */
+async function enrollLeadsFromList(user: SessionUser, groupId: string, listId: string, joinedAt: Date): Promise<number> {
+  if (!can(user.roles, "leads:write") || !can(user.roles, "students:write")) return 0;
+  const leads = await prisma.lead.findMany({
+    where: { organizationId: user.orgId, listId, convertedStudentId: null, archivedAt: null },
+    include: { tags: true },
+    orderBy: { position: "asc" },
+  });
+  let count = 0;
+  for (const lead of leads) {
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.student.findFirst({ where: { organizationId: user.orgId, phone: lead.phone }, select: { id: true, status: true } });
+      const studentId =
+        existing?.id ??
+        (
+          await tx.student.create({
+            data: {
+              organizationId: user.orgId,
+              name: lead.name,
+              phone: lead.phone,
+              note: lead.note,
+              status: "TRIAL",
+              tags: { create: lead.tags.map((t) => ({ organizationId: user.orgId, tagId: t.tagId })) },
+            },
+          })
+        ).id;
+      // Guruhsiz/tark etgan mavjud talaba ham sinovga o'tadi; faol/muzlatilgan holat o'zgarmaydi.
+      if (existing && ["NO_GROUP", "LEFT_ACTIVE_GROUP", "LEFT_AFTER_TRIAL"].includes(existing.status)) await tx.student.update({ where: { id: existing.id }, data: { status: "TRIAL" } });
+      await tx.groupStudent.upsert({
+        where: { groupId_studentId: { groupId, studentId } },
+        update: { leftAt: null, joinedAt },
+        create: { organizationId: user.orgId, groupId, studentId, joinedAt },
+      });
+      await tx.lead.update({ where: { id: lead.id }, data: { convertedStudentId: studentId, convertedAt: new Date() } });
+    });
+    await logHistory(user, "lead", lead.id, "converted", { studentName: lead.name });
+    count++;
+  }
+  return count;
+}
+
+export async function createGroup(input: GroupInput, fromListId?: string): Promise<Result<{ id: string; enrolled?: number }>> {
   const user = await guard("groups:write");
   if (!user) return { ok: false, error: "forbidden" };
 
@@ -101,8 +148,15 @@ export async function createGroup(input: GroupInput): Promise<Result<{ id: strin
     },
   });
   await logHistory(user, "group", group.id, "created");
+  let enrolled = 0;
+  if (fromListId && /^[0-9a-f-]{36}$/i.test(fromListId)) {
+    const list = await prisma.leadList.findFirst({ where: { id: fromListId, organizationId: user.orgId }, select: { id: true } });
+    if (list) enrolled = await enrollLeadsFromList(user, group.id, list.id, fromISODate(toISODate(new Date())));
+    revalidatePath("/leads");
+    revalidatePath("/students");
+  }
   revalidatePath("/groups");
-  return { ok: true, id: group.id };
+  return { ok: true, id: group.id, enrolled };
 }
 
 export async function updateGroup(id: string, input: GroupInput): Promise<Result> {
