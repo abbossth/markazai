@@ -157,7 +157,8 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
         </TabsList>
 
         <TabsContent value="profile" className="grid items-start gap-5 pt-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
-          <aside className="bg-card flex flex-col gap-1 rounded-xl border p-5 lg:sticky lg:top-4">
+          <div className="flex min-w-0 flex-col gap-5">
+          <div className="bg-card flex flex-col gap-1 rounded-xl border p-5">
             <h2 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">{tt("profile")}</h2>
             <dl className="flex flex-col divide-y text-sm">
               {details.map(([label, value]) => (
@@ -167,7 +168,40 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
                 </div>
               ))}
             </dl>
-          </aside>
+          </div>
+            <div className="flex flex-col gap-5">
+              <section id="teacher-reminders" className="bg-card flex scroll-mt-20 flex-col gap-3 rounded-xl border p-4">
+                <h2 className="flex items-center gap-2 font-semibold">
+                  <Flag className="size-4 text-emerald-600" />
+                  {t("reminders")}
+                  {reminders.length > 0 && <span className="text-muted-foreground text-sm font-normal">({reminders.length})</span>}
+                </h2>
+                <RemindersPanel
+                  link={{ teacherId: teacher.id }}
+                  items={reminders}
+                  lookups={reminderLookups}
+                  currentUserId={user.id}
+                  canWrite={canWrite}
+                  canDeleteAny={user.roles.includes("CEO")}
+                  today={toCenterParts(new Date()).date}
+                  compact
+                />
+              </section>
+              <section className="bg-card flex flex-col gap-3 rounded-xl border p-4">
+                <h2 className="flex items-center gap-2 font-semibold">
+                  <MessageSquare className="text-muted-foreground size-4" />
+                  {t("comments")}
+                  {comments.length > 0 && <span className="text-muted-foreground text-sm font-normal">({comments.length})</span>}
+                </h2>
+                <CommentsPanel
+                  target={{ teacherId: teacher.id }}
+                  currentUserId={user.id}
+                  canDeleteAny={user.roles.includes("CEO")}
+                  comments={comments.map((c) => ({ id: c.id, authorId: c.authorId, authorName: authorName.get(c.authorId) ?? "—", body: c.body, createdAt: c.createdAt.toISOString() }))}
+                />
+              </section>
+            </div>
+          </div>
 
           <div className="flex min-w-0 flex-col gap-5">
             <section className="flex flex-col gap-3">
@@ -227,38 +261,6 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
               )}
             </section>
 
-            <div className="grid items-start gap-5 xl:grid-cols-2">
-              <section id="teacher-reminders" className="bg-card flex scroll-mt-20 flex-col gap-3 rounded-xl border p-4">
-                <h2 className="flex items-center gap-2 font-semibold">
-                  <Flag className="size-4 text-emerald-600" />
-                  {t("reminders")}
-                  {reminders.length > 0 && <span className="text-muted-foreground text-sm font-normal">({reminders.length})</span>}
-                </h2>
-                <RemindersPanel
-                  link={{ teacherId: teacher.id }}
-                  items={reminders}
-                  lookups={reminderLookups}
-                  currentUserId={user.id}
-                  canWrite={canWrite}
-                  canDeleteAny={user.roles.includes("CEO")}
-                  today={toCenterParts(new Date()).date}
-                  compact
-                />
-              </section>
-              <section className="bg-card flex flex-col gap-3 rounded-xl border p-4">
-                <h2 className="flex items-center gap-2 font-semibold">
-                  <MessageSquare className="text-muted-foreground size-4" />
-                  {t("comments")}
-                  {comments.length > 0 && <span className="text-muted-foreground text-sm font-normal">({comments.length})</span>}
-                </h2>
-                <CommentsPanel
-                  target={{ teacherId: teacher.id }}
-                  currentUserId={user.id}
-                  canDeleteAny={user.roles.includes("CEO")}
-                  comments={comments.map((c) => ({ id: c.id, authorId: c.authorId, authorName: authorName.get(c.authorId) ?? "—", body: c.body, createdAt: c.createdAt.toISOString() }))}
-                />
-              </section>
-            </div>
           </div>
         </TabsContent>
 
