@@ -118,7 +118,10 @@
       "empty": "Bu kunlar uchun guruhlar yo'q",
       "time": "Vaqt",
       "noRoom": "Xonasiz",
-      "daysLeft": "{count} kun qoldi"
+      "daysLeft": "{count} kun qoldi",
+      "vertical": "Vertikal",
+      "horizontal": "Gorizontal",
+      "room": "Xona"
     }
   },
   "table": {

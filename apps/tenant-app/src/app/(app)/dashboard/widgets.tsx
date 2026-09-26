@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { ChartSkeleton } from "@/components/shared/skeletons";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useDaysLabel } from "@/components/shared/days-label";
+import { useLocalPref } from "@/hooks/use-local-pref";
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { MetricValue, ScheduleGroup } from "./queries";
@@ -132,11 +133,23 @@ export function ScheduleWidget({ groups }: { groups: ScheduleGroup[] }) {
   const t = useTranslations("dashboard.schedule");
   const daysLabel = useDaysLabel();
   const [tab, setTab] = useState<TimetableTab>("ODD");
+  // Jadval ko'rinishi: "vertikal" (vaqt qatorda, xona ustunda — sukut) yoki "gorizontal" (xona qatorda,
+  // vaqt ustunda). Foydalanuvchi tanlovi sifatida saqlanadi (bir marta tanlasa, keyingi safar ham shunday).
+  const [horizontal, setHorizontal] = useLocalPref("markazai.scheduleHorizontal", false);
 
   const counts = useMemo(() => Object.fromEntries(TIMETABLE_TABS.map((k) => [k, groups.filter((g) => timetableTab(g.days) === k).length])) as Record<TimetableTab, number>, [groups]);
   const shown = groups.filter((g) => timetableTab(g.days) === tab);
   const rooms = [...new Set(shown.map((g) => g.roomName ?? ""))].sort((a, b) => (a === "" ? 1 : b === "" ? -1 : a.localeCompare(b, undefined, { numeric: true })));
   const times = [...new Set(shown.map((g) => g.startTime))].sort();
+  // Gorizontal rejimda ustunlar — vaqt bo'yicha tor ("min-w-44" o'rniga "w-44"'ga yaqin, lekin moslashuvchan).
+  const rows = horizontal ? rooms : times;
+  const cols = horizontal ? times : rooms;
+
+  const cell = (row: string, col: string) => {
+    const time = horizontal ? col : row;
+    const room = horizontal ? row : col;
+    return shown.filter((g) => g.startTime === time && (g.roomName ?? "") === room);
+  };
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -156,6 +169,20 @@ export function ScheduleWidget({ groups }: { groups: ScheduleGroup[] }) {
             </button>
           ))}
         </div>
+        <div className="bg-muted inline-flex gap-1 rounded-lg p-1" role="tablist">
+          {([false, true] as const).map((h) => (
+            <button
+              key={String(h)}
+              type="button"
+              role="tab"
+              aria-selected={horizontal === h}
+              onClick={() => setHorizontal(h)}
+              className={cn("text-muted-foreground hover:text-foreground rounded-md px-3 py-1 text-sm transition-colors", horizontal === h && "bg-background text-foreground shadow-xs")}
+            >
+              {h ? t("horizontal") : t("vertical")}
+            </button>
+          ))}
+        </div>
       </div>
 
       {shown.length === 0 ? (
@@ -165,46 +192,43 @@ export function ScheduleWidget({ groups }: { groups: ScheduleGroup[] }) {
           <table className="w-full border-separate border-spacing-1 text-sm">
             <thead>
               <tr>
-                <th className="text-muted-foreground w-16 text-left text-xs font-normal">{t("time")}</th>
-                {rooms.map((r) => (
-                  <th key={r || "none"} className="text-left text-xs font-medium">
-                    {r || t("noRoom")}
+                <th className="text-muted-foreground w-16 text-left text-xs font-normal">{horizontal ? t("room") : t("time")}</th>
+                {cols.map((c) => (
+                  <th key={c || "none"} className={cn("text-left text-xs font-medium", horizontal ? "text-muted-foreground tabular-nums font-normal" : undefined)}>
+                    {horizontal ? c : c || t("noRoom")}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {times.map((time) => (
-                <tr key={time} className="align-top">
-                  <td className="text-muted-foreground pt-1 text-xs tabular-nums">{time}</td>
-                  {rooms.map((room) => {
-                    const cell = shown.filter((g) => g.startTime === time && (g.roomName ?? "") === room);
-                    return (
-                      <td key={room || "none"} className="min-w-44">
-                        <div className="flex flex-col gap-1">
-                          {cell.map((g) => (
-                            <Link key={g.id} href={`/groups/${g.id}`} className="bg-card hover:bg-muted/50 block rounded-md border-l-4 border py-1.5 pr-2 pl-2.5 transition-colors" style={{ borderLeftColor: g.courseColor }}>
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="font-semibold">{g.name}</span>
-                                <span className="text-muted-foreground text-xs tabular-nums">
-                                  {g.students}
-                                  {g.capacity !== null && `/${g.capacity}`}
-                                </span>
-                              </div>
-                              <div className="text-muted-foreground truncate text-xs">
-                                {g.courseName} · {g.teacherName}
-                              </div>
-                              <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 text-xs">
-                                <span className="tabular-nums">{timeRange(g.startTime, g.durationMinutes)}</span>
-                                {g.days === "OTHER" || g.days === "EVERY_DAY" || g.days === "WEEKEND" ? <span>{daysLabel(g.days, g.customDays)}</span> : null}
-                                {g.daysLeft !== null && <Badge variant="outline">{t("daysLeft", { count: g.daysLeft })}</Badge>}
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      </td>
-                    );
-                  })}
+              {rows.map((row) => (
+                <tr key={row || "none"} className="align-top">
+                  <td className={cn("pt-1 text-xs", horizontal ? "font-medium" : "text-muted-foreground tabular-nums")}>{horizontal ? row || t("noRoom") : row}</td>
+                  {cols.map((col) => (
+                    <td key={col || "none"} className="min-w-44">
+                      <div className="flex flex-col gap-1">
+                        {cell(row, col).map((g) => (
+                          <Link key={g.id} href={`/groups/${g.id}`} className="bg-card hover:bg-muted/50 block rounded-md border-l-4 border py-1.5 pr-2 pl-2.5 transition-colors" style={{ borderLeftColor: g.courseColor }}>
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-semibold">{g.name}</span>
+                              <span className="text-muted-foreground text-xs tabular-nums">
+                                {g.students}
+                                {g.capacity !== null && `/${g.capacity}`}
+                              </span>
+                            </div>
+                            <div className="text-muted-foreground truncate text-xs">
+                              {g.courseName} · {g.teacherName}
+                            </div>
+                            <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 text-xs">
+                              <span className="tabular-nums">{timeRange(g.startTime, g.durationMinutes)}</span>
+                              {g.days === "OTHER" || g.days === "EVERY_DAY" || g.days === "WEEKEND" ? <span>{daysLabel(g.days, g.customDays)}</span> : null}
+                              {g.daysLeft !== null && <Badge variant="outline">{t("daysLeft", { count: g.daysLeft })}</Badge>}
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>

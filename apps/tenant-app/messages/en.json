@@ -118,7 +118,10 @@
       "empty": "No groups for these days",
       "time": "Time",
       "noRoom": "No room",
-      "daysLeft": "{count} days left"
+      "daysLeft": "{count} days left",
+      "vertical": "Vertical",
+      "horizontal": "Horizontal",
+      "room": "Room"
     }
   },
   "table": {
