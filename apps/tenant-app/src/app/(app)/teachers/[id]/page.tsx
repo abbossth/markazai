@@ -11,7 +11,7 @@ import { GroupStatusBadge } from "@/components/shared/status-badge";
 import { HistoryList } from "@/components/shared/history-list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Flag, Phone, Users } from "lucide-react";
+import { BookOpen, Flag, MessageSquare, Phone, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate, formatMoney, formatPhone, initials } from "@/lib/format";
 import { can } from "@/lib/permissions";
@@ -132,92 +132,110 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
           ))}
         </TabsList>
 
-        <TabsContent value="profile" className="grid items-start gap-6 pt-4 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
-          <dl className="bg-card grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 rounded-xl border p-4 text-sm">
-            {details.map(([label, value]) => (
-              <div key={label} className="contents">
-                <dt className="text-muted-foreground">{label}</dt>
-                <dd className="text-right font-medium">{value}</dd>
-              </div>
-            ))}
-          </dl>
-          <div className="flex flex-col gap-6 lg:col-start-1">
-            <section id="teacher-reminders" className="flex scroll-mt-20 flex-col gap-2">
-              <h2 className="text-lg font-medium">{t("reminders")}</h2>
-              <RemindersPanel
-                link={{ teacherId: teacher.id }}
-                items={reminders}
-                lookups={reminderLookups}
-                currentUserId={user.id}
-                canWrite={canWrite}
-                canDeleteAny={user.roles.includes("CEO")}
-                today={toCenterParts(new Date()).date}
-                compact
-              />
-            </section>
-            <section className="flex flex-col gap-2">
-              <h2 className="text-lg font-medium">{t("comments")}</h2>
-              <CommentsPanel
-                target={{ teacherId: teacher.id }}
-                currentUserId={user.id}
-                canDeleteAny={user.roles.includes("CEO")}
-                comments={comments.map((c) => ({ id: c.id, authorId: c.authorId, authorName: authorName.get(c.authorId) ?? "—", body: c.body, createdAt: c.createdAt.toISOString() }))}
-              />
-            </section>
-          </div>
+        <TabsContent value="profile" className="grid items-start gap-5 pt-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+          <aside className="bg-card flex flex-col gap-1 rounded-xl border p-5 lg:sticky lg:top-4">
+            <h2 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">{tt("profile")}</h2>
+            <dl className="flex flex-col divide-y text-sm">
+              {details.map(([label, value]) => (
+                <div key={label} className="flex items-baseline justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
+                  <dt className="text-muted-foreground shrink-0">{label}</dt>
+                  <dd className="text-right font-medium">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </aside>
 
-          <section className="flex flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-            <h2 className="text-lg font-medium">
-              {t("groups")} <span className="text-muted-foreground text-sm font-normal">({teacher.groups.length})</span>
-            </h2>
-            {teacher.groups.length === 0 ? (
-              <EmptyState title={t("noGroups")} />
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {teacher.groups.map((g) => (
-                  <li key={g.id} className="bg-card rounded-xl border">
-                    <details className="group">
-                      <summary className="hover:bg-muted/40 flex cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 rounded-xl px-4 py-3">
-                        <div className="flex min-w-0 flex-1 flex-col">
-                          <span className="flex items-center gap-2 text-sm font-medium">
+          <div className="flex min-w-0 flex-col gap-5">
+            <section className="flex flex-col gap-3">
+              <h2 className="text-lg font-semibold">
+                {t("groups")} <span className="text-muted-foreground text-sm font-normal">({teacher.groups.length})</span>
+              </h2>
+              {teacher.groups.length === 0 ? (
+                <EmptyState title={t("noGroups")} />
+              ) : (
+                <ul className="grid gap-3 xl:grid-cols-2">
+                  {teacher.groups.map((g) => (
+                    <li key={g.id} className="bg-card hover:border-primary/30 flex flex-col gap-3 rounded-xl border p-4 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                          <span className="flex items-center gap-2 font-semibold">
+                            <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: g.course.color }} aria-hidden />
                             {g.name}
                             <GroupStatusBadge status={g.status} />
                           </span>
-                          <span className="text-muted-foreground truncate text-xs">
-                            {g.course.name} · {te(`days.${g.days}`)} · {g.startTime} · {g.room?.name ?? "—"}
-                          </span>
+                          <span className="text-muted-foreground text-sm">{g.course.name}</span>
                         </div>
-                        <Badge variant="secondary" className="tabular-nums">
-                          {t("studentsCount", { count: g.enrollments.length })}
-                        </Badge>
-                        <Link href={`/groups/${g.id}`} className="text-primary text-xs hover:underline">
+                        <Link href={`/groups/${g.id}`} className="text-primary shrink-0 text-xs whitespace-nowrap hover:underline">
                           {t("openGroup")} →
                         </Link>
-                      </summary>
-                      <div className="bg-muted/30 flex flex-col gap-2 rounded-b-xl border-t px-4 py-3 text-sm">
-                        <p className="text-muted-foreground text-xs">
-                          {g.durationMinutes} {t("minutesShort")} · {g.room ? `${g.room.name} (${g.room.capacity})` : "—"} · {formatMoney(g.price)}
-                        </p>
+                      </div>
+                      <p className="text-muted-foreground flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                        <span>{te(`days.${g.days}`)} · {g.startTime}–{endTimeOf(g.startTime, g.durationMinutes)}</span>
+                        <span>{g.room?.name ?? "—"}</span>
+                        <span className="font-medium">{formatMoney(g.price)}</span>
+                      </p>
+                      <details className="group border-t pt-3">
+                        <summary className="hover:text-foreground text-muted-foreground flex cursor-pointer list-none items-center justify-between text-xs">
+                          <span className="flex items-center gap-1.5">
+                            <Users className="size-3.5" />
+                            {t("studentsCount", { count: g.enrollments.length })}
+                          </span>
+                          <span className="text-[10px] group-open:hidden">▾</span>
+                          <span className="hidden text-[10px] group-open:inline">▴</span>
+                        </summary>
                         {g.enrollments.length === 0 ? (
-                          <p className="text-muted-foreground">{t("noStudents")}</p>
+                          <p className="text-muted-foreground mt-2 text-sm">{t("noStudents")}</p>
                         ) : (
-                          <ul className="flex flex-wrap gap-2">
+                          <ul className="mt-2 flex flex-wrap gap-1.5">
                             {g.enrollments.map((e) => (
                               <li key={e.student.id}>
-                                <Link href={`/students/${e.student.id}`} className="bg-background hover:bg-muted rounded-full border px-2.5 py-1 text-xs">
+                                <Link href={`/students/${e.student.id}`} className="bg-muted/60 hover:bg-muted rounded-full px-2.5 py-1 text-xs">
                                   {e.student.name}
                                 </Link>
                               </li>
                             ))}
                           </ul>
                         )}
-                      </div>
-                    </details>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+                      </details>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            <div className="grid items-start gap-5 xl:grid-cols-2">
+              <section id="teacher-reminders" className="bg-card flex scroll-mt-20 flex-col gap-3 rounded-xl border p-4">
+                <h2 className="flex items-center gap-2 font-semibold">
+                  <Flag className="size-4 text-emerald-600" />
+                  {t("reminders")}
+                  {reminders.length > 0 && <span className="text-muted-foreground text-sm font-normal">({reminders.length})</span>}
+                </h2>
+                <RemindersPanel
+                  link={{ teacherId: teacher.id }}
+                  items={reminders}
+                  lookups={reminderLookups}
+                  currentUserId={user.id}
+                  canWrite={canWrite}
+                  canDeleteAny={user.roles.includes("CEO")}
+                  today={toCenterParts(new Date()).date}
+                  compact
+                />
+              </section>
+              <section className="bg-card flex flex-col gap-3 rounded-xl border p-4">
+                <h2 className="flex items-center gap-2 font-semibold">
+                  <MessageSquare className="text-muted-foreground size-4" />
+                  {t("comments")}
+                  {comments.length > 0 && <span className="text-muted-foreground text-sm font-normal">({comments.length})</span>}
+                </h2>
+                <CommentsPanel
+                  target={{ teacherId: teacher.id }}
+                  currentUserId={user.id}
+                  canDeleteAny={user.roles.includes("CEO")}
+                  comments={comments.map((c) => ({ id: c.id, authorId: c.authorId, authorName: authorName.get(c.authorId) ?? "—", body: c.body, createdAt: c.createdAt.toISOString() }))}
+                />
+              </section>
+            </div>
+          </div>
         </TabsContent>
 
         {canSalary && (
@@ -244,4 +262,10 @@ function StatTile({ icon, label, value }: { icon: React.ReactNode; label: string
       <span className="text-xl font-semibold tabular-nums">{value}</span>
     </div>
   );
+}
+
+function endTimeOf(start: string, minutes: number) {
+  const [h, m] = start.split(":").map(Number);
+  const total = (h ?? 0) * 60 + (m ?? 0) + minutes;
+  return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 }

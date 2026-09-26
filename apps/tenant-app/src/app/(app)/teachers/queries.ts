@@ -112,7 +112,7 @@ export async function loadTeacherProfile(user: SessionUser, id: string) {
       groups: {
         orderBy: [{ status: "asc" }, { name: "asc" }],
         include: {
-          course: { select: { name: true } },
+          course: { select: { name: true, color: true } },
           room: { select: { name: true, capacity: true } },
           enrollments: { where: { leftAt: null }, orderBy: { student: { name: "asc" } }, select: { student: { select: { id: true, name: true } } } },
         },
