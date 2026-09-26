@@ -64,7 +64,7 @@ export function MetricWidget({ id, metric, edit }: { id: string; metric: MetricV
         <span className="text-muted-foreground text-xs">{title}</span>
       </div>
       <div className="flex items-baseline gap-1.5">
-        <span className="text-xl font-semibold tabular-nums">{metric.value === null ? "—" : isLoad ? `${metric.value}%` : formatMoney(metric.value)}</span>
+        <span className="text-2xl font-semibold tabular-nums">{metric.value === null ? "—" : isLoad ? `${metric.value}%` : formatMoney(metric.value)}</span>
         {isLoad && metric.of && (
           <span className="text-muted-foreground text-xs tabular-nums">
             {metric.of.students} / {metric.of.capacity}
