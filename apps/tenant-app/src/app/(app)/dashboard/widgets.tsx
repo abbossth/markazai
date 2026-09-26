@@ -407,7 +407,7 @@ export function ScheduleWidget({ groups, today }: { groups: ScheduleGroup[]; tod
                   <th
                     key={m}
                     className={cn(
-                      "bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))] text-muted-foreground min-w-20 border-b border-l p-2 text-left text-xs font-normal tabular-nums",
+                      "bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))] text-muted-foreground min-w-16 border-b border-l p-2 text-left text-xs font-normal tabular-nums",
                       m % 60 === 0 && "text-foreground border-l-border/80 border-l-2 font-medium",
                       isTimeJump(i) && "border-l-2 border-dashed border-l-amber-500",
                     )}

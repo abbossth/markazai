@@ -37,7 +37,7 @@ export function ScheduleDrawer() {
         <CalendarDays className="size-5" />
       </button>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="flex flex-col gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-5xl">
+        <SheetContent side="right" className="flex flex-col gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-[min(82vw,1240px)]">
           <SheetHeader>
             <SheetTitle className="sr-only">{t("title")}</SheetTitle>
           </SheetHeader>
