@@ -134,6 +134,12 @@ function defaultTabFor(today: string): TimetableTab {
   return "ODD";
 }
 
+const toMinutes = (time: string) => {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+};
+const toTimeLabel = (mins: number) => `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
+
 /**
  * Dars jadvali: Toq / Juft / Boshqa tablari (sukut — bugungi kunga mos keladigani); ustunlar — xonalar,
  * qatorlar — dars boshlanish vaqti. Katakda: guruh kodi, kurs, o'qituvchi, talabalar/sig'im va "N kun qoldi".
@@ -150,15 +156,82 @@ export function ScheduleWidget({ groups, today }: { groups: ScheduleGroup[]; tod
   const shown = groups.filter((g) => timetableTab(g.days) === tab);
   const rooms = [...new Set(shown.map((g) => g.roomName ?? ""))].sort((a, b) => (a === "" ? 1 : b === "" ? -1 : a.localeCompare(b, undefined, { numeric: true })));
   const times = [...new Set(shown.map((g) => g.startTime))].sort();
-  // Gorizontal rejimda ustunlar — vaqt bo'yicha tor ("min-w-44" o'rniga "w-44"'ga yaqin, lekin moslashuvchan).
-  const rows = horizontal ? rooms : times;
-  const cols = horizontal ? times : rooms;
 
-  const cell = (row: string, col: string) => {
-    const time = horizontal ? col : row;
-    const room = horizontal ? row : col;
-    return shown.filter((g) => g.startTime === time && (g.roomName ?? "") === room);
+  // Gorizontal (vaqt chizig'i): 30 daqiqalik ustunlar, har bir dars o'z davomiyligicha bir necha ustunni
+  // egallaydi (colSpan) — modme-uslubidagi taqvim ko'rinishi. Vertikal — sodda ro'yxat (o'zgarmadi).
+  // Ro'yxat har renderda qayta hisoblanadi (`shown` filtrlash natijasi — o'zi ham har safar yangi massiv,
+  // shuning uchun `useMemo`ning foydasi yo'q); guruhlar soni kichik, hisoblash arzon.
+  // Katta bo'sh oraliqlar (masalan 10:30–15:00 orasida hech narsa yo'q) butunlay olib tashlanadi — har bir
+  // darsning boshlanishidan ~1 soat oldin va tugashidan ~1 soat keyingi vaqt saqlanadi, xolos.
+  const slotMinutes: number[] = [];
+  if (horizontal && shown.length > 0) {
+    const starts = shown.map((g) => toMinutes(g.startTime));
+    const ends = shown.map((g) => toMinutes(g.startTime) + g.durationMinutes);
+    const from = Math.floor(Math.min(...starts) / 30) * 30;
+    const to = Math.ceil(Math.max(...ends) / 30) * 30;
+    const all: number[] = [];
+    for (let m = from; m < to; m += 30) all.push(m);
+    const BUFFER = 60; // daqiqa
+    const near = (m: number) => shown.some((g) => {
+      const s = toMinutes(g.startTime);
+      return m >= s - BUFFER && m < s + g.durationMinutes + BUFFER;
+    });
+    slotMinutes.push(...all.filter(near));
+  }
+
+  /** Bitta xona qatori: har bir 30 daq. slot — yo bo'sh (colSpan 1), yo dars boshlanish nuqtasi (colSpan = davomiyligi / 30). */
+  // `slotMinutes`da katta oraliqlar olib tashlangani uchun ba'zi qo'shni ustunlar orasida real vaqt sakrab
+  // qolishi mumkin — shu joyga vizual belgi (uzuq chegara) qo'yiladi, aks holda "10:30"dan keyin bevosita
+  // "15:00" kelishi tushunarsiz bo'lib qolardi.
+  const isTimeJump = (i: number) => i > 0 && slotMinutes[i] - slotMinutes[i - 1] > 30;
+
+  const segmentsFor = (room: string) => {
+    const segments: ({ kind: "lesson"; group: ScheduleGroup; span: number; colStart: number } | { kind: "gap"; colStart: number })[] = [];
+    let col = 0;
+    while (col < slotMinutes.length) {
+      const slotStart = slotMinutes[col];
+      const group = shown.find((g) => (g.roomName ?? "") === room && toMinutes(g.startTime) >= slotStart && toMinutes(g.startTime) < slotStart + 30);
+      if (group) {
+        const span = Math.min(Math.max(1, Math.round(group.durationMinutes / 30)), slotMinutes.length - col);
+        segments.push({ kind: "lesson", group, span, colStart: col });
+        col += span;
+      } else {
+        segments.push({ kind: "gap", colStart: col });
+        col += 1;
+      }
+    }
+    return segments;
   };
+
+  // Vertikal rejim uchun (o'zgarmagan): qatorlar — vaqt, ustunlar — xona.
+  const rows = times;
+  const cols = rooms;
+  const cell = (time: string, room: string) => shown.filter((g) => g.startTime === time && (g.roomName ?? "") === room);
+
+  const lessonCard = (g: ScheduleGroup) => (
+    <Link
+      key={g.id}
+      href={`/groups/${g.id}`}
+      className="hover:bg-muted/50 block h-full rounded-md border-l-4 border py-1.5 pr-2 pl-2.5 transition-colors"
+      style={{ borderLeftColor: g.courseColor, backgroundColor: `color-mix(in srgb, ${g.courseColor} 16%, var(--card))` }}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-semibold">{g.name}</span>
+        <span className="text-muted-foreground text-xs tabular-nums">
+          {g.students}
+          {g.capacity !== null && `/${g.capacity}`}
+        </span>
+      </div>
+      <div className="text-muted-foreground truncate text-xs">
+        {g.courseName} · {g.teacherName}
+      </div>
+      <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 text-xs">
+        <span className="tabular-nums">{timeRange(g.startTime, g.durationMinutes)}</span>
+        {g.days === "OTHER" || g.days === "EVERY_DAY" || g.days === "WEEKEND" ? <span>{daysLabel(g.days, g.customDays)}</span> : null}
+        {g.daysLeft !== null && <Badge variant="outline">{t("daysLeft", { count: g.daysLeft })}</Badge>}
+      </div>
+    </Link>
+  );
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -193,46 +266,68 @@ export function ScheduleWidget({ groups, today }: { groups: ScheduleGroup[]; tod
 
       {shown.length === 0 ? (
         <EmptyState title={t("empty")} />
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-separate border-spacing-1 text-sm">
+      ) : horizontal ? (
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full border-separate border-spacing-0 text-sm">
             <thead>
               <tr>
-                <th className="text-muted-foreground w-16 text-left text-xs font-normal">{horizontal ? t("room") : t("time")}</th>
+                <th className="bg-muted/60 text-muted-foreground sticky left-0 z-10 w-16 border-b p-2 text-left text-xs font-normal">{t("room")}</th>
+                {slotMinutes.map((m, i) => (
+                  <th
+                    key={m}
+                    className={cn(
+                      "bg-muted/60 text-muted-foreground min-w-20 border-b border-l p-2 text-left text-xs font-normal tabular-nums",
+                      m % 60 === 0 && "text-foreground border-l-border/80 border-l-2 font-medium",
+                      isTimeJump(i) && "border-l-2 border-dashed border-l-amber-500",
+                    )}
+                  >
+                    {toTimeLabel(m)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rooms.map((room) => (
+                <tr key={room || "none"}>
+                  <td className="bg-card sticky left-0 z-10 border-b p-2 text-xs font-medium">{room || t("noRoom")}</td>
+                  {segmentsFor(room).map((seg, i) =>
+                    seg.kind === "gap" ? (
+                      <td key={i} className={cn("h-16 border-b border-l", isTimeJump(seg.colStart) && "border-l-2 border-dashed border-l-amber-500")} />
+                    ) : (
+                      <td
+                        key={seg.group.id}
+                        colSpan={seg.span}
+                        className={cn("border-b border-l p-0.5 align-top", isTimeJump(seg.colStart) && "border-l-2 border-dashed border-l-amber-500")}
+                      >
+                        {lessonCard(seg.group)}
+                      </td>
+                    ),
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full border-separate border-spacing-0 text-sm">
+            <thead>
+              <tr>
+                <th className="bg-muted/60 text-muted-foreground sticky left-0 z-10 w-16 border-b p-2 text-left text-xs font-normal">{t("time")}</th>
                 {cols.map((c) => (
-                  <th key={c || "none"} className={cn("text-left text-xs font-medium", horizontal ? "text-muted-foreground tabular-nums font-normal" : undefined)}>
-                    {horizontal ? c : c || t("noRoom")}
+                  <th key={c || "none"} className="bg-muted/60 min-w-44 border-b border-l p-2 text-left text-xs font-medium">
+                    {c || t("noRoom")}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row || "none"} className="align-top">
-                  <td className={cn("pt-1 text-xs", horizontal ? "font-medium" : "text-muted-foreground tabular-nums")}>{horizontal ? row || t("noRoom") : row}</td>
+                <tr key={row || "none"}>
+                  <td className="bg-card text-muted-foreground sticky left-0 z-10 border-b p-2 text-xs font-medium tabular-nums">{row}</td>
                   {cols.map((col) => (
-                    <td key={col || "none"} className="min-w-44">
-                      <div className="flex flex-col gap-1">
-                        {cell(row, col).map((g) => (
-                          <Link key={g.id} href={`/groups/${g.id}`} className="bg-card hover:bg-muted/50 block rounded-md border-l-4 border py-1.5 pr-2 pl-2.5 transition-colors" style={{ borderLeftColor: g.courseColor }}>
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="font-semibold">{g.name}</span>
-                              <span className="text-muted-foreground text-xs tabular-nums">
-                                {g.students}
-                                {g.capacity !== null && `/${g.capacity}`}
-                              </span>
-                            </div>
-                            <div className="text-muted-foreground truncate text-xs">
-                              {g.courseName} · {g.teacherName}
-                            </div>
-                            <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 text-xs">
-                              <span className="tabular-nums">{timeRange(g.startTime, g.durationMinutes)}</span>
-                              {g.days === "OTHER" || g.days === "EVERY_DAY" || g.days === "WEEKEND" ? <span>{daysLabel(g.days, g.customDays)}</span> : null}
-                              {g.daysLeft !== null && <Badge variant="outline">{t("daysLeft", { count: g.daysLeft })}</Badge>}
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
+                    <td key={col || "none"} className="h-16 border-b border-l p-0.5 align-top">
+                      <div className="flex h-full flex-col gap-1">{cell(row, col).map((g) => lessonCard(g))}</div>
                     </td>
                   ))}
                 </tr>
