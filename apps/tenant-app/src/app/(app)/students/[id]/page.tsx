@@ -200,7 +200,7 @@ export default async function StudentProfilePage({ params, searchParams }: PageP
         </div>
       </header>
 
-      <Tabs defaultValue={tab}>
+      <Tabs key={tab} defaultValue={tab}>
         <TabsList className="print:hidden">
           {TABS.map((k) => (
             <TabsTrigger key={k} value={k}>

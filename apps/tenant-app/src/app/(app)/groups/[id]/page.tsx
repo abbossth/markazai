@@ -209,7 +209,7 @@ export default async function GroupProfilePage({ params, searchParams }: PagePro
         </aside>
 
         <section className="min-w-0">
-          <Tabs defaultValue={tab}>
+          <Tabs key={tab} defaultValue={tab}>
             <TabsList className="h-auto flex-wrap">
               {TABS.map((k) => (
                 <TabsTrigger key={k} value={k}>

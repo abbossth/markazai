@@ -141,7 +141,7 @@ export default async function LeadProfilePage({ params, searchParams }: PageProp
         </aside>
 
         <section className="min-w-0">
-          <Tabs defaultValue={tab}>
+          <Tabs key={tab} defaultValue={tab}>
             <TabsList>
               {TABS.map((k) => (
                 <TabsTrigger key={k} value={k}>

@@ -95,7 +95,7 @@ export default async function TeacherProfilePage({ params, searchParams }: PageP
         {canWrite && <TeacherHeaderActions teacher={toEditable(teacher, canSalary)} isActive={teacher.isActive} lookups={lookups} canSalary={canSalary} />}
       </header>
 
-      <Tabs defaultValue={tab}>
+      <Tabs key={tab} defaultValue={tab}>
         <TabsList>
           {TABS.map((k) => (
             <TabsTrigger key={k} value={k}>
