@@ -276,7 +276,8 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                       )}
                           </div>
                           <Button variant="ghost" size="icon-xs" aria-pressed={open} aria-label={open ? t("hideList") : t("showList")} title={open ? t("hideList") : t("showList")} onClick={() => toggleList(list.id)}>
-                            {open ? <Eye /> : <EyeOff />}
+                            {/* Belgi bosilganda bo'ladigan amalni ko'rsatadi: ochiq ro'yxatda "yashirish", yopiqda "ko'rsatish". */}
+                            {open ? <EyeOff /> : <Eye />}
                           </Button>
                         {canConfigure && (
                           <DropdownMenu>
