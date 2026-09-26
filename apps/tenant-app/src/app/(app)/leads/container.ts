@@ -8,3 +8,9 @@ export const parseContainer = (id: string) => {
   const [columnId, list] = id.split("|");
   return { columnId: columnId!, listId: list === NO_LIST ? null : (list ?? null) };
 };
+
+/**
+ * Birinchi 3 ta (standart: Lidlar, Expectation, Set) ustun o'chirilmaydi. Ustunlarni surish yo'q, yangi ustun oxiriga
+ * qo'shiladi, shuning uchun bu ustunlar doim tartib bo'yicha birinchi uchtasi bo'lib qoladi.
+ */
+export const PROTECTED_COLUMN_COUNT = 3;

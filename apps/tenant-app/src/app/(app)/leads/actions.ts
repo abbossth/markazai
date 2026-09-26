@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@markazai/db";
 import { DAYS_PATTERNS, columnSchema, insertBefore, changedPositions, leadSchema, listSchema, type ActionResult, type LeadInput } from "@markazai/types";
+import { PROTECTED_COLUMN_COUNT } from "./container";
 import { logHistory } from "@/lib/history";
 import { requirePermission, type SessionUser } from "@/lib/session";
 
@@ -207,7 +208,6 @@ export async function renameColumn(id: string, name: string): Promise<Result> {
   return { ok: true };
 }
 
-/** direction: -1 — chapga, +1 — o'ngga. */
 /** "Set" bo'limi belgisi: yoqilsa, ustundagi ro'yxatlar guruh ma'lumotlari (kurs, o'qituvchi, kunlar, vaqt) bilan yaratiladi. */
 export async function setColumnIsSet(id: string, isSet: boolean): Promise<Result> {
   const user = await guard("leads:configure");
@@ -218,28 +218,14 @@ export async function setColumnIsSet(id: string, isSet: boolean): Promise<Result
   return { ok: true };
 }
 
-export async function moveColumn(id: string, direction: -1 | 1): Promise<Result> {
-  const user = await guard("leads:configure");
-  if (!user) return { ok: false, error: "forbidden" };
-  const columns = await prisma.leadColumn.findMany({ where: { organizationId: user.orgId }, orderBy: { position: "asc" }, select: { id: true } });
-  const index = columns.findIndex((c) => c.id === id);
-  const swapWith = index + direction;
-  if (index === -1) return { ok: false, error: "notFound" };
-  if (swapWith < 0 || swapWith >= columns.length) return { ok: true };
-
-  const ids = columns.map((c) => c.id);
-  [ids[index], ids[swapWith]] = [ids[swapWith]!, ids[index]!];
-  await prisma.$transaction(ids.map((cid, position) => prisma.leadColumn.update({ where: { id: cid }, data: { position } })));
-  refresh();
-  return { ok: true };
-}
-
 /** Ustunda faol lidlar bo'lsa o'chirilmaydi; talabaga aylangan lidlar boshqa ustunga o'tkaziladi. */
 export async function deleteColumn(id: string): Promise<Result> {
   const user = await guard("leads:configure");
   if (!user) return { ok: false, error: "forbidden" };
   const columns = await prisma.leadColumn.findMany({ where: { organizationId: user.orgId }, orderBy: { position: "asc" }, select: { id: true } });
-  if (!columns.some((c) => c.id === id)) return { ok: false, error: "notFound" };
+  const index = columns.findIndex((c) => c.id === id);
+  if (index === -1) return { ok: false, error: "notFound" };
+  if (index < PROTECTED_COLUMN_COUNT) return { ok: false, error: "protected" };
   if (columns.length === 1) return { ok: false, error: "lastColumn" };
   if ((await prisma.lead.count({ where: { organizationId: user.orgId, columnId: id, convertedStudentId: null } })) > 0) return { ok: false, error: "columnNotEmpty" };
 

@@ -28,12 +28,12 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatPhone, initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { createColumn, deleteColumn, deleteLead, deleteList, moveColumn, moveLead, renameColumn, setColumnIsSet, setListLocked } from "./actions";
+import { createColumn, deleteColumn, deleteLead, deleteList, moveLead, renameColumn, setColumnIsSet, setListLocked } from "./actions";
 import { LeadSheet, type EditableLead } from "./lead-form";
 import { ListDialog, type ListDialogState } from "./list-dialog";
 import { NameDialog } from "./name-dialog";
 import { useLocalSet } from "@/hooks/use-local-set";
-import { containerId, parseContainer } from "./container";
+import { PROTECTED_COLUMN_COUNT, containerId, parseContainer } from "./container";
 import type { BoardColumn, BoardLookups, LeadCardData } from "./queries";
 
 // Ustun tepasidagi rang chizig'i (dekorativ).
@@ -231,10 +231,12 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                         <DropdownMenuItem onClick={() => setListDialog({ columnId: column.id })}>
                           <FolderPlus /> {t("newList")}
                         </DropdownMenuItem>
-                        <DropdownMenuItem disabled={index === 0} onClick={() => run(() => moveColumn(column.id, -1))}>{t("moveLeft")}</DropdownMenuItem>
-                        <DropdownMenuItem disabled={index === columns.length - 1} onClick={() => run(() => moveColumn(column.id, 1))}>{t("moveRight")}</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem variant="destructive" onClick={() => setConfirm({ kind: "deleteColumn", id: column.id, name: column.name })}>{tc("delete")}</DropdownMenuItem>
+                        {index >= PROTECTED_COLUMN_COUNT && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem variant="destructive" onClick={() => setConfirm({ kind: "deleteColumn", id: column.id, name: column.name })}>{tc("delete")}</DropdownMenuItem>
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   )}
