@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Bell, Check, FolderPlus, Lock, LockOpen, MoreHorizontal, Plus, UserPlus } from "lucide-react";
+import { Bell, Check, Eye, EyeOff, FolderPlus, Lock, LockOpen, MoreHorizontal, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { LEAD_SOURCES } from "@markazai/types";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -32,8 +32,12 @@ import { createColumn, deleteColumn, deleteLead, deleteList, moveColumn, moveLea
 import { LeadSheet, type EditableLead } from "./lead-form";
 import { ListDialog, type ListDialogState } from "./list-dialog";
 import { NameDialog } from "./name-dialog";
+import { useLocalSet } from "@/hooks/use-local-set";
 import { containerId, parseContainer } from "./container";
 import type { BoardColumn, BoardLookups, LeadCardData } from "./queries";
+
+// Ustun tepasidagi rang chizig'i (dekorativ).
+const COLUMN_ACCENT = ["border-t-brand-500", "border-t-amber-500", "border-t-emerald-500", "border-t-violet-500"];
 
 type Props = {
   columns: BoardColumn[];
@@ -69,6 +73,8 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
   const [sheet, setSheet] = useState<{ lead?: EditableLead; columnId?: string; listId?: string } | null>(null);
   const [nameDialog, setNameDialog] = useState<NameDialogState | null>(null);
   const [listDialog, setListDialog] = useState<ListDialogState | null>(null);
+  // Ochiq (ko'rinadigan) ro'yxatlar brauzerda saqlanadi; sukut bo'yicha hammasi yopiq.
+  const [openLists, toggleList] = useLocalSet("markazai.leadListsOpen");
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
 
   const sensors = useSensors(
@@ -197,12 +203,15 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
       <DndContext id="lead-board" sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={() => { setActiveId(null); setContainers(snapshot.current); }}>
         <div className="flex items-start gap-4 overflow-x-auto pb-4">
           {columns.map((column, index) => {
-            const count = [containerId(column.id, null), ...column.lists.map((l) => containerId(column.id, l.id))].reduce((n, c) => n + (containers[c]?.length ?? 0), 0);
+            const listIds = column.lists.map((l) => containerId(column.id, l.id));
+            const rootIds = containers[containerId(column.id, null)] ?? [];
+            const total = [containerId(column.id, null), ...listIds].reduce((n, c) => n + (containers[c]?.length ?? 0), 0);
+            const shown = rootIds.length + column.lists.reduce((n, l) => n + (openLists.has(l.id) ? (containers[containerId(column.id, l.id)]?.length ?? 0) : 0), 0);
             return (
-              <section key={column.id} className="bg-muted/50 flex w-72 shrink-0 flex-col rounded-xl border" aria-label={column.name}>
-                <header className="flex items-center gap-1 px-3 py-2">
-                  <h2 className="min-w-0 flex-1 truncate text-sm font-semibold">
-                    {column.name} <span className="text-muted-foreground font-normal">({count})</span>
+              <section key={column.id} className={cn("bg-card/60 flex w-80 shrink-0 flex-col rounded-2xl border border-t-[3px] shadow-xs", COLUMN_ACCENT[index % COLUMN_ACCENT.length])} aria-label={column.name}>
+                <header className="flex items-center gap-1 px-3 pt-3 pb-2">
+                  <h2 className="min-w-0 flex-1 truncate text-xs font-semibold tracking-wider uppercase">
+                    {column.name} <span className="text-muted-foreground font-normal tabular-nums">({shown} / {total})</span>
                   </h2>
                   {canConfigure && (
                     <Button variant="ghost" size="icon-sm" aria-label={t("newList")} title={t("newList")} onClick={() => setListDialog({ columnId: column.id })}>
@@ -241,12 +250,34 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                 )}
 
                 <div className="flex max-h-[calc(100vh-15rem)] flex-col gap-3 overflow-y-auto px-2 pb-2">
-                  {column.lists.map((list) => (
-                    <div key={list.id} className="flex flex-col gap-1.5">
-                      <div className="flex items-center gap-1 px-1 text-xs font-medium">
-                        {list.isLocked ? <Lock className="text-muted-foreground size-3" aria-label={t("listLocked")} /> : <span className="size-3" />}
-                        <span className="min-w-0 flex-1 truncate">{list.name}</span>
-                        <span className="text-muted-foreground">{containers[containerId(column.id, list.id)]?.length ?? 0}</span>
+                  {column.lists.map((list) => {
+                    const cid = containerId(column.id, list.id);
+                    const ids = containers[cid] ?? [];
+                    const open = openLists.has(list.id);
+                    return (
+                      <div key={list.id} className="bg-muted/40 flex flex-col gap-2 rounded-xl border p-2">
+                        <div className="flex items-start gap-1 px-1">
+                          <div className="min-w-0 flex-1">
+                            <p className="flex items-center gap-1 text-sm font-medium">
+                              {list.isLocked && <Lock className="text-muted-foreground size-3 shrink-0" aria-label={t("listLocked")} />}
+                              <span className="truncate">{list.name}</span>
+                            </p>
+                      {column.isSet && (list.courseId || list.teacherId || list.daysPattern || list.startTime) && (
+                        <p className="text-muted-foreground truncate text-xs">
+                          {[
+                            lookups.courses.find((c) => c.id === list.courseId)?.name,
+                            lookups.teachers.find((x) => x.id === list.teacherId)?.name,
+                            list.daysPattern ? te(`days.${list.daysPattern}`) : null,
+                            list.startTime,
+                          ]
+                            .filter(Boolean)
+                            .join(" • ")}
+                        </p>
+                      )}
+                          </div>
+                          <Button variant="ghost" size="icon-xs" aria-pressed={open} aria-label={open ? t("hideList") : t("showList")} title={open ? t("hideList") : t("showList")} onClick={() => toggleList(list.id)}>
+                            {open ? <Eye /> : <EyeOff />}
+                          </Button>
                         {canConfigure && (
                           <DropdownMenu>
                             <DropdownMenuTrigger render={<Button variant="ghost" size="icon-xs" aria-label={tc("actions")} />}>
@@ -276,22 +307,14 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                             </DropdownMenuContent>
                           </DropdownMenu>
                         )}
-                      </div>
-                      {column.isSet && (list.courseId || list.teacherId || list.daysPattern || list.startTime) && (
-                        <p className="text-muted-foreground truncate px-1 text-xs">
-                          {[
-                            lookups.courses.find((c) => c.id === list.courseId)?.name,
-                            lookups.teachers.find((x) => x.id === list.teacherId)?.name,
-                            list.daysPattern ? te(`days.${list.daysPattern}`) : null,
-                            list.startTime,
-                          ]
-                            .filter(Boolean)
-                            .join(" • ")}
+                        </div>
+                        <Container id={cid} ids={ids} cards={cards} collapsed={!open} canWrite={canWrite} canDelete={canDelete} onEdit={(c) => setSheet({ lead: toEditable(c) })} onDelete={(c) => setConfirm({ kind: "deleteLead", id: c.id, name: c.name })} />
+                        <p className="bg-background/70 text-muted-foreground rounded-md py-1 text-center text-xs font-medium tabular-nums">
+                          {open ? ids.length : 0} / {ids.length}
                         </p>
-                      )}
-                      <Container id={containerId(column.id, list.id)} ids={containers[containerId(column.id, list.id)] ?? []} cards={cards} canWrite={canWrite} canDelete={canDelete} onEdit={(c) => setSheet({ lead: toEditable(c) })} onDelete={(c) => setConfirm({ kind: "deleteLead", id: c.id, name: c.name })} />
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                   <Container id={containerId(column.id, null)} ids={containers[containerId(column.id, null)] ?? []} cards={cards} canWrite={canWrite} canDelete={canDelete} onEdit={(c) => setSheet({ lead: toEditable(c) })} onDelete={(c) => setConfirm({ kind: "deleteLead", id: c.id, name: c.name })} />
                 </div>
               </section>
@@ -333,12 +356,12 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
   );
 }
 
-function Container({ id, ids, cards, canWrite, canDelete, onEdit, onDelete }: { id: string; ids: string[]; cards: Record<string, LeadCardData>; canWrite: boolean; canDelete: boolean; onEdit: (c: LeadCardData) => void; onDelete: (c: LeadCardData) => void }) {
+function Container({ id, ids, cards, collapsed = false, canWrite, canDelete, onEdit, onDelete }: { id: string; ids: string[]; cards: Record<string, LeadCardData>; collapsed?: boolean; canWrite: boolean; canDelete: boolean; onEdit: (c: LeadCardData) => void; onDelete: (c: LeadCardData) => void }) {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
     <SortableContext id={id} items={ids} strategy={verticalListSortingStrategy}>
-      <div ref={setNodeRef} className={cn("flex min-h-10 flex-col gap-2 rounded-lg p-0.5 transition-colors", isOver && ids.length === 0 && "bg-primary/10", ids.length === 0 && "border border-dashed")}>
-        {ids.map((leadId) => {
+      <div ref={setNodeRef} className={cn("flex flex-col gap-2 rounded-lg p-0.5 transition-all", collapsed ? "min-h-1" : "min-h-10", isOver && (collapsed || ids.length === 0) && "bg-primary/10 min-h-10", !collapsed && ids.length === 0 && "border border-dashed")}>
+        {!collapsed && ids.map((leadId) => {
           const card = cards[leadId];
           return card ? <SortableCard key={leadId} card={card} canWrite={canWrite} canDelete={canDelete} onEdit={onEdit} onDelete={onDelete} /> : null;
         })}
@@ -365,54 +388,59 @@ function CardView({ card, overlay, canWrite, canDelete, onEdit, onDelete }: { ca
   const date = `${String(d.getUTCDate()).padStart(2, "0")}.${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 
   return (
-    <article className={cn("bg-card flex flex-col gap-1.5 rounded-lg border p-2.5 text-sm shadow-xs", overlay && "shadow-lg ring-2 ring-primary/40")}>
-      <div className="flex items-start gap-1">
-        {/* py-1 — teginish nishoni kamida 24px balandlikda bo'lishi uchun (WCAG 2.5.8; matn qatori o'zi ~20px edi). */}
-        <Link href={`/leads/${card.id}`} className="min-w-0 flex-1 truncate py-1 font-medium hover:underline" onPointerDown={(e) => e.stopPropagation()}>
-          {card.name}
-        </Link>
-        {!overlay && (
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" size="icon-xs" aria-label={tc("actions")} onPointerDown={(e) => e.stopPropagation()} />}>
-              <MoreHorizontal />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem render={<Link href={`/leads/${card.id}`} />}>{t("open")}</DropdownMenuItem>
-              {canWrite && <DropdownMenuItem onClick={onEdit}>{tc("edit")}</DropdownMenuItem>}
-              <DropdownMenuItem render={<Link href={`/leads/${card.id}?tab=sms`} />}>{t("menu.sms")}</DropdownMenuItem>
-              <DropdownMenuItem render={<Link href={`/leads/${card.id}?tab=comments`} />}>{t("menu.comment")}</DropdownMenuItem>
-              <DropdownMenuItem render={<Link href={`/leads/${card.id}?tab=calls`} />}>{t("menu.call")}</DropdownMenuItem>
-              {canDelete && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive" onClick={onDelete}>{tc("delete")}</DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-      <span className="text-muted-foreground text-xs">{formatPhone(card.phone)}</span>
-      <div className="flex items-center gap-1.5 text-xs">
-        <span className="text-muted-foreground">{date}</span>
-        {source && (
-          <Badge variant="outline" title={te(source.value)} className="px-1.5">
-            {source.abbr}
-          </Badge>
-        )}
-        {card.tags.length > 0 && <Badge variant="secondary" className="px-1.5">{card.tags[0]!.name}{card.tags.length > 1 ? ` +${card.tags.length - 1}` : ""}</Badge>}
-        <span className="ml-auto flex items-center gap-1.5">
-          {card.pendingReminders > 0 && (
-            <span className={cn("inline-flex items-center gap-0.5", card.hasOverdue ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400")} title={card.hasOverdue ? t("overdue") : t("pending")}>
-              <Bell className="size-3.5" /> {card.pendingReminders}
-            </span>
+    <article className={cn("bg-card hover:border-primary/30 flex gap-2.5 rounded-xl border p-2.5 text-sm shadow-xs transition-shadow hover:shadow-sm", overlay && "shadow-lg ring-2 ring-primary/40")}>
+      <span className="bg-brand-500/10 text-brand-500 mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold" aria-hidden>
+        {initials(card.name)}
+      </span>
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex items-start gap-1">
+          {/* py-1 — teginish nishoni kamida 24px balandlikda bo'lishi uchun (WCAG 2.5.8). */}
+          <Link href={`/leads/${card.id}`} className="min-w-0 flex-1 truncate py-0.5 font-medium hover:underline" onPointerDown={(e) => e.stopPropagation()}>
+            {card.name}
+          </Link>
+          {!overlay && (
+            <DropdownMenu>
+              <DropdownMenuTrigger render={<Button variant="ghost" size="icon-xs" aria-label={tc("actions")} onPointerDown={(e) => e.stopPropagation()} />}>
+                <MoreHorizontal />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem render={<Link href={`/leads/${card.id}`} />}>{t("open")}</DropdownMenuItem>
+                {canWrite && <DropdownMenuItem onClick={onEdit}>{tc("edit")}</DropdownMenuItem>}
+                <DropdownMenuItem render={<Link href={`/leads/${card.id}?tab=sms`} />}>{t("menu.sms")}</DropdownMenuItem>
+                <DropdownMenuItem render={<Link href={`/leads/${card.id}?tab=comments`} />}>{t("menu.comment")}</DropdownMenuItem>
+                <DropdownMenuItem render={<Link href={`/leads/${card.id}?tab=calls`} />}>{t("menu.call")}</DropdownMenuItem>
+                {canDelete && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem variant="destructive" onClick={onDelete}>{tc("delete")}</DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
-          {card.assigneeName && (
-            <span className="bg-muted flex size-5 items-center justify-center rounded-full text-[10px] font-medium" title={card.assigneeName}>
-              {initials(card.assigneeName)}
-            </span>
+        </div>
+        <span className="text-muted-foreground text-xs tabular-nums">{formatPhone(card.phone)}</span>
+        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+          <span className="text-muted-foreground tabular-nums">{date}</span>
+          {source && (
+            <Badge variant="outline" title={te(source.value)} className="px-1.5">
+              {source.abbr}
+            </Badge>
           )}
-        </span>
+          {card.tags.length > 0 && <Badge variant="secondary" className="px-1.5">{card.tags[0]!.name}{card.tags.length > 1 ? ` +${card.tags.length - 1}` : ""}</Badge>}
+          <span className="ml-auto flex items-center gap-1.5">
+            {card.pendingReminders > 0 && (
+              <span className={cn("inline-flex items-center gap-0.5", card.hasOverdue ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400")} title={card.hasOverdue ? t("overdue") : t("pending")}>
+                <Bell className="size-3.5" /> {card.pendingReminders}
+              </span>
+            )}
+            {card.assigneeName && (
+              <span className="bg-muted flex size-5 items-center justify-center rounded-full text-[10px] font-medium" title={card.assigneeName}>
+                {initials(card.assigneeName)}
+              </span>
+            )}
+          </span>
+        </div>
       </div>
     </article>
   );

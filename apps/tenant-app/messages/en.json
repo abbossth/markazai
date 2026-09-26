@@ -597,7 +597,9 @@
     "startTime": "Lesson start time",
     "createList": "Create",
     "createGroup": "Create group",
-    "setSection": "Set section"
+    "setSection": "Set section",
+    "hideList": "Hide list",
+    "showList": "Show list"
   },
   "calls": {
     "log": "Log a call",

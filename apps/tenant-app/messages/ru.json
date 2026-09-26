@@ -597,7 +597,9 @@
     "startTime": "Время начала урока",
     "createList": "Создать",
     "createGroup": "Создать группу",
-    "setSection": "Раздел «Set»"
+    "setSection": "Раздел «Set»",
+    "hideList": "Скрыть список",
+    "showList": "Показать список"
   },
   "calls": {
     "log": "Зафиксировать звонок",

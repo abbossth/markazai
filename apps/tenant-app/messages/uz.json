@@ -597,7 +597,9 @@
     "startTime": "Darsning boshlanish vaqti",
     "createList": "Yaratish",
     "createGroup": "Guruh yaratish",
-    "setSection": "Set bo'limi"
+    "setSection": "Set bo'limi",
+    "hideList": "Ro'yxatni yashirish",
+    "showList": "Ro'yxatni ko'rsatish"
   },
   "calls": {
     "log": "Qo'ng'iroqni qayd etish",
