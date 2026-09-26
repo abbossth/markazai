@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Bell, Eye, EyeOff, FolderPlus, MoreHorizontal, Plus, UserPlus } from "lucide-react";
+import { Bell, CalendarPlus, Eye, EyeOff, FolderPlus, MoreHorizontal, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { LEAD_SOURCES } from "@markazai/types";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -214,8 +214,8 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                     {column.name} <span className="text-muted-foreground font-normal tabular-nums">({shown} / {total})</span>
                   </h2>
                   {canConfigure && (
-                    <Button variant="ghost" size="icon-sm" aria-label={t("newList")} title={t("newList")} onClick={() => setListDialog({ columnId: column.id })}>
-                      <FolderPlus className="size-4" />
+                    <Button variant="ghost" size="icon-sm" aria-label={column.isSet ? t("newSet") : t("newList")} title={column.isSet ? t("newSet") : t("newList")} onClick={() => setListDialog({ columnId: column.id })}>
+                      {column.isSet ? <CalendarPlus className="size-4" /> : <FolderPlus className="size-4" />}
                     </Button>
                   )}
                   {canConfigure && (

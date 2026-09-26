@@ -599,7 +599,8 @@
     "createGroup": "Create group",
     "setSection": "Set section",
     "hideList": "Hide list",
-    "showList": "Show list"
+    "showList": "Show list",
+    "newSet": "New set (for a group)"
   },
   "calls": {
     "log": "Log a call",

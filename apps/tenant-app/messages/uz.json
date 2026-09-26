@@ -599,7 +599,8 @@
     "createGroup": "Guruh yaratish",
     "setSection": "Set bo'limi",
     "hideList": "Ro'yxatni yashirish",
-    "showList": "Ro'yxatni ko'rsatish"
+    "showList": "Ro'yxatni ko'rsatish",
+    "newSet": "Yangi set (guruh uchun)"
   },
   "calls": {
     "log": "Qo'ng'iroqni qayd etish",
