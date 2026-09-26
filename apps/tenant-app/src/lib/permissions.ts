@@ -40,7 +40,6 @@ const ADMIN_PERMISSIONS: Permission[] = [
   "students:write",
   "students:delete",
   "groups:write",
-  "groups:delete",
   "attendance:write",
   "leads:write",
   "leads:delete",
@@ -55,7 +54,8 @@ const FINANCE_MANAGER: Permission[] = [...FINANCE_STAFF, "payments:void", "withd
 const SETTINGS: Permission[] = ["settings:manage"];
 
 const PERMISSIONS: Record<Role, Permission[]> = {
-  CEO: [...ADMIN_PERMISSIONS, ...FINANCE_MANAGER, ...SETTINGS],
+  // Guruhni o'chirish — faqat CEO (qolgan rollarda "groups:delete" yo'q).
+  CEO: [...ADMIN_PERMISSIONS, "groups:delete", ...FINANCE_MANAGER, ...SETTINGS],
   BRANCH_DIRECTOR: [...ADMIN_PERMISSIONS, ...FINANCE_MANAGER, ...SETTINGS],
   ADMINISTRATOR: [...ADMIN_PERMISSIONS, ...FINANCE_STAFF, ...SETTINGS],
   ADMINISTRATOR2: [...ADMIN_PERMISSIONS, ...FINANCE_STAFF],
