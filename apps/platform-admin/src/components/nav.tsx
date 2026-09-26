@@ -8,6 +8,7 @@ const ITEMS = [
   { href: "/", label: "Bosh sahifa" },
   { href: "/organizations", label: "Tashkilotlar" },
   { href: "/plans", label: "Rejalar" },
+  { href: "/videos", label: "Video darsliklar" },
   { href: "/admins", label: "Platforma xodimlari" },
   { href: "/audit", label: "Audit-log" },
 ];

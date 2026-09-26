@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildDailyTrend, buildMonthlyTrend, expenseSchema, paymentSchema, withdrawalSchema } from "./finance-forms";
+import { youtubeId } from "./help";
 import { activeDiscountTotal, balanceOf, effectivePrice, expectedLessonCharge, financeTotals, isChargeable, lessonAmount } from "./billing";
 
 const d = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
@@ -141,5 +142,15 @@ describe("moliyaviy forma sxemalari", () => {
     expect(expenseSchema.safeParse({ category: " ", amount: 1000, date: "2026-09-21" }).success).toBe(false);
     expect(expenseSchema.safeParse({ category: "Ijara", amount: 1000, date: "2026-09-21" }).success).toBe(true);
     expect(withdrawalSchema.safeParse({ amount: 1000, date: "2026-09-21" }).success).toBe(true);
+  });
+});
+
+describe("youtubeId", () => {
+  it("parses common YouTube URL shapes", () => {
+    expect(youtubeId("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ");
+    expect(youtubeId("https://youtu.be/dQw4w9WgXcQ?t=5")).toBe("dQw4w9WgXcQ");
+    expect(youtubeId("https://youtube.com/shorts/dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ");
+    expect(youtubeId("https://example.com/watch?v=dQw4w9WgXcQ")).toBeNull();
+    expect(youtubeId("not a url")).toBeNull();
   });
 });

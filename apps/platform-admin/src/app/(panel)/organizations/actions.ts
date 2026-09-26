@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { platformPrisma } from "@markazai/db/platform";
-import { BILLING_CYCLES, ORG_STATUSES, PLAN_MODULES, cyclePrice, phoneSchema, slugSchema, subscriptionEndDate, type OrgStatus } from "@markazai/types";
+import { BILLING_CYCLES, isChargeMode, ORG_STATUSES, PLAN_MODULES, cyclePrice, phoneSchema, slugSchema, subscriptionEndDate, type OrgStatus } from "@markazai/types";
 import type { FormState } from "@/components/action-form";
 import { audit } from "@/lib/audit";
 import { fromISO, todayISO } from "@/lib/format";
@@ -68,6 +68,19 @@ export async function setStatus(orgId: string, status: OrgStatus, _prev: FormSta
   revalidatePath(`/organizations/${orgId}`);
   revalidatePath("/organizations");
   return { ok: true, message: "Holat yangilandi (tenant-app'da ≤30 soniyada kuchga kiradi)" };
+}
+
+/** Tashkilotning talabalardan pul yechish rejimi (footer'da "To'lov rejimi" sifatida ko'rinadi). */
+export async function setChargeMode(orgId: string, _prev: FormState, data: FormData): Promise<FormState> {
+  const admin = await requireAdmin(["BILLING", "SUPPORT"]);
+  const mode = data.get("chargeMode");
+  if (!isChargeMode(mode)) return { error: "To'lov rejimi noto'g'ri" };
+  const org = await platformPrisma.organization.findUnique({ where: { id: orgId } });
+  if (!org) return { error: "Tashkilot topilmadi" };
+  await platformPrisma.organization.update({ where: { id: orgId }, data: { chargeMode: mode } });
+  await audit(admin, "organization.chargeMode", "organization", orgId, { from: org.chargeMode, to: mode });
+  revalidatePath(`/organizations/${orgId}`);
+  return { ok: true, message: "Saqlandi (tenant-app'da ≤30 soniyada ko'rinadi)" };
 }
 
 const paymentSchema = z.object({

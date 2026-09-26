@@ -16,6 +16,17 @@ enum OrgStatus {
   DELETED
 }
 
+// O'quv markaz o'z talabalaridan pulni qanday yechishi (modme "To'lov rejimi"). Hozir amalda faqat DAILY
+// (dars bo'yicha) ishlaydi; qolganlari Control Plane'da belgilanadi va footer'da ko'rsatiladi.
+enum ChargeMode {
+  DAILY
+  CALENDAR
+  GROUP_START
+  MODULE
+  INDIVIDUAL
+  FULL_COURSE
+}
+
 enum SubscriptionStatus {
   ACTIVE
   EXPIRED
@@ -38,6 +49,7 @@ model Organization {
   contactPhone String    @map("contact_phone")
   contactEmail String?   @map("contact_email")
   logoUrl      String?   @map("logo_url")
+  chargeMode   ChargeMode @default(DAILY) @map("charge_mode")
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
@@ -159,4 +171,17 @@ model AuditLog {
 
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// Video darsliklar (yordam): platforma egasi YouTube'ga yuklab, havolasini Control Plane'da kiritadi; hamma tenant ko'radi.
+model HelpVideo {
+  id        String   @id @default(uuid()) @db.Uuid
+  category  String
+  title     String
+  url       String
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([category, sortOrder])
+  @@map("help_videos")
 }

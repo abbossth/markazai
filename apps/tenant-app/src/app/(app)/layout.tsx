@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { AppFooter } from "@/components/layout/app-footer";
 import { SubscriptionBanner } from "@/components/layout/subscription-banner";
 import { prisma } from "@markazai/db";
 import { canAccess } from "@/lib/permissions";
@@ -17,17 +18,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const [account, reminders, tenant] = await Promise.all([
     prisma.user.findUnique({ where: { id: user.id }, select: { phone: true, photoUrl: true } }),
     loadMyReminders(user),
-    // Obuna eslatmasi — faqat Sozlamalarni ko'ra oladigan (rahbariyat/administrator) rollarga ko'rsatiladi.
-    canAccess(user.roles, "settings") ? currentTenant() : Promise.resolve(null),
+    currentTenant(),
   ]);
 
   return (
     <div className="flex h-screen overflow-hidden print:block print:h-auto print:overflow-visible">
       <Sidebar roles={user.roles} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <SubscriptionBanner tenant={tenant} />
+        {/* Obuna eslatmasi — faqat Sozlamalarni ko'ra oladigan (rahbariyat/administrator) rollarga ko'rsatiladi. */}
+        <SubscriptionBanner tenant={canAccess(user.roles, "settings") ? tenant : null} />
         <Header user={{ name: user.name, phone: account?.phone ?? "", image: account?.photoUrl ?? null, roles: user.roles }} reminders={reminders} />
         <main className="bg-muted/30 flex-1 overflow-auto p-6 print:overflow-visible print:p-0">{children}</main>
+        <AppFooter chargeMode={tenant?.chargeMode ?? "DAILY"} />
       </div>
     </div>
   );

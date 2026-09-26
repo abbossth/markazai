@@ -2,7 +2,7 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { platformPrisma } from "@markazai/db/platform";
 import { setTenantResolver } from "@markazai/db";
-import { accessDecision, moduleEnabled, parseHost, toISODate, type AccessDecision, type HostTarget, type OrgStatus, type PlanLimits } from "@markazai/types";
+import { accessDecision, isChargeMode, type ChargeMode, moduleEnabled, parseHost, toISODate, type AccessDecision, type HostTarget, type OrgStatus, type PlanLimits } from "@markazai/types";
 
 /**
  * Tenant kontekstini aniqlash (0.2): host → slug → tashkilot (Control Plane bazasidan o'qiladi, qisqa muddat keshlanadi).
@@ -22,6 +22,8 @@ export type TenantInfo = {
   subscriptionEnd: string | null;
   limits: PlanLimits;
   planName: string | null;
+  /** Talabalardan pul yechish rejimi (Control Plane belgilaydi). */
+  chargeMode: ChargeMode;
   /** Reja + bayroqlar bo'yicha yoqilgan modullar. */
   modules: string[];
   access: AccessDecision;
@@ -55,6 +57,7 @@ async function loadTenantBySlug(slug: string): Promise<TenantInfo | null> {
       // Obunasi yo'q (yangi/sinov) tashkilot cheklanmagan hisoblanadi — Control Plane keyin reja biriktiradi.
       limits: { maxStaff: sub?.plan.maxStaff ?? null, maxBranches: sub?.plan.maxBranches ?? null, maxStudents: sub?.plan.maxStudents ?? null },
       planName: sub?.plan.name ?? null,
+      chargeMode: isChargeMode(org.chargeMode) ? org.chargeMode : "DAILY",
       modules: [...allModules].filter((m) => moduleEnabled(planModules, flags, m)),
       access: accessDecision({ status: org.status, subscriptionEnd }, toISODate(new Date())),
     };

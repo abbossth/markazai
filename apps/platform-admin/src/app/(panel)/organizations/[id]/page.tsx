@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { platformPrisma } from "@markazai/db/platform";
-import { BILLING_CYCLES, PLAN_MODULES, cyclePrice } from "@markazai/types";
+import { BILLING_CYCLES, CHARGE_MODES, CHARGE_MODE_HINT, CHARGE_MODE_LABEL, PLAN_MODULES, cyclePrice } from "@markazai/types";
 import { ActionForm } from "@/components/action-form";
 import { Badge, Card, Field, Input, PageHeader, Select, Table } from "@/components/ui";
 import { fmtDate, fmtMoney, todayISO } from "@/lib/format";
 import { can, requireAdmin } from "@/lib/session";
 import { STATUS_LABEL, STATUS_TONE } from "../page";
-import { recordPayment, refreshUsage, setFlag, setStatus } from "../actions";
+import { recordPayment, refreshUsage, setChargeMode, setFlag, setStatus } from "../actions";
 
 const MODULE_LABEL: Record<string, string> = { gamification: "Gamifikatsiya", integrations: "Integratsiyalar" };
 
@@ -59,6 +59,25 @@ export default async function OrganizationPage({ params }: { params: Promise<{ i
             </div>
           ) : (
             <p className="text-muted-foreground text-sm">Holatni faqat Billing/Owner o&apos;zgartira oladi.</p>
+          )}
+        </Card>
+
+        <Card title="To'lov rejimi (talabalardan pul yechish)">
+          <p className="text-muted-foreground text-sm">Tenant-app pastki panelida &quot;To&apos;lov rejimi&quot; sifatida ko&apos;rsatiladi. Hozir amalda faqat &quot;Kunlik&quot; ishlaydi (har darsda yechiladi); boshqa rejimlar belgilanadi, lekin hisob-kitob hali o&apos;zgarmaydi.</p>
+          {canBilling || canSupport ? (
+            <ActionForm action={setChargeMode.bind(null, org.id)} submit="Saqlash" variant="outline" className="gap-3">
+              <Field label="Rejim">
+                <Select name="chargeMode" defaultValue={org.chargeMode}>
+                  {CHARGE_MODES.map((m) => (
+                    <option key={m} value={m}>
+                      {CHARGE_MODE_LABEL[m]} — {CHARGE_MODE_HINT[m]}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </ActionForm>
+          ) : (
+            <p className="text-sm font-medium">{CHARGE_MODE_LABEL[org.chargeMode]}</p>
           )}
         </Card>
 
