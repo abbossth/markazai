@@ -7,9 +7,11 @@ import { useTranslations } from "next-intl";
 import {
   AlertTriangle,
   Banknote,
+  Columns3,
   Funnel,
   Gauge,
   MonitorPlay,
+  Rows3,
   UserMinus,
   Users,
   UsersRound,
@@ -169,20 +171,17 @@ export function ScheduleWidget({ groups }: { groups: ScheduleGroup[] }) {
             </button>
           ))}
         </div>
-        <div className="bg-muted inline-flex gap-1 rounded-lg p-1" role="tablist">
-          {([false, true] as const).map((h) => (
-            <button
-              key={String(h)}
-              type="button"
-              role="tab"
-              aria-selected={horizontal === h}
-              onClick={() => setHorizontal(h)}
-              className={cn("text-muted-foreground hover:text-foreground rounded-md px-3 py-1 text-sm transition-colors", horizontal === h && "bg-background text-foreground shadow-xs")}
-            >
-              {h ? t("horizontal") : t("vertical")}
-            </button>
-          ))}
-        </div>
+        {/* Ikkita alohida tugma o'rniga bitta ikonka — "Toq/Juft/Boshqa" qatoriga qo'shilib, tugmalar
+            ko'payib ketmasligi uchun (foydalanuvchi fikri bilan minimallashtirildi). */}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={horizontal ? t("vertical") : t("horizontal")}
+          title={horizontal ? t("vertical") : t("horizontal")}
+          onClick={() => setHorizontal(!horizontal)}
+        >
+          {horizontal ? <Rows3 className="size-4" /> : <Columns3 className="size-4" />}
+        </Button>
       </div>
 
       {shown.length === 0 ? (
