@@ -112,6 +112,10 @@ async function enrollLeadsFromList(user: SessionUser, groupId: string, listId: s
     await logHistory(user, "lead", lead.id, "converted", { studentName: lead.name });
     count++;
   }
+  // Barcha lidlar ko'chgach, bo'shab qolgan "guruh to'plami" ro'yxatining o'zi ham doskadan olib tashlanadi.
+  if ((await prisma.lead.count({ where: { organizationId: user.orgId, listId, convertedStudentId: null, archivedAt: null } })) === 0) {
+    await prisma.leadList.deleteMany({ where: { id: listId, organizationId: user.orgId } });
+  }
   return count;
 }
 
