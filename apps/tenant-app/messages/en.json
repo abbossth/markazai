@@ -590,7 +590,13 @@
       "sms": "SMS",
       "history": "History",
       "reminders": "Reminders"
-    }
+    },
+    "editList": "Edit list",
+    "listName": "Name",
+    "teacher": "Teacher",
+    "startTime": "Lesson start time",
+    "createList": "Create",
+    "createGroup": "Create group"
   },
   "calls": {
     "log": "Log a call",

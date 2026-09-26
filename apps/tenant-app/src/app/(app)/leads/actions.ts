@@ -1,8 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { prisma } from "@markazai/db";
-import { columnSchema, insertBefore, changedPositions, leadSchema, listSchema, type ActionResult, type LeadInput } from "@markazai/types";
+import { DAYS_PATTERNS, columnSchema, insertBefore, changedPositions, leadSchema, listSchema, type ActionResult, type LeadInput } from "@markazai/types";
 import { logHistory } from "@/lib/history";
 import { requirePermission, type SessionUser } from "@/lib/session";
 
@@ -243,14 +244,46 @@ export async function deleteColumn(id: string): Promise<Result> {
 
 // ───────────── Ro'yxatlar (ustun ichidagi papkalar) ─────────────
 
-export async function createList(columnId: string, name: string): Promise<Result> {
+const listDetailsSchema = z.object({
+  courseId: z.union([z.uuid(), z.literal("")]).optional(),
+  teacherId: z.union([z.uuid(), z.literal("")]).optional(),
+  daysPattern: z.union([z.enum(DAYS_PATTERNS), z.literal("")]).optional(),
+  startTime: z.union([z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/), z.literal("")]).optional(),
+});
+export type ListDetails = z.input<typeof listDetailsSchema>;
+
+/** Bo'sh qiymat — NULL (ixtiyoriy maydon tozalanadi). */
+const listDetailData = (d: z.output<typeof listDetailsSchema>) => ({
+  courseId: d.courseId || null,
+  teacherId: d.teacherId || null,
+  daysPattern: d.daysPattern || null,
+  startTime: d.startTime || null,
+});
+
+export async function createList(columnId: string, name: string, details: ListDetails = {}): Promise<Result> {
   const user = await guard("leads:configure");
   if (!user) return { ok: false, error: "forbidden" };
   const parsed = listSchema.safeParse({ name });
-  if (!parsed.success) return { ok: false, error: "validation" };
+  const d = listDetailsSchema.safeParse(details);
+  if (!parsed.success || !d.success) return { ok: false, error: "validation" };
   if (!(await prisma.leadColumn.findFirst({ where: { id: columnId, organizationId: user.orgId }, select: { id: true } }))) return { ok: false, error: "notFound" };
   const last = await prisma.leadList.aggregate({ where: { organizationId: user.orgId, columnId }, _max: { position: true } });
-  await prisma.leadList.create({ data: { organizationId: user.orgId, columnId, name: parsed.data.name, position: (last._max.position ?? -1) + 1 } });
+  await prisma.leadList.create({ data: { organizationId: user.orgId, columnId, name: parsed.data.name, position: (last._max.position ?? -1) + 1, ...listDetailData(d.data) } });
+  refresh();
+  return { ok: true };
+}
+
+/** Ro'yxat nomi va "set" ma'lumotlarini yangilaydi (qulflangan ro'yxat o'zgarmaydi). */
+export async function updateList(id: string, name: string, details: ListDetails = {}): Promise<Result> {
+  const user = await guard("leads:configure");
+  if (!user) return { ok: false, error: "forbidden" };
+  const parsed = listSchema.safeParse({ name });
+  const d = listDetailsSchema.safeParse(details);
+  if (!parsed.success || !d.success) return { ok: false, error: "validation" };
+  const list = await prisma.leadList.findFirst({ where: { id, organizationId: user.orgId } });
+  if (!list) return { ok: false, error: "notFound" };
+  if (list.isLocked) return { ok: false, error: "locked" };
+  await prisma.leadList.update({ where: { id }, data: { name: parsed.data.name, ...listDetailData(d.data) } });
   refresh();
   return { ok: true };
 }

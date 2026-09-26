@@ -259,16 +259,16 @@ export function GroupsTable({ rows, total, page, pageSize, sort, lookups, canWri
   );
 }
 
-export function NewGroupButton({ lookups }: { lookups: GroupLookups }) {
+export function NewGroupButton({ lookups, prefill, defaultOpen = false }: { lookups: GroupLookups; prefill?: Parameters<typeof GroupSheet>[0]["prefill"]; defaultOpen?: boolean }) {
   const t = useTranslations("group");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <>
       <Button onClick={() => setOpen(true)}>
         <Plus className="size-4" />
         {t("new")}
       </Button>
-      <GroupSheet open={open} onOpenChange={setOpen} lookups={lookups} />
+      <GroupSheet open={open} onOpenChange={setOpen} lookups={lookups} prefill={prefill} />
     </>
   );
 }

@@ -588,6 +588,11 @@ model LeadList {
   name           String
   position       Int
   isLocked       Boolean  @default(false) @map("is_locked")
+  // Ixtiyoriy "set" ma'lumotlari: shu ro'yxatdan yangi guruh ochish uchun (kurs, o'qituvchi, kunlar, boshlanish vaqti).
+  courseId       String?      @map("course_id") @db.Uuid
+  teacherId      String?      @map("teacher_id") @db.Uuid
+  daysPattern    DaysPattern? @map("days_pattern")
+  startTime      String?      @map("start_time")
   createdAt      DateTime @default(now()) @map("created_at")
 
   column LeadColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)

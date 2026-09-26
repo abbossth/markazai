@@ -27,7 +27,7 @@ export type LeadCardData = {
 export type BoardColumn = {
   id: string;
   name: string;
-  lists: { id: string; name: string; isLocked: boolean }[];
+  lists: { id: string; name: string; isLocked: boolean; courseId: string | null; teacherId: string | null; daysPattern: DaysPattern | null; startTime: string | null }[];
 };
 
 export async function loadBoard(user: SessionUser, sp: RawSearchParams) {
@@ -110,15 +110,16 @@ export async function loadBoard(user: SessionUser, sp: RawSearchParams) {
   const boardColumns: BoardColumn[] = columns.map((c) => ({
     id: c.id,
     name: c.name,
-    lists: lists.filter((l) => l.columnId === c.id).map((l) => ({ id: l.id, name: l.name, isLocked: l.isLocked })),
+    lists: lists.filter((l) => l.columnId === c.id).map((l) => ({ id: l.id, name: l.name, isLocked: l.isLocked, courseId: l.courseId, teacherId: l.teacherId, daysPattern: l.daysPattern, startTime: l.startTime })),
   }));
 
-  const [courses, tags] = await Promise.all([
+  const [courses, tags, teachers] = await Promise.all([
     prisma.course.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.tag.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.teacher.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
 
-  return { columns: boardColumns, cards, containers, lookups: { courses, tags, assignees, columns: boardColumns } };
+  return { columns: boardColumns, cards, containers, lookups: { courses, tags, teachers, assignees, columns: boardColumns } };
 }
 
 export type BoardLookups = Awaited<ReturnType<typeof loadBoard>>["lookups"];

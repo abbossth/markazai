@@ -590,7 +590,13 @@
       "sms": "SMS",
       "history": "Tarix",
       "reminders": "Eslatmalar"
-    }
+    },
+    "editList": "Ro'yxatni tahrirlash",
+    "listName": "Nomi",
+    "teacher": "O'qituvchi",
+    "startTime": "Darsning boshlanish vaqti",
+    "createList": "Yaratish",
+    "createGroup": "Guruh yaratish"
   },
   "calls": {
     "log": "Qo'ng'iroqni qayd etish",

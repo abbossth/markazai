@@ -28,8 +28,9 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatPhone, initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { createColumn, createList, deleteColumn, deleteLead, deleteList, moveColumn, moveLead, renameColumn, renameList, setListLocked } from "./actions";
+import { createColumn, deleteColumn, deleteLead, deleteList, moveColumn, moveLead, renameColumn, setListLocked } from "./actions";
 import { LeadSheet, type EditableLead } from "./lead-form";
+import { ListDialog, type ListDialogState } from "./list-dialog";
 import { NameDialog } from "./name-dialog";
 import { containerId, parseContainer } from "./container";
 import type { BoardColumn, BoardLookups, LeadCardData } from "./queries";
@@ -44,17 +45,14 @@ type Props = {
   canConfigure: boolean;
 };
 
-type NameDialogState =
-  | { kind: "newColumn" }
-  | { kind: "renameColumn"; id: string; name: string }
-  | { kind: "newList"; columnId: string }
-  | { kind: "renameList"; id: string; name: string };
+type NameDialogState = { kind: "newColumn" } | { kind: "renameColumn"; id: string; name: string };
 
 type ConfirmState = { kind: "deleteColumn"; id: string; name: string } | { kind: "deleteList"; id: string; name: string } | { kind: "deleteLead"; id: string; name: string };
 
 export function Board({ columns, cards, containers: initialContainers, lookups, canWrite, canDelete, canConfigure }: Props) {
   const t = useTranslations("lead");
   const tc = useTranslations("common");
+  const te = useTranslations("enums");
   const router = useRouter();
   const [containers, setContainers] = useState(initialContainers);
   // Server yangi ma'lumot yuborganda (revalidate/refresh) lokal holat serverniki bilan almashtiriladi.
@@ -70,6 +68,7 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
 
   const [sheet, setSheet] = useState<{ lead?: EditableLead; columnId?: string; listId?: string } | null>(null);
   const [nameDialog, setNameDialog] = useState<NameDialogState | null>(null);
+  const [listDialog, setListDialog] = useState<ListDialogState | null>(null);
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
 
   const sensors = useSensors(
@@ -211,13 +210,18 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                     </Button>
                   )}
                   {canConfigure && (
+                    <Button variant="ghost" size="icon-sm" aria-label={t("newList")} title={t("newList")} onClick={() => setListDialog({ columnId: column.id })}>
+                      <FolderPlus className="size-4" />
+                    </Button>
+                  )}
+                  {canConfigure && (
                     <DropdownMenu>
                       <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" aria-label={tc("actions")} />}>
                         <MoreHorizontal className="size-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setNameDialog({ kind: "renameColumn", id: column.id, name: column.name })}>{t("renameColumn")}</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setNameDialog({ kind: "newList", columnId: column.id })}>
+                        <DropdownMenuItem onClick={() => setListDialog({ columnId: column.id })}>
                           <FolderPlus /> {t("newList")}
                         </DropdownMenuItem>
                         <DropdownMenuItem disabled={index === 0} onClick={() => run(() => moveColumn(column.id, -1))}>{t("moveLeft")}</DropdownMenuItem>
@@ -247,7 +251,19 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                               <MoreHorizontal />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem disabled={list.isLocked} onClick={() => setNameDialog({ kind: "renameList", id: list.id, name: list.name })}>{t("renameList")}</DropdownMenuItem>
+                              <DropdownMenuItem disabled={list.isLocked} onClick={() => setListDialog({ list })}>{tc("edit")}</DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  const q = new URLSearchParams({ new: "1", name: list.name });
+                                  if (list.courseId) q.set("courseId", list.courseId);
+                                  if (list.teacherId) q.set("teacherId", list.teacherId);
+                                  if (list.daysPattern) q.set("days", list.daysPattern);
+                                  if (list.startTime) q.set("startTime", list.startTime);
+                                  router.push(`/groups?${q}`);
+                                }}
+                              >
+                                {t("createGroup")}
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => run(() => setListLocked(list.id, !list.isLocked))}>
                                 {list.isLocked ? <LockOpen /> : <Lock />} {list.isLocked ? t("unlockList") : t("lockList")}
                               </DropdownMenuItem>
@@ -257,6 +273,18 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
                           </DropdownMenu>
                         )}
                       </div>
+                      {(list.courseId || list.teacherId || list.daysPattern || list.startTime) && (
+                        <p className="text-muted-foreground truncate px-1 text-xs">
+                          {[
+                            lookups.courses.find((c) => c.id === list.courseId)?.name,
+                            lookups.teachers.find((x) => x.id === list.teacherId)?.name,
+                            list.daysPattern ? te(`days.${list.daysPattern}`) : null,
+                            list.startTime,
+                          ]
+                            .filter(Boolean)
+                            .join(" • ")}
+                        </p>
+                      )}
                       <Container id={containerId(column.id, list.id)} ids={containers[containerId(column.id, list.id)] ?? []} cards={cards} canWrite={canWrite} canDelete={canDelete} onEdit={(c) => setSheet({ lead: toEditable(c) })} onDelete={(c) => setConfirm({ kind: "deleteLead", id: c.id, name: c.name })} />
                     </div>
                   ))}
@@ -272,16 +300,18 @@ export function Board({ columns, cards, containers: initialContainers, lookups, 
 
       {sheet && <LeadSheet open onOpenChange={(o) => !o && setSheet(null)} lookups={lookups} lead={sheet.lead} defaultColumnId={sheet.columnId} defaultListId={sheet.listId} />}
 
+      {listDialog && <ListDialog state={listDialog} onClose={() => setListDialog(null)} lookups={lookups} />}
+
       {nameDialog && (
         <NameDialog
           key={JSON.stringify(nameDialog)}
           open
           onOpenChange={(o) => !o && setNameDialog(null)}
-          title={nameDialog.kind === "newColumn" ? t("newColumn") : nameDialog.kind === "renameColumn" ? t("renameColumn") : nameDialog.kind === "newList" ? t("newList") : t("renameList")}
-          initial={nameDialog.kind === "renameColumn" || nameDialog.kind === "renameList" ? nameDialog.name : ""}
+          title={nameDialog.kind === "newColumn" ? t("newColumn") : t("renameColumn")}
+          initial={nameDialog.kind === "renameColumn" ? nameDialog.name : ""}
           submitLabel={tc("save")}
           onSubmit={(name) =>
-            nameDialog.kind === "newColumn" ? createColumn(name) : nameDialog.kind === "renameColumn" ? renameColumn(nameDialog.id, name) : nameDialog.kind === "newList" ? createList(nameDialog.columnId, name) : renameList(nameDialog.id, name)
+            nameDialog.kind === "newColumn" ? createColumn(name) : renameColumn(nameDialog.id, name)
           }
         />
       )}

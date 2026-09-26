@@ -5,17 +5,19 @@ import type { BoardLookups } from "../queries";
 /** Lid formasi uchun ma'lumotnomalar (doskadagi bilan bir xil shakl). */
 export async function loadLeadLookups(user: SessionUser): Promise<BoardLookups> {
   const columns = await ensureDefaultLeadColumns(prisma, user.orgId);
-  const [lists, courses, tags, assignees] = await Promise.all([
+  const [lists, courses, tags, teachers, assignees] = await Promise.all([
     prisma.leadList.findMany({ where: { organizationId: user.orgId }, orderBy: { position: "asc" } }),
     prisma.course.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.tag.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.teacher.findMany({ where: { organizationId: user.orgId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.user.findMany({ where: { organizationId: user.orgId, isActive: true }, select: { id: true, name: true } }),
   ]);
   return {
     courses,
     tags,
+    teachers,
     assignees,
-    columns: columns.map((c) => ({ id: c.id, name: c.name, lists: lists.filter((l) => l.columnId === c.id).map((l) => ({ id: l.id, name: l.name, isLocked: l.isLocked })) })),
+    columns: columns.map((c) => ({ id: c.id, name: c.name, lists: lists.filter((l) => l.columnId === c.id).map((l) => ({ id: l.id, name: l.name, isLocked: l.isLocked, courseId: l.courseId, teacherId: l.teacherId, daysPattern: l.daysPattern, startTime: l.startTime })) })),
   };
 }
 

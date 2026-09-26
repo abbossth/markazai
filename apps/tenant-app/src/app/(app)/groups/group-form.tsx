@@ -39,19 +39,21 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   lookups: GroupLookups;
   group?: EditableGroup;
+  /** Yangi guruh formasini oldindan to'ldirish (masalan lidlar ro'yxatidan "Guruh yaratish"). */
+  prefill?: Partial<Pick<GroupInput, "name" | "courseId" | "teacherId" | "days" | "startTime">>;
 };
 
 const NONE = "__none";
 
-function defaults(group?: EditableGroup): GroupInput {
+function defaults(group?: EditableGroup, prefill?: Props["prefill"]): GroupInput {
   return {
-    name: group?.name ?? "",
-    courseId: group?.courseId ?? "",
-    teacherId: group?.teacherId ?? "",
+    name: group?.name ?? prefill?.name ?? "",
+    courseId: group?.courseId ?? prefill?.courseId ?? "",
+    teacherId: group?.teacherId ?? prefill?.teacherId ?? "",
     roomId: group?.roomId ?? "",
-    days: group?.days ?? "ODD",
+    days: group?.days ?? prefill?.days ?? "ODD",
     customDays: group?.customDays ?? [],
-    startTime: group?.startTime ?? "09:00",
+    startTime: group?.startTime ?? prefill?.startTime ?? "09:00",
     durationMinutes: group?.durationMinutes ?? 90,
     startDate: group?.startDate ?? toISODate(new Date()),
     endDate: group?.endDate ?? "",
@@ -60,17 +62,17 @@ function defaults(group?: EditableGroup): GroupInput {
   };
 }
 
-export function GroupSheet({ open, onOpenChange, lookups, group }: Props) {
+export function GroupSheet({ open, onOpenChange, lookups, group, prefill }: Props) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 sm:max-w-xl">
-        {open && <GroupFormBody lookups={lookups} group={group} onDone={() => onOpenChange(false)} />}
+        {open && <GroupFormBody lookups={lookups} group={group} prefill={prefill} onDone={() => onOpenChange(false)} />}
       </SheetContent>
     </Sheet>
   );
 }
 
-function GroupFormBody({ lookups, group, onDone }: { lookups: GroupLookups; group?: EditableGroup; onDone: () => void }) {
+function GroupFormBody({ lookups, group, prefill, onDone }: { lookups: GroupLookups; group?: EditableGroup; prefill?: Props["prefill"]; onDone: () => void }) {
   const t = useTranslations("group");
   const tc = useTranslations("common");
   const tv = useTranslations("validation");
@@ -87,7 +89,7 @@ function GroupFormBody({ lookups, group, onDone }: { lookups: GroupLookups; grou
     setValue,
     watch,
     formState: { errors, dirtyFields },
-  } = useForm<GroupInput, unknown, GroupOutput>({ resolver: zodResolver(groupSchema), defaultValues: defaults(group) });
+  } = useForm<GroupInput, unknown, GroupOutput>({ resolver: zodResolver(groupSchema), defaultValues: defaults(group, prefill) });
 
   const days = watch("days");
   const errText = (msg?: string) => (msg ? (tv.has(msg as "required") ? tv(msg as "required") : tv("invalid")) : undefined);
