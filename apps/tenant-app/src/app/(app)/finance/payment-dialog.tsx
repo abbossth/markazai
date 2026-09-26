@@ -62,14 +62,14 @@ function PaymentForm({ student: initial, today, onDone }: { student?: PayStudent
   });
   const errText = (msg?: string) => (msg ? (tv.has(msg as "required") ? tv(msg as "required") : tv("invalid")) : undefined);
 
-  // Talaba qidiruvi (250ms debounce), natijalar server action'dan.
+  // Talaba ro'yxati/qidiruvi: bo'sh so'rovda darhol ro'yxat, yozilganda 250ms debounce bilan filtr.
   useEffect(() => {
-    if (student || q.trim().length < 2) return;
+    if (student) return;
     let cancelled = false;
     const id = setTimeout(async () => {
       const found = await searchStudentsForPayment(q);
       if (!cancelled) setResults(found);
-    }, 250);
+    }, q.trim() ? 250 : 0);
     return () => {
       cancelled = true;
       clearTimeout(id);
@@ -96,7 +96,7 @@ function PaymentForm({ student: initial, today, onDone }: { student?: PayStudent
       } else toast.error(res.error === "forbidden" ? tc("forbidden") : tc("error"));
     });
 
-  const shown = student || q.trim().length < 2 ? [] : results;
+  const shown = student ? [] : results;
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4" noValidate>
@@ -125,11 +125,14 @@ function PaymentForm({ student: initial, today, onDone }: { student?: PayStudent
           <div className="flex flex-col gap-1">
             <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("searchStudent")} autoFocus />
             {shown.length > 0 && (
-              <ul className="max-h-44 divide-y overflow-auto rounded-lg border">
+              <ul className="max-h-60 divide-y overflow-auto rounded-lg border">
                 {shown.map((s) => (
                   <li key={s.id}>
                     <button type="button" className="hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-left text-sm" onClick={() => pick(s)}>
-                      <span>{s.name}</span>
+                      <span className="flex min-w-0 flex-col">
+                        <span className="truncate">{s.name}</span>
+                        {s.phone && <span className="text-muted-foreground text-xs">{formatPhone(s.phone)}</span>}
+                      </span>
                       <Money value={s.balance} className="text-xs" />
                     </button>
                   </li>

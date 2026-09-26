@@ -107,18 +107,21 @@ export async function markReceiptPrinted(id: string): Promise<Result> {
 }
 
 /** To'lov dialogi uchun talaba qidiruvi: ism/telefon bo'yicha, balans va guruhlari bilan. */
+/** To'lov oynasidagi talaba qidiruvi. Bo'sh so'rov — ro'yxat (nom bo'yicha dastlabki 30 ta), matn — filtr. */
 export async function searchStudentsForPayment(q: string) {
   const user = await guard("payments:write");
   if (!user) return [];
-  const term = q.trim();
-  if (term.length < 2) return [];
+  const term = q.trim().slice(0, 60);
   const digits = term.replace(/\D/g, "");
 
   const students = await prisma.student.findMany({
-    where: { organizationId: user.orgId, OR: [{ name: { contains: term, mode: "insensitive" } }, ...(digits.length >= 2 ? [{ phone: { contains: digits } }] : [])] },
+    where: {
+      organizationId: user.orgId,
+      ...(term && { OR: [{ name: { contains: term, mode: "insensitive" as const } }, ...(digits.length >= 2 ? [{ phone: { contains: digits } }] : [])] }),
+    },
     select: { id: true, name: true, phone: true, balance: true, enrollments: { where: { leftAt: null }, select: { group: { select: { id: true, name: true } } } } },
     orderBy: { name: "asc" },
-    take: 8,
+    take: 30,
   });
   return students.map((s) => ({ id: s.id, name: s.name, phone: s.phone, balance: s.balance, groups: s.enrollments.map((e) => e.group) }));
 }
