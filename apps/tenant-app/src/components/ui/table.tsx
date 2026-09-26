@@ -7,11 +7,12 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      className="relative w-full overflow-x-auto py-1.5"
     >
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
+        // Birinchi/oxirgi katak jadval chegarasiga yopishib qolmasligi uchun chetlarda qo'shimcha bo'shliq.
+        className={cn("w-full caption-bottom text-sm [&_tr>*:first-child]:pl-4 [&_tr>*:last-child]:pr-4", className)}
         {...props}
       />
     </div>
