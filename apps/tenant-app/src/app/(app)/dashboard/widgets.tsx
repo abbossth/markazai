@@ -47,14 +47,14 @@ const METRIC_ICON: Record<string, { icon: LucideIcon; tone: "brand" | "destructi
 };
 
 /** Metrika kartochkasi: ikonka, qiymat, yorliq va (tahrirlash rejimida bo'lmasa) tegishli ro'yxatga havola. */
-export function MetricWidget({ id, metric, edit, primary }: { id: string; metric: MetricValue; edit: boolean; primary?: boolean }) {
+export function MetricWidget({ id, metric, edit }: { id: string; metric: MetricValue; edit: boolean }) {
   const t = useTranslations("dashboard");
   const isLoad = id === "centerLoad";
   const title = t(`widgets.${id}` as "widgets.groups");
   const iconInfo = METRIC_ICON[id];
   const Icon = iconInfo?.icon;
   return (
-    <div className={cn("flex h-full flex-col justify-between gap-2", primary && "-m-3 rounded-lg bg-brand-500/[0.06] p-3")}>
+    <div className="flex h-full flex-col justify-between gap-2">
       <div className="flex items-center gap-2">
         {Icon && (
           <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-md", iconInfo.tone === "destructive" ? "bg-destructive/10 text-destructive" : "bg-brand-500/10 text-brand-500")}>

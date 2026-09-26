@@ -95,7 +95,7 @@ export function DashboardGrid({ layout: initial, allowed, data }: Props) {
     const def = widgetDef(item.id);
     if (def?.kind === "metric") {
       const metric = data.metrics[item.id];
-      return metric ? <MetricWidget id={item.id} metric={metric} edit={editing} primary={item.id === "activeStudents"} /> : null;
+      return metric ? <MetricWidget id={item.id} metric={metric} edit={editing} /> : null;
     }
     if (item.id === "paymentsChart") return data.payments ? <PaymentsWidget points={data.payments} /> : null;
     if (item.id === "schedule") return data.schedule ? <ScheduleWidget groups={data.schedule} /> : null;
