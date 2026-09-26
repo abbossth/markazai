@@ -3,7 +3,7 @@ import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { AppFooter } from "@/components/layout/app-footer";
 import { SubscriptionBanner } from "@/components/layout/subscription-banner";
-import { prisma } from "@markazai/db";
+import { prisma, withTenant } from "@markazai/db";
 import { canAccess } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
 import { currentTenant } from "@/lib/tenant";
@@ -16,8 +16,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Proxy — birinchi to'siq, bu — haqiqiy tekshiruv (bazadagi joriy rollar va faollik bilan).
   const user = await requireUser();
   const [account, reminders, tenant] = await Promise.all([
-    prisma.user.findUnique({ where: { id: user.id }, select: { phone: true, photoUrl: true } }),
-    loadMyReminders(user),
+    withTenant(user.orgId, () => prisma.user.findUnique({ where: { id: user.id }, select: { phone: true, photoUrl: true } })),
+    withTenant(user.orgId, () => loadMyReminders(user)),
     currentTenant(),
   ]);
 

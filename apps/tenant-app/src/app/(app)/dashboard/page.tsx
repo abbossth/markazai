@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
+import { withTenant } from "@markazai/db";
 import { ChartSkeleton, StatGridSkeleton } from "@/components/shared/skeletons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { can } from "@/lib/permissions";
@@ -32,7 +33,9 @@ export default async function DashboardPage() {
 }
 
 async function DashboardData({ user }: { user: SessionUser }) {
-  const [layout, data] = await Promise.all([loadLayout(user), loadDashboard(user)]);
+  // Tashkilot kontekstini SHU YERDA aniq beramiz: Suspense ichida (alohida, kechroq oqimda) bajariladigan so'rovlar
+  // ba'zan kontekstni yo'qotib, RLS sababli JIM bo'sh natija (0 tushum, bo'sh jadval) qaytarardi.
+  const [layout, data] = await withTenant(user.orgId, () => Promise.all([loadLayout(user), loadDashboard(user)]));
   return <DashboardGrid layout={layout} allowed={[...allowedWidgetIds(user)]} data={data} canManageCapacity={can(user.roles, "settings:manage")} />;
 }
 
