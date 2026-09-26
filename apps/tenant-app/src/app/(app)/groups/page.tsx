@@ -46,7 +46,10 @@ export default async function GroupsPage({ searchParams }: PageProps<"/groups">)
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
+      <div className="flex items-baseline gap-3">
+        <h1 className="text-2xl font-semibold">{t("title")}</h1>
+        <span className="text-muted-foreground text-sm">{t("countLabel", { count: total })}</span>
+      </div>
       <FilterBar searchPlaceholder={t("searchPlaceholder")} fields={fields} actions={canWrite ? <NewGroupButton lookups={lookups} prefill={prefill} defaultOpen={!!prefill} /> : null} />
       <GroupsTable
         rows={rows}

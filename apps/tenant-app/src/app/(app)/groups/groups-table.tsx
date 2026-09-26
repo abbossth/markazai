@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { MoreHorizontal, Pin, PinOff, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { GROUP_STATUSES } from "@markazai/types";
 import { DataTable, type AnyColumnDef } from "@/components/data-table/data-table";
@@ -23,6 +23,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLocalSet } from "@/hooks/use-local-set";
 import { formatDate, formatMoney } from "@/lib/format";
 import { deleteGroup, setGroupStatus } from "./actions";
 import { GroupSheet, type EditableGroup } from "./group-form";
@@ -63,6 +64,9 @@ export function GroupsTable({ rows, total, page, pageSize, sort, lookups, canWri
   const te = useTranslations("enums.groupStatus");
   const router = useRouter();
   const daysLabel = useDaysLabel();
+  // Mahkamlangan guruhlar (brauzerda saqlanadi) ro'yxatning tepasida turadi.
+  const [pinned, togglePin] = useLocalSet("markazai.pinnedGroups");
+  const data = useMemo(() => [...rows].sort((a, b) => Number(pinned.has(b.id)) - Number(pinned.has(a.id))), [rows, pinned]);
   const [editing, setEditing] = useState<GroupRow | null>(null);
   const [deleting, setDeleting] = useState<GroupRow | null>(null);
   const [pending, startTransition] = useTransition();
@@ -94,12 +98,20 @@ export function GroupsTable({ rows, total, page, pageSize, sort, lookups, canWri
   const columns = useMemo<AnyColumnDef<GroupRow>[]>(
     () => [
       {
+        id: "no",
+        header: "№",
+        enableHiding: false,
+        meta: { className: "w-8 text-muted-foreground text-xs tabular-nums" },
+        cell: ({ row }) => (page - 1) * pageSize + row.index + 1,
+      },
+      {
         id: "name",
         header: t("name"),
         meta: { sortKey: "name", label: t("name") },
         cell: ({ row }) => (
           <div className="flex flex-col gap-1">
-            <Link href={`/groups/${row.original.id}`} className="font-medium hover:underline">
+            <Link href={`/groups/${row.original.id}`} className="inline-flex items-center gap-1.5 font-medium hover:underline">
+              {pinned.has(row.original.id) && <Pin className="text-brand-500 size-3.5 shrink-0" aria-label={t("pinned")} />}
               {row.original.name}
             </Link>
             <GroupStatusBadge status={row.original.status} />
@@ -145,14 +157,21 @@ export function GroupsTable({ rows, total, page, pageSize, sort, lookups, canWri
         meta: { label: t("elapsed") },
         cell: ({ row }) => {
           const { progress, daysElapsed } = row.original;
-          return progress === null ? (
-            <span className="text-xs">{t("daysCount", { count: daysElapsed })}</span>
-          ) : (
-            <div className="flex w-24 flex-col gap-1">
-              <div className="bg-muted h-1.5 overflow-hidden rounded-full">
-                <div className="bg-primary h-full" style={{ width: `${progress}%` }} />
-              </div>
-              <span className="text-muted-foreground text-xs">{progress}%</span>
+          // "2 oy 3 hafta" ko'rinishi: to'liq oylar, qolgan kunlardan haftalar (oy = 30 kun).
+          const months = Math.floor(daysElapsed / 30);
+          const weeks = Math.floor((daysElapsed % 30) / 7);
+          const text = months || weeks ? [months ? t("elapsedMonths", { count: months }) : "", weeks ? t("elapsedWeeks", { count: weeks }) : ""].filter(Boolean).join(" ") : t("daysCount", { count: daysElapsed });
+          return (
+            <div className="flex w-28 flex-col gap-1">
+              {progress !== null && (
+                <div className="bg-muted h-1.5 overflow-hidden rounded-full">
+                  <div className="bg-primary h-full" style={{ width: `${progress}%` }} />
+                </div>
+              )}
+              <span className="text-xs whitespace-nowrap">
+                {text}
+                {progress !== null && <span className="text-muted-foreground"> · {progress}%</span>}
+              </span>
             </div>
           );
         },
@@ -207,6 +226,9 @@ export function GroupsTable({ rows, total, page, pageSize, sort, lookups, canWri
               <MoreHorizontal className="size-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => togglePin(row.original.id)}>
+                {pinned.has(row.original.id) ? <PinOff /> : <Pin />} {pinned.has(row.original.id) ? t("unpin") : t("pin")}
+              </DropdownMenuItem>
               <DropdownMenuItem render={<Link href={`/groups/${row.original.id}`} />}>{t("open")}</DropdownMenuItem>
               {canWrite && (
                 <>
@@ -236,12 +258,12 @@ export function GroupsTable({ rows, total, page, pageSize, sort, lookups, canWri
         ),
       },
     ],
-    [t, tc, te, daysLabel, canWrite, canDelete, changeStatus],
+    [t, tc, te, daysLabel, canWrite, canDelete, changeStatus, page, pageSize, pinned, togglePin],
   );
 
   return (
     <>
-      <DataTable columns={columns} data={rows} total={total} page={page} pageSize={pageSize} sort={sort} getRowId={(r) => r.id} storageKey="groups" />
+      <DataTable columns={columns} data={data} total={total} page={page} pageSize={pageSize} sort={sort} getRowId={(r) => r.id} storageKey="groups" />
 
       {editing && <GroupSheet open onOpenChange={(o) => !o && setEditing(null)} lookups={lookups} group={toEditable(editing, lookups)} />}
 

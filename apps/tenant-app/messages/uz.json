@@ -523,7 +523,13 @@
       "fileUrl": "Fayl havolasi (ixtiyoriy)",
       "open": "Ochish"
     },
-    "reminders": "Eslatma"
+    "reminders": "Eslatma",
+    "elapsedMonths": "{count} oy",
+    "elapsedWeeks": "{count} hafta",
+    "pin": "Mahkamlash",
+    "unpin": "Mahkamlashni bekor qilish",
+    "pinned": "Mahkamlangan",
+    "countLabel": "Soni: {count}"
   },
   "lead": {
     "title": "Lidlar",

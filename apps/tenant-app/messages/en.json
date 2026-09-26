@@ -523,7 +523,13 @@
       "fileUrl": "File link (optional)",
       "open": "Open"
     },
-    "reminders": "Reminders"
+    "reminders": "Reminders",
+    "elapsedMonths": "{count} mo",
+    "elapsedWeeks": "{count} wk",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "pinned": "Pinned",
+    "countLabel": "Total: {count}"
   },
   "lead": {
     "title": "Leads",

@@ -523,7 +523,13 @@
       "fileUrl": "Ссылка на файл (необязательно)",
       "open": "Открыть"
     },
-    "reminders": "Напоминания"
+    "reminders": "Напоминания",
+    "elapsedMonths": "{count} мес.",
+    "elapsedWeeks": "{count} нед.",
+    "pin": "Закрепить",
+    "unpin": "Открепить",
+    "pinned": "Закреплена",
+    "countLabel": "Всего: {count}"
   },
   "lead": {
     "title": "Лиды",
