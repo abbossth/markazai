@@ -18,11 +18,15 @@ function createAppClient() {
   if (!url && process.env.NODE_ENV === "production") throw new Error("APP_DATABASE_URL o'rnatilmagan: production'da RLS'siz ishga tushmaydi");
   const connectionString = url ?? process.env.DATABASE_URL;
   if (!connectionString) throw new Error("APP_DATABASE_URL / DATABASE_URL o'rnatilmagan");
-  // `max` sukut bo'yicha 10 edi: pool to'lib qolsa, `TenantPool.connect()` ichki navbatda kutadi va o'sha
-  // navbatdan bo'shagan payt kontekst (enterWith orqali o'rnatilgan) ba'zan yo'qolib qolgan (productionda
-  // vaqti-vaqti bilan "hasAccount: false" — user o'ziniki RLS ostida "yo'q" bo'lib chiqishi sifatida kuzatilgan).
-  // Neon'ning pooled endpoint'i (`-pooler`) buni bemalol ko'taradi, shuning uchun bu yerda oshirish xavfsiz.
-  return new PrismaClient({ adapter: new PrismaPg(new TenantPool({ connectionString, max: 25, idleTimeoutMillis: 30_000 }) as unknown as pg.Pool) });
+  // MUHIM: `TenantPool` tashkilotni SESSIYA darajasida (`set_config(..., false)`) o'rnatadi. Bu faqat har ulanish
+  // o'ziga xos (dedicated) bo'lganda ishonchli. Neon'ning POOLED endpoint'i (`-pooler`, PgBouncer transaction
+  // rejimi) so'rovlarni turli backend ulanishlarga taqsimlaydi — o'rnatilgan `app.current_org` keyingi so'rovda yo'q
+  // bo'ladi va RLS JIMGINA bo'sh natija beradi (login "xato", `hasAccount: false`, 0 tushum, bo'sh jadval).
+  // Shuning uchun APP_DATABASE_URL — to'g'ridan-to'g'ri (NON-pooled) endpoint bo'lishi kerak (hostda `-pooler` yo'q).
+  // To'g'ridan-to'g'ri ulanishlar soni cheklangan, shu sabab har instansiya pool'i kichik (DB_POOL_MAX bilan sozlanadi).
+  if (/-pooler[.-]/.test(connectionString)) console.warn("[db] APP_DATABASE_URL pooled (-pooler) endpoint'ga qaraydi: RLS kontekstini yo'qotishi mumkin. To'g'ridan-to'g'ri endpoint ishlating.");
+  const max = Number(process.env.DB_POOL_MAX) || 8;
+  return new PrismaClient({ adapter: new PrismaPg(new TenantPool({ connectionString, max, idleTimeoutMillis: 10_000 }) as unknown as pg.Pool) });
 }
 
 /**
