@@ -708,7 +708,8 @@
       "date": "Date",
       "comment": "Note",
       "recorded": "Payment received",
-      "printReceipt": "Print receipt"
+      "printReceipt": "Print receipt",
+      "quick": "Payment"
     },
     "receipt": {
       "title": "Payment receipt",

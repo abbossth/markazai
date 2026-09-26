@@ -3,6 +3,7 @@
 import { canAddWithinPlan } from "@/lib/plan";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@markazai/db";
+import { loadStudentLookups } from "./queries";
 import {
   fromISODate,
   studentSchema,
@@ -281,4 +282,12 @@ export async function deleteStudent(id: string): Promise<Result> {
   await prisma.student.delete({ where: { id } });
   revalidatePath("/students");
   return { ok: true };
+}
+
+/** Sarlavhadagi "Yangi talaba" tez qo'shish formasi uchun teg va guruhlar (faqat forma ochilganda yuklanadi). */
+export async function loadQuickStudentLookups() {
+  const user = await guard("students:write");
+  if (!user) return null;
+  const { tags, groups } = await loadStudentLookups(user);
+  return { tags, groups };
 }

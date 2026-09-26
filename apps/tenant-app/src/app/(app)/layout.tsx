@@ -4,7 +4,8 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { AppFooter } from "@/components/layout/app-footer";
 import { SubscriptionBanner } from "@/components/layout/subscription-banner";
 import { prisma, withTenant } from "@markazai/db";
-import { canAccess } from "@/lib/permissions";
+import { toCenterParts } from "@markazai/types";
+import { can, canAccess } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
 import { currentTenant } from "@/lib/tenant";
 import { loadMyReminders } from "./reminders/queries";
@@ -27,7 +28,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Obuna eslatmasi — faqat Sozlamalarni ko'ra oladigan (rahbariyat/administrator) rollarga ko'rsatiladi. */}
         <SubscriptionBanner tenant={canAccess(user.roles, "settings") ? tenant : null} />
-        <Header user={{ name: user.name, phone: account?.phone ?? "", image: account?.photoUrl ?? null, roles: user.roles }} reminders={reminders} />
+        <Header user={{ name: user.name, phone: account?.phone ?? "", image: account?.photoUrl ?? null, roles: user.roles }} reminders={reminders} quick={{ canStudent: can(user.roles, "students:write"), canPayment: can(user.roles, "payments:write"), today: toCenterParts(new Date()).date }} />
         <main className="bg-muted/30 flex-1 overflow-auto p-6 print:overflow-visible print:p-0">{children}</main>
         <AppFooter chargeMode={tenant?.chargeMode ?? "DAILY"} />
       </div>

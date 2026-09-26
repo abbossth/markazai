@@ -708,7 +708,8 @@
       "date": "Дата",
       "comment": "Комментарий",
       "recorded": "Платёж принят",
-      "printReceipt": "Печать чека"
+      "printReceipt": "Печать чека",
+      "quick": "Платёж"
     },
     "receipt": {
       "title": "Чек об оплате",

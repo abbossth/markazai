@@ -708,7 +708,8 @@
       "date": "Sana",
       "comment": "Izoh",
       "recorded": "To'lov qabul qilindi",
-      "printReceipt": "Chek chop etish"
+      "printReceipt": "Chek chop etish",
+      "quick": "To'lov"
     },
     "receipt": {
       "title": "To'lov cheki",
