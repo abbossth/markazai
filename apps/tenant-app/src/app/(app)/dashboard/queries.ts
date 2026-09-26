@@ -2,6 +2,7 @@ import { prisma, type Prisma } from "@markazai/db";
 import {
   TRIAL_DAYS,
   WIDGETS,
+  buildDailyTrend,
   buildMonthlyTrend,
   daysLeft,
   defaultLayout,
@@ -24,8 +25,8 @@ export function allowedWidgetIds(user: SessionUser): Set<string> {
 
 export type MetricValue = {
   value: number | null;
-  /** "centerLoad" uchun: joylashtirilgan o'quvchilar va jami sig'im. */
-  of?: { students: number; capacity: number };
+  /** "centerLoad" uchun: joylashtirilgan o'quvchilar va jami sig'im. `capacity: null` — hali kiritilmagan. */
+  of?: { students: number; capacity: number | null };
   href: string;
 };
 
@@ -45,11 +46,14 @@ export type ScheduleGroup = {
   daysLeft: number | null;
 };
 
+/** Tushum va xarajat: `key` — oylik uchun "YYYY-MM", kunlik uchun "YYYY-MM-DD". */
+export type TrendPoint = { key: string; revenue: number; expenses: number };
+
 export type DashboardData = {
   generatedAt: string;
   today: string;
   metrics: Record<string, MetricValue>;
-  payments: { key: string; revenue: number }[] | null;
+  payments: { monthly: TrendPoint[]; daily: TrendPoint[] } | null;
   schedule: ScheduleGroup[] | null;
 };
 
@@ -85,7 +89,7 @@ export async function loadDashboard(user: SessionUser): Promise<DashboardData> {
   const chartFrom = `${chartFromY}-${String(chartFromM).padStart(2, "0")}-01`;
   const chartRange = { gte: fromISODate(chartFrom), lte: fromISODate(today) };
 
-  const [activeStudents, groups, debtors, activeLeads, trial, paidThisMonth, leftActiveGroup, trialStudents, loadGroups, paymentRows, scheduleGroups] = await Promise.all([
+  const [activeStudents, groups, debtors, activeLeads, trial, paidThisMonth, leftActiveGroup, trialStudents, loadStudents, centerCapacity, paymentRows, expenseRows, scheduleGroups] = await Promise.all([
     has("activeStudents") ? prisma.student.count({ where: { organizationId: org, status: "ACTIVE", ...studentScope } }) : null,
     has("groups") ? prisma.group.count({ where: { organizationId: org, status: "ACTIVE", ...groupScope } }) : null,
     has("debtors") ? prisma.student.count({ where: { organizationId: org, balance: { lt: 0 } } }) : null,
@@ -101,10 +105,12 @@ export async function loadDashboard(user: SessionUser): Promise<DashboardData> {
           select: { enrollments: { where: { leftAt: null, ...(teacherId && { group: { teacherId } }) }, select: { joinedAt: true } } },
         })
       : null,
-    has("centerLoad")
-      ? prisma.group.findMany({ where: { organizationId: org, status: "ACTIVE", roomId: { not: null }, ...groupScope }, select: { room: { select: { capacity: true } }, _count: { select: { enrollments: { where: { leftAt: null } } } } } })
-      : null,
+    // Sig'im endi xonalardan emas, qo'lda kiritilgan qiymatdan olinadi (Sozlash → "Sig'imni kiritish") — shu
+    // sabab bu yerda faqat FAOL o'quvchilar soni kerak, xona/sig'imi bo'lmagan guruhlar ham hisoblanadi.
+    has("centerLoad") ? prisma.groupStudent.count({ where: { organizationId: org, leftAt: null, group: { status: "ACTIVE", ...groupScope } } }) : null,
+    has("centerLoad") ? prisma.centerSettings.findUnique({ where: { organizationId: org }, select: { capacity: true } }) : null,
     has("paymentsChart") ? prisma.payment.groupBy({ by: ["date"], where: { organizationId: org, type: "MANUAL", date: chartRange }, _sum: { amount: true } }) : null,
+    has("paymentsChart") ? prisma.expense.groupBy({ by: ["date"], where: { organizationId: org, date: chartRange }, _sum: { amount: true } }) : null,
     has("schedule")
       ? prisma.group.findMany({
           where: { organizationId: org, status: "ACTIVE", ...groupScope },
@@ -131,17 +137,16 @@ export async function loadDashboard(user: SessionUser): Promise<DashboardData> {
   set("paidThisMonth", paidThisMonth ? paidThisMonth.length : null, "/students?finance=paidThisMonth");
   set("leftActiveGroup", leftActiveGroup, "/students?status=LEFT_ACTIVE_GROUP");
   set("trialOverdue", trialStudents ? trialStudents.filter((s) => s.enrollments.some((e) => isTrialOverdue(toISODate(e.joinedAt), today, TRIAL_DAYS))).length : null, "/students?status=TRIAL");
-  if (loadGroups) {
-    const students = loadGroups.reduce((n, g) => n + g._count.enrollments, 0);
-    const capacity = loadGroups.reduce((n, g) => n + (g.room?.capacity ?? 0), 0);
-    set("centerLoad", loadPercent(students, capacity), "/groups?status=ACTIVE", { students, capacity });
+  if (loadStudents !== null) {
+    const capacity = centerCapacity?.capacity ?? null;
+    set("centerLoad", capacity ? loadPercent(loadStudents, capacity) : null, "/groups?status=ACTIVE", { students: loadStudents, capacity });
   }
 
   return {
     generatedAt: new Date().toISOString(),
     today,
     metrics,
-    payments: paymentRows ? buildMonthlyTrend(chartFrom, today, new Map(paymentRows.map((p) => [toISODate(p.date), p._sum.amount ?? 0]))) : null,
+    payments: paymentRows && expenseRows ? buildPaymentsTrend(paymentRows, expenseRows, chartFrom, monthStart, today) : null,
     schedule: scheduleGroups
       ? scheduleGroups.map((g) => ({
           id: g.id,
@@ -159,5 +164,24 @@ export async function loadDashboard(user: SessionUser): Promise<DashboardData> {
           daysLeft: daysLeft(g.endDate ? toISODate(g.endDate) : null, today),
         }))
       : null,
+  };
+}
+
+/** 6 oylik (oylik nuqtalar) va joriy oy (kunlik nuqtalar) tushum/xarajat; ma'lumot bo'lmasa ham nollar bilan to'liq qator. */
+function buildPaymentsTrend(
+  payments: { date: Date; _sum: { amount: number | null } }[],
+  expenses: { date: Date; _sum: { amount: number | null } }[],
+  chartFrom: string,
+  monthStart: string,
+  today: string,
+): { monthly: TrendPoint[]; daily: TrendPoint[] } {
+  const toMap = (rows: typeof payments) => new Map(rows.map((r) => [toISODate(r.date), r._sum.amount ?? 0]));
+  const rev = toMap(payments);
+  const exp = toMap(expenses);
+  const revMonths = buildMonthlyTrend(chartFrom, today, rev);
+  const expMonths = buildMonthlyTrend(chartFrom, today, exp);
+  return {
+    monthly: revMonths.map((m, i) => ({ key: m.key, revenue: m.revenue, expenses: expMonths[i]?.revenue ?? 0 })),
+    daily: buildDailyTrend(monthStart, today, rev, exp).map((d) => ({ key: d.date, revenue: d.revenue, expenses: d.expenses })),
   };
 }

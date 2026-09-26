@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { ChartSkeleton, StatGridSkeleton } from "@/components/shared/skeletons";
 import { Skeleton } from "@/components/ui/skeleton";
+import { can } from "@/lib/permissions";
 import { requireModule, type SessionUser } from "@/lib/session";
 import { DashboardGrid } from "./dashboard-grid";
 import { allowedWidgetIds, loadDashboard, loadLayout } from "./queries";
@@ -32,7 +33,7 @@ export default async function DashboardPage() {
 
 async function DashboardData({ user }: { user: SessionUser }) {
   const [layout, data] = await Promise.all([loadLayout(user), loadDashboard(user)]);
-  return <DashboardGrid layout={layout} allowed={[...allowedWidgetIds(user)]} data={data} />;
+  return <DashboardGrid layout={layout} allowed={[...allowedWidgetIds(user)]} data={data} canManageCapacity={can(user.roles, "settings:manage")} />;
 }
 
 function DashboardDataSkeleton() {

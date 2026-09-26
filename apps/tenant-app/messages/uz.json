@@ -105,7 +105,7 @@
       "leftActiveGroup": "Faol guruhni tark etganlar",
       "trialOverdue": "Sinov muddatidan kechganlar",
       "centerLoad": "Markaz yuklamasi",
-      "paymentsChart": "So'nggi 6 oy to'lovlari",
+      "paymentsChart": "Tushum va xarajat",
       "schedule": "Dars jadvali"
     },
     "schedule": {
@@ -127,7 +127,9 @@
     "enterCapacity": "Sig'imni kiritish",
     "capacityDialogTitle": "Sig'im",
     "capacityFieldLabel": "Sig'im (o'rinlar)",
-    "capacityFieldHint": "Markaz bir vaqtda nechta o'quvchini o'qita oladi (ikki guruhdagi o'quvchi 2 o'rin egallaydi). Bo'sh — yuklama ko'rsatilmaydi."
+    "capacityFieldHint": "Markaz bir vaqtda nechta o'quvchini o'qita oladi (ikki guruhdagi o'quvchi 2 o'rin egallaydi). Bo'sh — yuklama ko'rsatilmaydi.",
+    "rangeMonthly": "Oylik",
+    "rangeDaily": "Kunlik"
   },
   "table": {
     "columns": "Ustunlar",

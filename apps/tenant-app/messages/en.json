@@ -105,7 +105,7 @@
       "leftActiveGroup": "Left an active group",
       "trialOverdue": "Trial period overdue",
       "centerLoad": "Center load",
-      "paymentsChart": "Payments over the last 6 months",
+      "paymentsChart": "Revenue and expenses",
       "schedule": "Class schedule"
     },
     "schedule": {
@@ -127,7 +127,9 @@
     "enterCapacity": "Enter capacity",
     "capacityDialogTitle": "Capacity",
     "capacityFieldLabel": "Capacity (seats)",
-    "capacityFieldHint": "How many students the center can teach at once (a student in two groups takes 2 seats). Empty — load is not shown."
+    "capacityFieldHint": "How many students the center can teach at once (a student in two groups takes 2 seats). Empty — load is not shown.",
+    "rangeMonthly": "Monthly",
+    "rangeDaily": "Daily"
   },
   "table": {
     "columns": "Columns",

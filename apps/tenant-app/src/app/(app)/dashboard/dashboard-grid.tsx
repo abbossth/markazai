@@ -22,7 +22,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { cn } from "@/lib/utils";
 import { resetDashboardLayout, saveDashboardLayout } from "./actions";
 import type { DashboardData } from "./queries";
-import { MetricWidget, PaymentsWidget, ScheduleWidget } from "./widgets";
+import { CenterLoadWidget, MetricWidget, PaymentsWidget, ScheduleWidget } from "./widgets";
 
 // Tailwind to'liq sinf nomlarini ko'rishi uchun har bir o'lcham alohida yozilgan.
 const SPAN: Record<WidgetSize, string> = {
@@ -33,13 +33,13 @@ const SPAN: Record<WidgetSize, string> = {
   XL: "sm:col-span-2 xl:col-span-5",
 };
 
-type Props = { layout: LayoutItem[]; allowed: string[]; data: DashboardData };
+type Props = { layout: LayoutItem[]; allowed: string[]; data: DashboardData; canManageCapacity: boolean };
 
 /**
  * Vidjetlar to'ri. "Sozlash" rejimida: sudrab tartiblash (tutqich yoki klaviatura), o'lcham (S/M/L/XL),
  * olib tashlash va "Vidjet qo'shish". Tartib foydalanuvchi bo'yicha saqlanadi.
  */
-export function DashboardGrid({ layout: initial, allowed, data }: Props) {
+export function DashboardGrid({ layout: initial, allowed, data, canManageCapacity }: Props) {
   const t = useTranslations("dashboard");
   const tc = useTranslations("common");
   const router = useRouter();
@@ -93,11 +93,15 @@ export function DashboardGrid({ layout: initial, allowed, data }: Props) {
 
   const renderWidget = (item: LayoutItem) => {
     const def = widgetDef(item.id);
+    if (item.id === "centerLoad") {
+      const metric = data.metrics.centerLoad;
+      return metric ? <CenterLoadWidget metric={metric} edit={editing} canManage={canManageCapacity} /> : null;
+    }
     if (def?.kind === "metric") {
       const metric = data.metrics[item.id];
       return metric ? <MetricWidget id={item.id} metric={metric} edit={editing} /> : null;
     }
-    if (item.id === "paymentsChart") return data.payments ? <PaymentsWidget points={data.payments} /> : null;
+    if (item.id === "paymentsChart") return data.payments ? <PaymentsWidget data={data.payments} /> : null;
     if (item.id === "schedule") return data.schedule ? <ScheduleWidget groups={data.schedule} today={data.today} /> : null;
     return null;
   };

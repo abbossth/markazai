@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import {
   AlertTriangle,
   Banknote,
@@ -22,12 +24,16 @@ import { fromISODate, isoWeekday, TIMETABLE_TABS, timeRange, timetableTab, type 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChartSkeleton } from "@/components/shared/skeletons";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/empty-state";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useDaysLabel } from "@/components/shared/days-label";
 import { useLocalPref } from "@/hooks/use-local-pref";
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { MetricValue, ScheduleGroup } from "./queries";
+import { saveCenterCapacity } from "./actions";
+import type { MetricValue, ScheduleGroup, TrendPoint } from "./queries";
 
 // recharts — alohida chunk (payments-chart.tsx), dashboard ochilganda darhol yuklanmaydi.
 const PaymentsChart = dynamic(() => import("./payments-chart"), { loading: () => <ChartSkeleton />, ssr: false });
@@ -49,7 +55,6 @@ const METRIC_ICON: Record<string, { icon: LucideIcon; tone: "brand" | "destructi
 /** Metrika kartochkasi: ikonka, qiymat, yorliq va (tahrirlash rejimida bo'lmasa) tegishli ro'yxatga havola. */
 export function MetricWidget({ id, metric, edit }: { id: string; metric: MetricValue; edit: boolean }) {
   const t = useTranslations("dashboard");
-  const isLoad = id === "centerLoad";
   const title = t(`widgets.${id}` as "widgets.groups");
   const iconInfo = METRIC_ICON[id];
   const Icon = iconInfo?.icon;
@@ -64,12 +69,7 @@ export function MetricWidget({ id, metric, edit }: { id: string; metric: MetricV
         <span className="text-muted-foreground text-xs">{title}</span>
       </div>
       <div className="flex items-baseline gap-1.5">
-        <span className="text-2xl font-semibold tabular-nums">{metric.value === null ? "—" : isLoad ? `${metric.value}%` : formatMoney(metric.value)}</span>
-        {isLoad && metric.of && (
-          <span className="text-muted-foreground text-xs tabular-nums">
-            {metric.of.students} / {metric.of.capacity}
-          </span>
-        )}
+        <span className="text-2xl font-semibold tabular-nums">{metric.value === null ? "—" : formatMoney(metric.value)}</span>
       </div>
       {/* Butun kartochka havola (tahrirlash rejimida sudrash bilan to'qnashmasligi uchun o'chiriladi). */}
       {!edit && <Link href={metric.href} className="hover:bg-muted/40 absolute inset-0 rounded-lg transition-colors" aria-label={title} />}
@@ -78,25 +78,149 @@ export function MetricWidget({ id, metric, edit }: { id: string; metric: MetricV
 }
 
 /**
- * Oy davomidagi to'lovlar (bitta seriya → legenda yo'q, sarlavha nomlaydi). Crosshair + tooltip; "Jadval" ko'rinishi bor.
- * Rang — validatsiya qilingan kategorik 1-slot (`--viz-1`).
+ * "Markaz yuklamasi": sig'im (o'rinlar) endi xonalardan avtomatik emas, qo'lda kiritiladi — kiritilmagan bo'lsa
+ * foiz o'rniga faqat faol o'quvchilar soni va "Sig'imni kiritish" tugmasi ko'rsatiladi (modme-uslubidan).
  */
-export function PaymentsWidget({ points }: { points: { key: string; revenue: number }[] }) {
+export function CenterLoadWidget({ metric, edit, canManage }: { metric: MetricValue; edit: boolean; canManage: boolean }) {
+  const t = useTranslations("dashboard");
+  const tc = useTranslations("common");
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const students = metric.of?.students ?? 0;
+  const capacity = metric.of?.capacity ?? null;
+  const iconInfo = METRIC_ICON.centerLoad;
+  const Icon = iconInfo.icon;
+
+  const save = (raw: string) => {
+    const trimmed = raw.trim();
+    const parsed = trimmed === "" ? null : Number(trimmed);
+    if (parsed !== null && (!Number.isInteger(parsed) || parsed < 0)) {
+      toast.error(tc("error"));
+      return;
+    }
+    startTransition(async () => {
+      const res = await saveCenterCapacity(parsed);
+      if (res.ok) {
+        toast.success(tc("saved"));
+        setOpen(false);
+        router.refresh();
+      } else toast.error(res.error === "forbidden" ? tc("forbidden") : tc("error"));
+    });
+  };
+
+  return (
+    <div className="flex h-full flex-col justify-between gap-2">
+      <div className="flex items-center gap-2">
+        <span className="bg-brand-500/10 text-brand-500 flex size-7 shrink-0 items-center justify-center rounded-md">
+          <Icon className="size-4" />
+        </span>
+        <span className="text-muted-foreground text-xs">{t("widgets.centerLoad")}</span>
+      </div>
+      {capacity ? (
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-2xl font-semibold tabular-nums">{metric.value}%</span>
+          <span className="text-muted-foreground text-xs tabular-nums">
+            {students} / {capacity}
+          </span>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <span className="text-2xl font-semibold tabular-nums">{students}</span>
+          {canManage && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-muted-foreground text-xs">{t("capacityHint")}</span>
+              <Button size="xs" variant="outline" disabled={edit} onClick={() => setOpen(true)}>
+                {t("enterCapacity")}
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+      {canManage && capacity && !edit && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="text-muted-foreground hover:text-foreground absolute top-2 right-2 text-xs underline-offset-2 hover:underline"
+        >
+          {t("enterCapacity")}
+        </button>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("capacityDialogTitle")}</DialogTitle>
+          </DialogHeader>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              save(new FormData(e.currentTarget).get("capacity") as string);
+            }}
+          >
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="capacity">{t("capacityFieldLabel")}</Label>
+              {/* `key` — sig'im serverdan yangilanganda (saqlangach) input o'zining ichki (uncontrolled)
+                  holatini toza qayta boshlaydi, aks holda Base UI "default qiymat init'dan keyin o'zgardi"
+                  deb ogohlantirar edi. */}
+              <Input key={capacity ?? "empty"} id="capacity" name="capacity" type="number" min={0} defaultValue={capacity ?? ""} autoFocus />
+            </div>
+            <DialogDescription>{t("capacityFieldHint")}</DialogDescription>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                {tc("cancel")}
+              </Button>
+              <Button type="submit" disabled={pending}>
+                {tc("save")}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+/**
+ * Tushum va xarajat (ikki seriya → legenda bor). Oylik (oxirgi 6 oy) va kunlik (joriy oy) ko'rinish; ma'lumot
+ * bo'lmasa ham diagramma nollar bilan ko'rinadi. "Jadval" ko'rinishi bor. Ranglar — `--viz-1` (tushum), `--viz-2` (xarajat).
+ */
+export function PaymentsWidget({ data }: { data: { monthly: TrendPoint[]; daily: TrendPoint[] } }) {
   const t = useTranslations("dashboard");
   const tf = useTranslations("finance");
   const tm = useTranslations("enums.monthsShort");
   const [view, setView] = useState<"chart" | "table">("chart");
-  // `key` — "YYYY-MM" (oylik trend). Yorliq: "Sen 26" uslubida.
-  const data = points.map((p) => ({ ...p, label: `${tm(String(Number(p.key.slice(5, 7))) as "1")} ${p.key.slice(2, 4)}` }));
-  const total = points.reduce((s, p) => s + p.revenue, 0);
+  const [range, setRange] = useState<"monthly" | "daily">("monthly");
+  const points = data[range].map((p) => ({
+    ...p,
+    // Oylik: "YYYY-MM" → "Sen 26"; kunlik: "YYYY-MM-DD" → "26".
+    label: range === "monthly" ? `${tm(String(Number(p.key.slice(5, 7))) as "1")} ${p.key.slice(2, 4)}` : String(Number(p.key.slice(8, 10))),
+    title: range === "monthly" ? `${tm(String(Number(p.key.slice(5, 7))) as "1")} ${p.key.slice(0, 4)}` : `${p.key.slice(8, 10)}.${p.key.slice(5, 7)}.${p.key.slice(0, 4)}`,
+  }));
+  const revenue = points.reduce((s, p) => s + p.revenue, 0);
+  const expenses = points.reduce((s, p) => s + p.expenses, 0);
   const units = { million: tf("unitMillion"), thousand: tf("unitThousand") };
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <span className="text-muted-foreground text-sm">{t("widgets.paymentsChart")}</span>
-        <span className="font-semibold tabular-nums">{formatMoney(total)}</span>
-        <div className="ml-auto flex gap-1">
+        <span className="flex items-center gap-1.5 text-sm">
+          <span className="size-2.5 rounded-sm" style={{ backgroundColor: "var(--viz-1)" }} aria-hidden />
+          {tf("revenue")} <span className="font-semibold tabular-nums">{formatMoney(revenue)}</span>
+        </span>
+        <span className="flex items-center gap-1.5 text-sm">
+          <span className="size-2.5 rounded-sm" style={{ backgroundColor: "var(--viz-2)" }} aria-hidden />
+          {tf("expenses")} <span className="font-semibold tabular-nums">{formatMoney(expenses)}</span>
+        </span>
+        <div className="ml-auto flex flex-wrap gap-1">
+          <Button size="xs" variant={range === "monthly" ? "secondary" : "ghost"} onClick={() => setRange("monthly")}>
+            {t("rangeMonthly")}
+          </Button>
+          <Button size="xs" variant={range === "daily" ? "secondary" : "ghost"} onClick={() => setRange("daily")}>
+            {t("rangeDaily")}
+          </Button>
           <Button size="xs" variant={view === "chart" ? "secondary" : "ghost"} onClick={() => setView("chart")}>
             {tf("viewChart")}
           </Button>
@@ -105,18 +229,24 @@ export function PaymentsWidget({ points }: { points: { key: string; revenue: num
           </Button>
         </div>
       </div>
-      {total === 0 ? (
-        <p className="text-muted-foreground py-8 text-center text-sm">{tf("trendEmpty")}</p>
-      ) : view === "chart" ? (
-        <PaymentsChart data={data} units={units} label={t("widgets.paymentsChart")} />
+      {view === "chart" ? (
+        <PaymentsChart data={points} units={units} labels={{ revenue: tf("revenue"), expenses: tf("expenses") }} />
       ) : (
         <div className="max-h-56 overflow-auto">
           <table className="w-full text-sm">
+            <thead>
+              <tr className="text-muted-foreground text-xs">
+                <th className="py-1 text-left font-normal" />
+                <th className="py-1 text-right font-normal">{tf("revenue")}</th>
+                <th className="py-1 text-right font-normal">{tf("expenses")}</th>
+              </tr>
+            </thead>
             <tbody>
-              {data.filter((p) => p.revenue > 0).map((p) => (
-                <tr key={p.key} className="border-t first:border-0">
-                  <td className="py-1">{p.label}</td>
+              {points.map((p) => (
+                <tr key={p.key} className="border-t">
+                  <td className="py-1">{p.title}</td>
                   <td className="py-1 text-right tabular-nums">{formatMoney(p.revenue)}</td>
+                  <td className="py-1 text-right tabular-nums">{formatMoney(p.expenses)}</td>
                 </tr>
               ))}
             </tbody>
@@ -267,16 +397,16 @@ export function ScheduleWidget({ groups, today }: { groups: ScheduleGroup[]; tod
       {shown.length === 0 ? (
         <EmptyState title={t("empty")} />
       ) : horizontal ? (
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full border-separate border-spacing-0 text-sm">
+        <div className="overflow-x-auto pb-4">
+          <table className="w-full rounded-lg border border-separate border-spacing-0 text-sm">
             <thead>
               <tr>
-                <th className="bg-muted/60 text-muted-foreground sticky left-0 z-10 w-16 border-b p-2 text-left text-xs font-normal">{t("room")}</th>
+                <th className="bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))] text-muted-foreground sticky left-0 z-10 w-16 border-b p-2 text-left text-xs font-normal">{t("room")}</th>
                 {slotMinutes.map((m, i) => (
                   <th
                     key={m}
                     className={cn(
-                      "bg-muted/60 text-muted-foreground min-w-20 border-b border-l p-2 text-left text-xs font-normal tabular-nums",
+                      "bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))] text-muted-foreground min-w-20 border-b border-l p-2 text-left text-xs font-normal tabular-nums",
                       m % 60 === 0 && "text-foreground border-l-border/80 border-l-2 font-medium",
                       isTimeJump(i) && "border-l-2 border-dashed border-l-amber-500",
                     )}
@@ -309,13 +439,13 @@ export function ScheduleWidget({ groups, today }: { groups: ScheduleGroup[]; tod
           </table>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full border-separate border-spacing-0 text-sm">
+        <div className="overflow-x-auto pb-4">
+          <table className="w-full rounded-lg border border-separate border-spacing-0 text-sm">
             <thead>
               <tr>
-                <th className="bg-muted/60 text-muted-foreground sticky left-0 z-10 w-16 border-b p-2 text-left text-xs font-normal">{t("time")}</th>
+                <th className="bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))] text-muted-foreground sticky left-0 z-10 w-16 border-b p-2 text-left text-xs font-normal">{t("time")}</th>
                 {cols.map((c) => (
-                  <th key={c || "none"} className="bg-muted/60 min-w-44 border-b border-l p-2 text-left text-xs font-medium">
+                  <th key={c || "none"} className="bg-[color-mix(in_srgb,var(--muted)_60%,var(--card))] min-w-44 border-b border-l p-2 text-left text-xs font-medium">
                     {c || t("noRoom")}
                   </th>
                 ))}

@@ -111,6 +111,9 @@ model CenterSettings {
   receiptShowCashier   Boolean  @default(true) @map("receipt_show_cashier")
   // Gamifikatsiya: har bir "keldi" dars uchun beriladigan coin (0 — faqat qo'lda beriladi).
   coinsPerLesson       Int      @default(1) @map("coins_per_lesson")
+  // Markaz bir vaqtda nechta o'quvchini o'qita oladi (dashboard "Markaz yuklamasi"); qo'lda kiritiladi —
+  // xonalar sig'imidan avtomatik hisoblanmaydi. NULL — yuklama ko'rsatilmaydi.
+  capacity             Int?
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
